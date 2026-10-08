@@ -8,3 +8,7 @@ spring:
 app:
   upload:
     dir: ${user.home}/dev-tools/dev-resource/figure-preorder-ledger/uploads
+  cors:
+    allowed-origins: [http://localhost:5173]
+  dev:
+    user-id: 1

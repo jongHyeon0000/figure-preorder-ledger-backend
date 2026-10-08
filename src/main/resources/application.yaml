@@ -9,6 +9,9 @@ spring:
     multipart:
       max-file-size: ${app.upload.max-size}
       max-request-size: ${app.upload.max-size}
+  web:
+    locale: ko_KR
+    locale-resolver: fixed
 
 app:
   upload:
@@ -16,5 +19,7 @@ app:
     allowed-extensions: [jpg, jpeg, png, gif, webp]
 
 mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.jong.figurepreorderledgerbackend.vo
   configuration:
     map-underscore-to-camel-case: true
