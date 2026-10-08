@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: figure-preorder-ledger-backend
+  profiles:
+    default: local
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
