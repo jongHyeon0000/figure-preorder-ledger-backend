@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.series.SeriesGroupMapper">
+
+    <select id="selectAll" resultType="SeriesGroupResponse">
+        SELECT id, name
+        FROM series_group
+        WHERE user_id = #{userId}
+        ORDER BY id
+    </select>
+
+    <select id="selectById" resultType="SeriesGroupResponse">
+        SELECT id, name
+        FROM series_group
+        WHERE user_id = #{userId} AND id = #{id}
+    </select>
+
+    <select id="selectByName" resultType="SeriesGroupResponse">
+        SELECT id, name
+        FROM series_group
+        WHERE user_id = #{userId} AND name = #{name}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO series_group (user_id, name)
+        VALUES (#{userId}, #{name})
+    </insert>
+
+    <update id="updateName">
+        UPDATE series_group SET name = #{name}
+        WHERE user_id = #{userId} AND id = #{id}
+    </update>
+
+    <!-- 하위(series)는 FK의 ON DELETE CASCADE로 함께 지워진다 -->
+    <delete id="delete">
+        DELETE FROM series_group
+        WHERE user_id = #{userId} AND id = #{id}
+    </delete>
+
+    <!-- 상품을 옮겨 갈 기본 항목: 이름이 기타인 상위 아래의 기타 하위 -->
+    <select id="selectDefaultChildId" resultType="long">
+        SELECT c.id
+        FROM series c
+        JOIN series_group p ON p.id = c.group_id AND p.user_id = c.user_id
+        WHERE c.user_id = #{userId} AND p.name = #{defaultName} AND c.name = #{defaultName}
+    </select>
+
+    <!-- 이 상위에 속한 하위 중 하나라도 쓰는 상품의 수 -->
+    <select id="countUsage" resultType="int">
+        SELECT COUNT(DISTINCT figure_id)
+        FROM figure_series
+        WHERE user_id = #{userId}
+          AND series_id IN (SELECT id FROM series WHERE user_id = #{userId} AND group_id = #{id})
+    </select>
+
+    <!-- 1단계: 이 상위의 하위만 가지고 있던 상품에 기본 항목을 연결한다. 다른 항목이 남은 상품에는 추가하지 않는다 -->
+    <insert id="moveInsertFallback">
+        INSERT INTO figure_series (user_id, figure_id, series_id)
+        SELECT DISTINCT l.user_id, l.figure_id, #{fallbackId}
+        FROM figure_series l
+        WHERE l.user_id = #{userId}
+          AND l.series_id IN (SELECT id FROM series WHERE user_id = #{userId} AND group_id = #{id})
+          AND NOT EXISTS (
+              SELECT 1 FROM figure_series o
+              WHERE o.user_id = l.user_id AND o.figure_id = l.figure_id
+                AND o.series_id NOT IN (SELECT id FROM series WHERE user_id = #{userId} AND group_id = #{id})
+          )
+    </insert>
+
+    <!-- 2단계: 이 상위의 하위에 대한 연결을 지운다 -->
+    <delete id="moveDeleteLinks">
+        DELETE FROM figure_series
+        WHERE user_id = #{userId}
+          AND series_id IN (SELECT id FROM series WHERE user_id = #{userId} AND group_id = #{id})
+    </delete>
+
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.maker.MakerMapper">
+
+    <select id="selectAll" resultType="MakerResponse">
+        SELECT id, name
+        FROM maker
+        WHERE user_id = #{userId}
+        ORDER BY id
+    </select>
+
+    <select id="selectById" resultType="MakerResponse">
+        SELECT id, name
+        FROM maker
+        WHERE user_id = #{userId} AND id = #{id}
+    </select>
+
+    <select id="selectByName" resultType="MakerResponse">
+        SELECT id, name
+        FROM maker
+        WHERE user_id = #{userId} AND name = #{name}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO maker (user_id, name)
+        VALUES (#{userId}, #{name})
+    </insert>
+
+    <update id="updateName">
+        UPDATE maker SET name = #{name}
+        WHERE user_id = #{userId} AND id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM maker
+        WHERE user_id = #{userId} AND id = #{id}
+    </delete>
+
+    <!-- 상품을 옮겨 갈 기본 항목: 이름이 기타인 제조사 -->
+    <select id="selectDefaultId" resultType="long">
+        SELECT id
+        FROM maker
+        WHERE user_id = #{userId} AND name = #{defaultName}
+    </select>
+
+    <!-- 이 제조사를 쓰는 상품의 수 -->
+    <select id="countUsage" resultType="int">
+        SELECT COUNT(*)
+        FROM figure
+        WHERE user_id = #{userId} AND maker_id = #{id}
+    </select>
+
+    <!-- 이 제조사를 쓰던 상품을 기본 항목으로 바꾼다 -->
+    <update id="moveUsage">
+        UPDATE figure SET maker_id = #{fallbackId}
+        WHERE user_id = #{userId} AND maker_id = #{id}
+    </update>
+
+</mapper>
