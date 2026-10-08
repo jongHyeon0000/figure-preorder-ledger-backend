@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.figure.FigureSeriesMapper">
+
+    <!-- 여러 상품의 시리즈를 한 번에 조회 (figure_id로 상품별로 묶는 것은 서비스) -->
+    <select id="selectByFigureIds" resultType="FigureSeriesInfo">
+        SELECT fs.figure_id, s.id, s.name, g.id AS group_id, g.name AS group_name
+        FROM figure_series fs
+        JOIN series s ON s.user_id = fs.user_id AND s.id = fs.series_id
+        JOIN series_group g ON g.user_id = s.user_id AND g.id = s.group_id
+        WHERE fs.user_id = #{userId}
+          AND fs.figure_id IN
+        <foreach collection="figureIds" item="figureId" open="(" separator="," close=")">
+            #{figureId}
+        </foreach>
+        ORDER BY fs.figure_id, s.id
+    </select>
+
+    <insert id="insertAll">
+        INSERT INTO figure_series (user_id, figure_id, series_id)
+        VALUES
+        <foreach collection="seriesIds" item="seriesId" separator=",">
+            (#{userId}, #{figureId}, #{seriesId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByFigure">
+        DELETE FROM figure_series
+        WHERE user_id = #{userId} AND figure_id = #{figureId}
+    </delete>
+
+</mapper>

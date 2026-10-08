@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.figure.FigureMapper">
+
+    <!-- 목록용: 설명(HTML) 제외. 시리즈와 캐릭터는 서비스가 따로 조회해 채운다 -->
+    <resultMap id="listMap" type="FigureListResponse" autoMapping="true">
+        <id property="id" column="id"/>
+        <association property="subtype" javaType="FigureSubtypeInfo">
+            <id property="id" column="subtype_id"/>
+            <result property="name" column="subtype_name"/>
+            <result property="typeId" column="type_id"/>
+            <result property="typeName" column="type_name"/>
+        </association>
+        <association property="shop" javaType="FigureShopInfo">
+            <id property="id" column="shop_id"/>
+            <result property="name" column="shop_name"/>
+            <result property="channelId" column="channel_id"/>
+            <result property="channelName" column="channel_name"/>
+        </association>
+        <association property="maker" javaType="FigureMakerInfo">
+            <id property="id" column="maker_id"/>
+            <result property="name" column="maker_name"/>
+        </association>
+    </resultMap>
+
+    <!-- 상세용: 목록 항목 + 설명(HTML), 생성일, 수정일 -->
+    <resultMap id="detailMap" type="FigureDetailResponse" autoMapping="true">
+        <id property="id" column="id"/>
+        <association property="subtype" javaType="FigureSubtypeInfo">
+            <id property="id" column="subtype_id"/>
+            <result property="name" column="subtype_name"/>
+            <result property="typeId" column="type_id"/>
+            <result property="typeName" column="type_name"/>
+        </association>
+        <association property="shop" javaType="FigureShopInfo">
+            <id property="id" column="shop_id"/>
+            <result property="name" column="shop_name"/>
+            <result property="channelId" column="channel_id"/>
+            <result property="channelName" column="channel_name"/>
+        </association>
+        <association property="maker" javaType="FigureMakerInfo">
+            <id property="id" column="maker_id"/>
+            <result property="name" column="maker_name"/>
+        </association>
+    </resultMap>
+
+    <select id="selectList" resultMap="listMap">
+        SELECT f.id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
+               f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
+               f.paid_at, f.delivered_at, f.purchase_link, f.thumbnail_url,
+               st.id AS subtype_id, st.name AS subtype_name, t.id AS type_id, t.name AS type_name,
+               sh.id AS shop_id, sh.name AS shop_name, ch.id AS channel_id, ch.name AS channel_name,
+               m.id AS maker_id, m.name AS maker_name
+        FROM figure f
+        JOIN figure_subtype st ON st.user_id = f.user_id AND st.id = f.subtype_id
+        JOIN figure_type t ON t.user_id = st.user_id AND t.id = st.type_id
+        JOIN shop sh ON sh.user_id = f.user_id AND sh.id = f.shop_id
+        JOIN shop_channel ch ON ch.user_id = sh.user_id AND ch.id = sh.channel_id
+        JOIN maker m ON m.user_id = f.user_id AND m.id = f.maker_id
+        WHERE f.user_id = #{userId}
+        ORDER BY f.id DESC
+    </select>
+
+    <select id="selectListById" resultMap="listMap">
+        SELECT f.id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
+               f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
+               f.paid_at, f.delivered_at, f.purchase_link, f.thumbnail_url,
+               st.id AS subtype_id, st.name AS subtype_name, t.id AS type_id, t.name AS type_name,
+               sh.id AS shop_id, sh.name AS shop_name, ch.id AS channel_id, ch.name AS channel_name,
+               m.id AS maker_id, m.name AS maker_name
+        FROM figure f
+        JOIN figure_subtype st ON st.user_id = f.user_id AND st.id = f.subtype_id
+        JOIN figure_type t ON t.user_id = st.user_id AND t.id = st.type_id
+        JOIN shop sh ON sh.user_id = f.user_id AND sh.id = f.shop_id
+        JOIN shop_channel ch ON ch.user_id = sh.user_id AND ch.id = sh.channel_id
+        JOIN maker m ON m.user_id = f.user_id AND m.id = f.maker_id
+        WHERE f.user_id = #{userId} AND f.id = #{id}
+    </select>
+
+    <select id="selectDetailById" resultMap="detailMap">
+        SELECT f.id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
+               f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
+               f.paid_at, f.delivered_at, f.purchase_link, f.thumbnail_url,
+               f.description, f.created_at, f.updated_at,
+               st.id AS subtype_id, st.name AS subtype_name, t.id AS type_id, t.name AS type_name,
+               sh.id AS shop_id, sh.name AS shop_name, ch.id AS channel_id, ch.name AS channel_name,
+               m.id AS maker_id, m.name AS maker_name
+        FROM figure f
+        JOIN figure_subtype st ON st.user_id = f.user_id AND st.id = f.subtype_id
+        JOIN figure_type t ON t.user_id = st.user_id AND t.id = st.type_id
+        JOIN shop sh ON sh.user_id = f.user_id AND sh.id = f.shop_id
+        JOIN shop_channel ch ON ch.user_id = sh.user_id AND ch.id = sh.channel_id
+        JOIN maker m ON m.user_id = f.user_id AND m.id = f.maker_id
+        WHERE f.user_id = #{userId} AND f.id = #{id}
+    </select>
+
+    <!-- 결제 방식과 결제 관련 칸은 등록할 때 비워 두고 상태 전이에서 채운다 -->
+    <insert id="insert">
+        INSERT INTO figure (user_id, status, name, delivery_month, reservation_deadline, price, quantity,
+                            subtype_id, shop_id, maker_id, purchase_link, thumbnail_url, description)
+        VALUES (#{userId}, #{status}, #{request.name},
+                #{request.deliveryMonth,jdbcType=DATE}, #{request.reservationDeadline,jdbcType=DATE},
+                #{request.price}, #{request.quantity},
+                #{request.subtypeId}, #{request.shopId}, #{request.makerId},
+                #{request.purchaseLink,jdbcType=VARCHAR}, #{request.thumbnailUrl,jdbcType=VARCHAR},
+                #{request.description,jdbcType=LONGVARCHAR})
+    </insert>
+
+    <!-- 같은 트랜잭션(같은 커넥션)에서 방금 넣은 행의 id -->
+    <select id="selectLastInsertId" resultType="long">
+        SELECT LAST_INSERT_ID()
+    </select>
+
+    <!-- 상태와 결제 방식은 건드리지 않는다 -->
+    <update id="update">
+        UPDATE figure
+        SET name = #{request.name},
+            delivery_month = #{request.deliveryMonth,jdbcType=DATE},
+            reservation_deadline = #{request.reservationDeadline,jdbcType=DATE},
+            price = #{request.price},
+            quantity = #{request.quantity},
+            subtype_id = #{request.subtypeId},
+            shop_id = #{request.shopId},
+            maker_id = #{request.makerId},
+            purchase_link = #{request.purchaseLink,jdbcType=VARCHAR},
+            thumbnail_url = #{request.thumbnailUrl,jdbcType=VARCHAR},
+            description = #{request.description,jdbcType=LONGVARCHAR}
+        WHERE user_id = #{userId} AND id = #{id}
+    </update>
+
+    <!-- 연결 행(시리즈, 캐릭터, 에디터 이미지)은 DB가 함께 삭제한다 -->
+    <delete id="delete">
+        DELETE FROM figure
+        WHERE user_id = #{userId} AND id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        DELETE FROM figure
+        WHERE user_id = #{userId}
+          AND id IN
+        <foreach collection="ids" item="figureId" open="(" separator="," close=")">
+            #{figureId}
+        </foreach>
+    </delete>
+
+    <select id="selectCurrentStatus" resultType="FigureCurrentStatus">
+        SELECT id, status, payment_type
+        FROM figure
+        WHERE user_id = #{userId} AND id = #{id}
+    </select>
+
+    <select id="selectCurrentStatusByIds" resultType="FigureCurrentStatus">
+        SELECT id, status, payment_type
+        FROM figure
+        WHERE user_id = #{userId}
+          AND id IN
+        <foreach collection="ids" item="figureId" open="(" separator="," close=")">
+            #{figureId}
+        </foreach>
+    </select>
+
+    <!-- null로 넘어온 칸은 기존 값을 유지한다 (전이마다 채울 칸이 다르기 때문) -->
+    <update id="updateStatus">
+        UPDATE figure
+        SET status = #{status},
+            payment_type = COALESCE(#{paymentType,jdbcType=VARCHAR}, payment_type),
+            deposit_amount = COALESCE(#{depositAmount,jdbcType=INTEGER}, deposit_amount),
+            deposit_paid_at = COALESCE(#{depositPaidAt,jdbcType=DATE}, deposit_paid_at),
+            balance_due_date = COALESCE(#{balanceDueDate,jdbcType=DATE}, balance_due_date),
+            paid_at = COALESCE(#{paidAt,jdbcType=DATE}, paid_at),
+            delivered_at = COALESCE(#{deliveredAt,jdbcType=DATE}, delivered_at)
+        WHERE user_id = #{userId} AND id = #{id}
+    </update>
+
+</mapper>

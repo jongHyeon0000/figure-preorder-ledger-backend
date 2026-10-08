@@ -16,6 +16,7 @@ public enum GlobalExceptionCode {
     PROTECTED_CATEGORY(HttpStatus.BAD_REQUEST, "기타는 수정하거나 삭제할 수 없습니다"),
     LAST_CHILD_CATEGORY(HttpStatus.BAD_REQUEST, "마지막 하위 항목은 삭제할 수 없습니다"),
     DUPLICATE_NAME(HttpStatus.BAD_REQUEST, "이미 같은 이름이 있습니다"),
+    INVALID_STATUS_TRANSITION(HttpStatus.BAD_REQUEST, "허용되지 않는 상태 변경입니다"),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다");
 
     private final HttpStatus status;
