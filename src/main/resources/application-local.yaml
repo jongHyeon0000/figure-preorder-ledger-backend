@@ -1,6 +1,10 @@
 # 로컬
 spring:
   datasource:
-    url: jdbc:mariadb://localhost:3306/figure_ledger
+    url: jdbc:mariadb://localhost:3306/figure_preorder_ledger
     username: root
     password: ""
+
+app:
+  upload:
+    dir: ${user.home}/dev-tools/dev-resource/figure-preorder-ledger/uploads

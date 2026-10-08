@@ -5,6 +5,15 @@ spring:
     default: local
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: ${app.upload.max-size}
+      max-request-size: ${app.upload.max-size}
+
+app:
+  upload:
+    max-size: 5MB
+    allowed-extensions: [jpg, jpeg, png, gif, webp]
 
 mybatis:
   configuration:

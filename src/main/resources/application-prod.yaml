@@ -4,3 +4,8 @@ spring:
     url: ${PROD_DB_URL}
     username: ${PROD_DB_USERNAME}
     password: ${PROD_DB_PASSWORD}
+
+app:
+  upload:
+    # 임시값: 웹호스팅이 정해지면 PROD_UPLOAD_DIR 환경변수로 실제 경로를 지정한다
+    dir: ${PROD_UPLOAD_DIR:/data/figure-ledger/uploads}
