@@ -3,31 +3,37 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.shop.ShopGroupMapper">
 
     <select id="selectAll" resultType="ShopGroupVO">
-        SELECT shop_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM shop_group
-        WHERE user_id = #{userId}
-        ORDER BY shop_group_id
+        SELECT e.shop_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM shop_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SHOP_GROUP' AND t.target_id = e.shop_group_id
+        WHERE e.user_id = #{userId}
+        ORDER BY e.shop_group_id
     </select>
 
     <select id="selectById" resultType="ShopGroupVO">
-        SELECT shop_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM shop_group
-        WHERE user_id = #{userId} AND shop_group_id = #{shopGroupId}
+        SELECT e.shop_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM shop_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SHOP_GROUP' AND t.target_id = e.shop_group_id
+        WHERE e.user_id = #{userId} AND e.shop_group_id = #{shopGroupId}
     </select>
 
     <select id="selectByName" resultType="ShopGroupVO">
-        SELECT shop_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM shop_group
-        WHERE user_id = #{userId} AND name = #{name}
+        SELECT e.shop_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM shop_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SHOP_GROUP' AND t.target_id = e.shop_group_id
+        WHERE e.user_id = #{userId} AND e.name = #{name}
     </select>
 
     <insert id="insert">
-        INSERT INTO shop_group (user_id, name)
-        VALUES (#{userId}, #{name})
+        INSERT INTO shop_group (user_id, name, description)
+        VALUES (#{userId}, #{name}, #{description,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateName">
-        UPDATE shop_group SET name = #{name}
+    <update id="update">
+        UPDATE shop_group SET name = #{name}, description = #{description,jdbcType=VARCHAR}
         WHERE user_id = #{userId} AND shop_group_id = #{shopGroupId}
     </update>
 

@@ -2,10 +2,12 @@ package com.jong.figurepreorderledgerbackend.service.genre.impl;
 
 import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
+import com.jong.figurepreorderledgerbackend.common.constant.ThumbnailTarget;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterMapper;
 import com.jong.figurepreorderledgerbackend.service.genre.GenreCharacterGroupService;
+import com.jong.figurepreorderledgerbackend.service.thumbnail.ThumbnailImageService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterGroupVO;
 import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterVO;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -24,6 +27,7 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
 
     private final GenreCharacterGroupMapper genreCharacterGroupMapper;
     private final GenreCharacterMapper genreCharacterMapper;
+    private final ThumbnailImageService thumbnailImageService;
 
     @Override
     public List<GenreCharacterGroupVO> getTree(Long userId) {
@@ -46,13 +50,13 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
     public GenreCharacterGroupVO create(Long userId, GenreCharacterGroupVO vo) {
         String trimmed = vo.getName().trim();
         try {
-            genreCharacterGroupMapper.insert(userId, trimmed);
+            genreCharacterGroupMapper.insert(userId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
         GenreCharacterGroupVO parent = genreCharacterGroupMapper.selectByName(userId, trimmed);
 
-        genreCharacterMapper.insert(userId, parent.getGenreCharacterGroupId(), CategoryConstant.DEFAULT_NAME);
+        genreCharacterMapper.insert(userId, parent.getGenreCharacterGroupId(), CategoryConstant.DEFAULT_NAME, null);
         List<GenreCharacterVO> children = new ArrayList<>();
         children.add(genreCharacterMapper.selectByParentAndName(userId, parent.getGenreCharacterGroupId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
@@ -63,11 +67,12 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
     @Transactional
     public void update(Long userId, Long genreCharacterGroupId, GenreCharacterGroupVO vo) {
         GenreCharacterGroupVO parent = find(userId, genreCharacterGroupId);
-        if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
+        if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())
+                && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            genreCharacterGroupMapper.updateName(userId, genreCharacterGroupId, vo.getName().trim());
+            genreCharacterGroupMapper.update(userId, genreCharacterGroupId, vo.getName().trim(), vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -86,7 +91,10 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
         }
         genreCharacterGroupMapper.moveInsertFallback(userId, genreCharacterGroupId, fallbackId);
         genreCharacterGroupMapper.moveDeleteLinks(userId, genreCharacterGroupId);
+        List<Long> childIds = genreCharacterMapper.selectIdsByParent(userId, genreCharacterGroupId);   // 상위를 지우면 하위도 CASCADE로 지워지므로 미리 모아 둔다
         genreCharacterGroupMapper.delete(userId, genreCharacterGroupId);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.GENRE_CHARACTER_GROUP, Collections.singletonList(genreCharacterGroupId));
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.GENRE_CHARACTER, childIds);
     }
 
     @Override

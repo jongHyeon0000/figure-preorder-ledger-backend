@@ -30,7 +30,7 @@ public class FigureTypeController {
      * 형태 하위 목록 조회 (예: 푸치)
      * [GET] 목록 | /api/figure-type
      *
-     * @return ApiResponse<List<FigureTypeVO>> figureTypeId, figureTypeGroupId(상위 형태 id), name
+     * @return ApiResponse<List<FigureTypeVO>> figureTypeId, figureTypeGroupId(상위 형태 id), name, description, thumbnailUrl
      */
     @GetMapping
     public ApiResponse<List<FigureTypeVO>> getAll() {
@@ -41,9 +41,9 @@ public class FigureTypeController {
      * 형태 하위 추가 (예: 푸치)
      * [POST] 단일 | /api/figure-type
      *
-     * @param request figureTypeGroupId: 상위 형태 id, name: 형태 하위 이름 (본문, 둘 다 필수, 이름은 100자 이하)
+     * @param request figureTypeGroupId: 상위 형태 id, name: 형태 하위 이름 (본문, 둘 다 필수, 이름은 100자 이하), description: 설명 (본문, 선택, 1000자 이하)
      *
-     * @return ApiResponse<FigureTypeVO> 생성된 figureTypeId, figureTypeGroupId, name
+     * @return ApiResponse<FigureTypeVO> 생성된 figureTypeId, figureTypeGroupId, name, description, thumbnailUrl
      * @throws 404 상위 형태 없음 | 400 이름 중복, 입력값 오류
      */
     @PostMapping
@@ -52,14 +52,14 @@ public class FigureTypeController {
     }
 
     /**
-     * 형태 하위 이름 수정 (예: 푸치)
+     * 형태 하위 이름과 설명 수정 (예: 푸치)
      * [PUT] 단일 | /api/figure-type/{figureTypeId}
      *
      * @param figureTypeId 수정할 형태 하위 id (경로)
-     * @param request      name: 새 이름 (본문, 필수, 100자 이하)
+     * @param request      name: 새 이름 (본문, 필수, 100자 이하), description: 새 설명 (본문, 선택, 1000자 이하, 생략하면 설명 삭제)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
-     * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
+     * @throws 404 대상 없음 | 400 기타 이름 변경 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{figureTypeId}")
     public ApiResponse<Void> update(@PathVariable Long figureTypeId, @Valid @RequestBody FigureTypeVO request) {

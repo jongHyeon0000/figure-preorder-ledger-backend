@@ -16,11 +16,13 @@ public interface GenreCharacterMapper {
     GenreCharacterVO selectByParentAndName(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId,
                                         @Param("name") String name);
 
+    List<Long> selectIdsByParent(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId);
+
     int countByParent(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId);
 
-    int insert(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId, @Param("name") String name);
+    int insert(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId, @Param("name") String name, @Param("description") String description);
 
-    int updateName(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId, @Param("name") String name);
+    int update(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId, @Param("name") String name, @Param("description") String description);
 
     int delete(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId);
 

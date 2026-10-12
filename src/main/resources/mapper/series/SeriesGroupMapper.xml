@@ -3,31 +3,37 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.series.SeriesGroupMapper">
 
     <select id="selectAll" resultType="SeriesGroupVO">
-        SELECT series_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM series_group
-        WHERE user_id = #{userId}
-        ORDER BY series_group_id
+        SELECT e.series_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM series_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SERIES_GROUP' AND t.target_id = e.series_group_id
+        WHERE e.user_id = #{userId}
+        ORDER BY e.series_group_id
     </select>
 
     <select id="selectById" resultType="SeriesGroupVO">
-        SELECT series_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM series_group
-        WHERE user_id = #{userId} AND series_group_id = #{seriesGroupId}
+        SELECT e.series_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM series_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SERIES_GROUP' AND t.target_id = e.series_group_id
+        WHERE e.user_id = #{userId} AND e.series_group_id = #{seriesGroupId}
     </select>
 
     <select id="selectByName" resultType="SeriesGroupVO">
-        SELECT series_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM series_group
-        WHERE user_id = #{userId} AND name = #{name}
+        SELECT e.series_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM series_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SERIES_GROUP' AND t.target_id = e.series_group_id
+        WHERE e.user_id = #{userId} AND e.name = #{name}
     </select>
 
     <insert id="insert">
-        INSERT INTO series_group (user_id, name)
-        VALUES (#{userId}, #{name})
+        INSERT INTO series_group (user_id, name, description)
+        VALUES (#{userId}, #{name}, #{description,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateName">
-        UPDATE series_group SET name = #{name}
+    <update id="update">
+        UPDATE series_group SET name = #{name}, description = #{description,jdbcType=VARCHAR}
         WHERE user_id = #{userId} AND series_group_id = #{seriesGroupId}
     </update>
 

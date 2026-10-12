@@ -30,7 +30,7 @@ public class GenreCharacterGroupController {
      * 장르 목록 조회, 하위 캐릭터 중첩 (예: 보컬로이드)
      * [GET] 목록 | /api/genre-character-group
      *
-     * @return ApiResponse<List<GenreCharacterGroupVO>> genreCharacterGroupId, name, children(캐릭터 목록: genreCharacterId, genreCharacterGroupId, name)
+     * @return ApiResponse<List<GenreCharacterGroupVO>> genreCharacterGroupId, name, description, thumbnailUrl, children(캐릭터 목록: genreCharacterId, genreCharacterGroupId, name, description, thumbnailUrl)
      */
     @GetMapping
     public ApiResponse<List<GenreCharacterGroupVO>> getTree() {
@@ -41,9 +41,9 @@ public class GenreCharacterGroupController {
      * 장르 추가, 기본 하위 '기타' 자동 생성 (예: 보컬로이드)
      * [POST] 단일 | /api/genre-character-group
      *
-     * @param request name: 장르 이름 (본문, 필수, 100자 이하)
+     * @param request name: 장르 이름 (본문, 필수, 100자 이하), description: 설명 (본문, 선택, 1000자 이하)
      *
-     * @return ApiResponse<GenreCharacterGroupVO> 생성된 genreCharacterGroupId, name, children(기본 '기타' 하나)
+     * @return ApiResponse<GenreCharacterGroupVO> 생성된 genreCharacterGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)
      * @throws 400 이름 중복, 입력값 오류
      */
     @PostMapping
@@ -52,14 +52,14 @@ public class GenreCharacterGroupController {
     }
 
     /**
-     * 장르 이름 수정 (예: 보컬로이드)
+     * 장르 이름과 설명 수정 (예: 보컬로이드)
      * [PUT] 단일 | /api/genre-character-group/{genreCharacterGroupId}
      *
      * @param genreCharacterGroupId 수정할 장르 id (경로)
-     * @param request               name: 새 이름 (본문, 필수, 100자 이하)
+     * @param request               name: 새 이름 (본문, 필수, 100자 이하), description: 새 설명 (본문, 선택, 1000자 이하, 생략하면 설명 삭제)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
-     * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
+     * @throws 404 대상 없음 | 400 기타 이름 변경 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{genreCharacterGroupId}")
     public ApiResponse<Void> update(@PathVariable Long genreCharacterGroupId, @Valid @RequestBody GenreCharacterGroupVO request) {

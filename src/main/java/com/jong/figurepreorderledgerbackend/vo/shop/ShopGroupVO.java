@@ -31,6 +31,10 @@ public class ShopGroupVO {
     @Size(max = 100)
     private String name;
 
+    /** 설명 (일반 텍스트) */
+    @Size(max = 1000)
+    private String description;
+
     /** 생성일 */
     private LocalDateTime createdAt;
 
@@ -39,4 +43,7 @@ public class ShopGroupVO {
 
     /** [response] 하위 스토어 목록 */
     private List<ShopVO> children;
+
+    /** [thumbnail_image joined] 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) */
+    private String thumbnailUrl;
 }

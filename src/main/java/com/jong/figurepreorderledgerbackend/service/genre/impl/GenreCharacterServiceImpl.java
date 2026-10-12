@@ -2,10 +2,12 @@ package com.jong.figurepreorderledgerbackend.service.genre.impl;
 
 import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
+import com.jong.figurepreorderledgerbackend.common.constant.ThumbnailTarget;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterMapper;
 import com.jong.figurepreorderledgerbackend.service.genre.GenreCharacterService;
+import com.jong.figurepreorderledgerbackend.service.thumbnail.ThumbnailImageService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterVO;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -22,6 +25,7 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
 
     private final GenreCharacterMapper genreCharacterMapper;
     private final GenreCharacterGroupMapper genreCharacterGroupMapper;
+    private final ThumbnailImageService thumbnailImageService;
 
     @Override
     public List<GenreCharacterVO> getAll(Long userId) {
@@ -40,7 +44,7 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
         }
         String trimmed = vo.getName().trim();
         try {
-            genreCharacterMapper.insert(userId, genreCharacterGroupId, trimmed);
+            genreCharacterMapper.insert(userId, genreCharacterGroupId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -51,11 +55,12 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
     @Transactional
     public void update(Long userId, Long genreCharacterId, GenreCharacterVO vo) {
         GenreCharacterVO child = find(userId, genreCharacterId);
-        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
+        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())
+                && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            genreCharacterMapper.updateName(userId, genreCharacterId, vo.getName().trim());
+            genreCharacterMapper.update(userId, genreCharacterId, vo.getName().trim(), vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -78,6 +83,7 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
         genreCharacterMapper.moveInsertFallback(userId, genreCharacterId, fallbackId);
         genreCharacterMapper.moveDeleteLinks(userId, genreCharacterId);
         genreCharacterMapper.delete(userId, genreCharacterId);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.GENRE_CHARACTER, Collections.singletonList(genreCharacterId));
     }
 
     @Override

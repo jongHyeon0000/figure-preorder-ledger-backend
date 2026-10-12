@@ -31,6 +31,10 @@ public class GenreCharacterGroupVO {
     @Size(max = 100)
     private String name;
 
+    /** 설명 (일반 텍스트) */
+    @Size(max = 1000)
+    private String description;
+
     /** 생성일 */
     private LocalDateTime createdAt;
 
@@ -39,4 +43,7 @@ public class GenreCharacterGroupVO {
 
     /** [response] 하위 캐릭터 목록 */
     private List<GenreCharacterVO> children;
+
+    /** [thumbnail_image joined] 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) */
+    private String thumbnailUrl;
 }

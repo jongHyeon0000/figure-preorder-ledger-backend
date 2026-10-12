@@ -3,31 +3,37 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterGroupMapper">
 
     <select id="selectAll" resultType="GenreCharacterGroupVO">
-        SELECT genre_character_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM genre_character_group
-        WHERE user_id = #{userId}
-        ORDER BY genre_character_group_id
+        SELECT e.genre_character_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM genre_character_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'GENRE_CHARACTER_GROUP' AND t.target_id = e.genre_character_group_id
+        WHERE e.user_id = #{userId}
+        ORDER BY e.genre_character_group_id
     </select>
 
     <select id="selectById" resultType="GenreCharacterGroupVO">
-        SELECT genre_character_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM genre_character_group
-        WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId}
+        SELECT e.genre_character_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM genre_character_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'GENRE_CHARACTER_GROUP' AND t.target_id = e.genre_character_group_id
+        WHERE e.user_id = #{userId} AND e.genre_character_group_id = #{genreCharacterGroupId}
     </select>
 
     <select id="selectByName" resultType="GenreCharacterGroupVO">
-        SELECT genre_character_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM genre_character_group
-        WHERE user_id = #{userId} AND name = #{name}
+        SELECT e.genre_character_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM genre_character_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'GENRE_CHARACTER_GROUP' AND t.target_id = e.genre_character_group_id
+        WHERE e.user_id = #{userId} AND e.name = #{name}
     </select>
 
     <insert id="insert">
-        INSERT INTO genre_character_group (user_id, name)
-        VALUES (#{userId}, #{name})
+        INSERT INTO genre_character_group (user_id, name, description)
+        VALUES (#{userId}, #{name}, #{description,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateName">
-        UPDATE genre_character_group SET name = #{name}
+    <update id="update">
+        UPDATE genre_character_group SET name = #{name}, description = #{description,jdbcType=VARCHAR}
         WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId}
     </update>
 

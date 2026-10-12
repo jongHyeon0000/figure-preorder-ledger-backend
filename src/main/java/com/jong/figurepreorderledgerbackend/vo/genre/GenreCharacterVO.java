@@ -34,6 +34,10 @@ public class GenreCharacterVO {
     @Size(max = 100)
     private String name;
 
+    /** 설명 (일반 텍스트) */
+    @Size(max = 1000)
+    private String description;
+
     /** 생성일 */
     private LocalDateTime createdAt;
 
@@ -46,4 +50,7 @@ public class GenreCharacterVO {
     /** [figure_character_map joined] 이 캐릭터가 연결된 상품 (figure_id). 상품별로 묶을 때만 쓰고 응답에는 내보내지 않는다 */
     @JsonIgnore
     private Long figureId;
+
+    /** [thumbnail_image joined] 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) */
+    private String thumbnailUrl;
 }

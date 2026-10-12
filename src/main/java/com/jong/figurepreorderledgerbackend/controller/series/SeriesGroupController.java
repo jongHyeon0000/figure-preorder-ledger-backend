@@ -30,7 +30,7 @@ public class SeriesGroupController {
      * 시리즈 그룹 목록 조회, 하위 시리즈 중첩 (예: 굿스마일 라인업)
      * [GET] 목록 | /api/series-group
      *
-     * @return ApiResponse<List<SeriesGroupVO>> seriesGroupId, name, children(시리즈 목록: seriesId, seriesGroupId, name)
+     * @return ApiResponse<List<SeriesGroupVO>> seriesGroupId, name, description, thumbnailUrl, children(시리즈 목록: seriesId, seriesGroupId, name, description, thumbnailUrl)
      */
     @GetMapping
     public ApiResponse<List<SeriesGroupVO>> getTree() {
@@ -41,9 +41,9 @@ public class SeriesGroupController {
      * 시리즈 그룹 추가, 기본 하위 '기타' 자동 생성 (예: 굿스마일 라인업)
      * [POST] 단일 | /api/series-group
      *
-     * @param request name: 시리즈 그룹 이름 (본문, 필수, 100자 이하)
+     * @param request name: 시리즈 그룹 이름 (본문, 필수, 100자 이하), description: 설명 (본문, 선택, 1000자 이하)
      *
-     * @return ApiResponse<SeriesGroupVO> 생성된 seriesGroupId, name, children(기본 '기타' 하나)
+     * @return ApiResponse<SeriesGroupVO> 생성된 seriesGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)
      * @throws 400 이름 중복, 입력값 오류
      */
     @PostMapping
@@ -52,14 +52,14 @@ public class SeriesGroupController {
     }
 
     /**
-     * 시리즈 그룹 이름 수정 (예: 굿스마일 라인업)
+     * 시리즈 그룹 이름과 설명 수정 (예: 굿스마일 라인업)
      * [PUT] 단일 | /api/series-group/{seriesGroupId}
      *
      * @param seriesGroupId 수정할 시리즈 그룹 id (경로)
-     * @param request       name: 새 이름 (본문, 필수, 100자 이하)
+     * @param request       name: 새 이름 (본문, 필수, 100자 이하), description: 새 설명 (본문, 선택, 1000자 이하, 생략하면 설명 삭제)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
-     * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
+     * @throws 404 대상 없음 | 400 기타 이름 변경 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{seriesGroupId}")
     public ApiResponse<Void> update(@PathVariable Long seriesGroupId, @Valid @RequestBody SeriesGroupVO request) {

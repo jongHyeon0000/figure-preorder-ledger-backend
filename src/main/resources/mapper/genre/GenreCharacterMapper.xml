@@ -3,22 +3,35 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterMapper">
 
     <select id="selectAll" resultType="GenreCharacterVO">
-        SELECT genre_character_id, user_id, genre_character_group_id, name, created_at, updated_at
-        FROM genre_character
-        WHERE user_id = #{userId}
-        ORDER BY genre_character_id
+        SELECT e.genre_character_id, e.user_id, e.genre_character_group_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM genre_character e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'GENRE_CHARACTER' AND t.target_id = e.genre_character_id
+        WHERE e.user_id = #{userId}
+        ORDER BY e.genre_character_id
     </select>
 
     <select id="selectById" resultType="GenreCharacterVO">
-        SELECT genre_character_id, user_id, genre_character_group_id, name, created_at, updated_at
-        FROM genre_character
-        WHERE user_id = #{userId} AND genre_character_id = #{genreCharacterId}
+        SELECT e.genre_character_id, e.user_id, e.genre_character_group_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM genre_character e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'GENRE_CHARACTER' AND t.target_id = e.genre_character_id
+        WHERE e.user_id = #{userId} AND e.genre_character_id = #{genreCharacterId}
     </select>
 
     <select id="selectByParentAndName" resultType="GenreCharacterVO">
-        SELECT genre_character_id, user_id, genre_character_group_id, name, created_at, updated_at
+        SELECT e.genre_character_id, e.user_id, e.genre_character_group_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM genre_character e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'GENRE_CHARACTER' AND t.target_id = e.genre_character_id
+        WHERE e.user_id = #{userId} AND e.genre_character_group_id = #{genreCharacterGroupId} AND e.name = #{name}
+    </select>
+
+    <!-- 상위를 지울 때 함께 지워지는 하위들의 썸네일을 정리하려고 id만 모은다 -->
+    <select id="selectIdsByParent" resultType="long">
+        SELECT genre_character_id
         FROM genre_character
-        WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId} AND name = #{name}
+        WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId}
     </select>
 
     <select id="countByParent" resultType="int">
@@ -28,12 +41,12 @@
     </select>
 
     <insert id="insert">
-        INSERT INTO genre_character (user_id, genre_character_group_id, name)
-        VALUES (#{userId}, #{genreCharacterGroupId}, #{name})
+        INSERT INTO genre_character (user_id, genre_character_group_id, name, description)
+        VALUES (#{userId}, #{genreCharacterGroupId}, #{name}, #{description,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateName">
-        UPDATE genre_character SET name = #{name}
+    <update id="update">
+        UPDATE genre_character SET name = #{name}, description = #{description,jdbcType=VARCHAR}
         WHERE user_id = #{userId} AND genre_character_id = #{genreCharacterId}
     </update>
 

@@ -2,10 +2,12 @@ package com.jong.figurepreorderledgerbackend.service.type.impl;
 
 import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
+import com.jong.figurepreorderledgerbackend.common.constant.ThumbnailTarget;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeMapper;
 import com.jong.figurepreorderledgerbackend.service.type.FigureTypeGroupService;
+import com.jong.figurepreorderledgerbackend.service.thumbnail.ThumbnailImageService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeGroupVO;
 import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeVO;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -24,6 +27,7 @@ public class FigureTypeGroupServiceImpl implements FigureTypeGroupService {
 
     private final FigureTypeGroupMapper figureTypeGroupMapper;
     private final FigureTypeMapper figureTypeMapper;
+    private final ThumbnailImageService thumbnailImageService;
 
     @Override
     public List<FigureTypeGroupVO> getTree(Long userId) {
@@ -46,13 +50,13 @@ public class FigureTypeGroupServiceImpl implements FigureTypeGroupService {
     public FigureTypeGroupVO create(Long userId, FigureTypeGroupVO vo) {
         String trimmed = vo.getName().trim();
         try {
-            figureTypeGroupMapper.insert(userId, trimmed);
+            figureTypeGroupMapper.insert(userId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
         FigureTypeGroupVO parent = figureTypeGroupMapper.selectByName(userId, trimmed);
 
-        figureTypeMapper.insert(userId, parent.getFigureTypeGroupId(), CategoryConstant.DEFAULT_NAME);
+        figureTypeMapper.insert(userId, parent.getFigureTypeGroupId(), CategoryConstant.DEFAULT_NAME, null);
         List<FigureTypeVO> children = new ArrayList<>();
         children.add(figureTypeMapper.selectByParentAndName(userId, parent.getFigureTypeGroupId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
@@ -63,11 +67,12 @@ public class FigureTypeGroupServiceImpl implements FigureTypeGroupService {
     @Transactional
     public void update(Long userId, Long figureTypeGroupId, FigureTypeGroupVO vo) {
         FigureTypeGroupVO parent = find(userId, figureTypeGroupId);
-        if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
+        if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())
+                && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            figureTypeGroupMapper.updateName(userId, figureTypeGroupId, vo.getName().trim());
+            figureTypeGroupMapper.update(userId, figureTypeGroupId, vo.getName().trim(), vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -85,7 +90,10 @@ public class FigureTypeGroupServiceImpl implements FigureTypeGroupService {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
         figureTypeGroupMapper.moveUsage(userId, figureTypeGroupId, fallbackId);
+        List<Long> childIds = figureTypeMapper.selectIdsByParent(userId, figureTypeGroupId);   // 상위를 지우면 하위도 CASCADE로 지워지므로 미리 모아 둔다
         figureTypeGroupMapper.delete(userId, figureTypeGroupId);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.FIGURE_TYPE_GROUP, Collections.singletonList(figureTypeGroupId));
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.FIGURE_TYPE, childIds);
     }
 
     @Override

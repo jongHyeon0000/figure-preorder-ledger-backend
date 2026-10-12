@@ -30,7 +30,7 @@ public class SeriesController {
      * 시리즈 목록 조회 (예: 팝업퍼레이드)
      * [GET] 목록 | /api/series
      *
-     * @return ApiResponse<List<SeriesVO>> seriesId, seriesGroupId(상위 시리즈 그룹 id), name
+     * @return ApiResponse<List<SeriesVO>> seriesId, seriesGroupId(상위 시리즈 그룹 id), name, description, thumbnailUrl
      */
     @GetMapping
     public ApiResponse<List<SeriesVO>> getAll() {
@@ -41,9 +41,9 @@ public class SeriesController {
      * 시리즈 추가 (예: 팝업퍼레이드)
      * [POST] 단일 | /api/series
      *
-     * @param request seriesGroupId: 상위 시리즈 그룹 id, name: 시리즈 이름 (본문, 둘 다 필수, 이름은 100자 이하)
+     * @param request seriesGroupId: 상위 시리즈 그룹 id, name: 시리즈 이름 (본문, 둘 다 필수, 이름은 100자 이하), description: 설명 (본문, 선택, 1000자 이하)
      *
-     * @return ApiResponse<SeriesVO> 생성된 seriesId, seriesGroupId, name
+     * @return ApiResponse<SeriesVO> 생성된 seriesId, seriesGroupId, name, description, thumbnailUrl
      * @throws 404 상위 시리즈 그룹 없음 | 400 이름 중복, 입력값 오류
      */
     @PostMapping
@@ -52,14 +52,14 @@ public class SeriesController {
     }
 
     /**
-     * 시리즈 이름 수정 (예: 팝업퍼레이드)
+     * 시리즈 이름과 설명 수정 (예: 팝업퍼레이드)
      * [PUT] 단일 | /api/series/{seriesId}
      *
      * @param seriesId 수정할 시리즈 id (경로)
-     * @param request  name: 새 이름 (본문, 필수, 100자 이하)
+     * @param request  name: 새 이름 (본문, 필수, 100자 이하), description: 새 설명 (본문, 선택, 1000자 이하, 생략하면 설명 삭제)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
-     * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
+     * @throws 404 대상 없음 | 400 기타 이름 변경 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{seriesId}")
     public ApiResponse<Void> update(@PathVariable Long seriesId, @Valid @RequestBody SeriesVO request) {

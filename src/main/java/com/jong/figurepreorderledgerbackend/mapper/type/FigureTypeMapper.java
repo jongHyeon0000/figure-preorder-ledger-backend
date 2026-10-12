@@ -16,11 +16,13 @@ public interface FigureTypeMapper {
     FigureTypeVO selectByParentAndName(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId,
                                         @Param("name") String name);
 
+    List<Long> selectIdsByParent(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId);
+
     int countByParent(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId);
 
-    int insert(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId, @Param("name") String name);
+    int insert(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId, @Param("name") String name, @Param("description") String description);
 
-    int updateName(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId, @Param("name") String name);
+    int update(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId, @Param("name") String name, @Param("description") String description);
 
     int delete(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId);
 

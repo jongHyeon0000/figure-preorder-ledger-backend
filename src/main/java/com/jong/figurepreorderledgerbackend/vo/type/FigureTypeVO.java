@@ -33,6 +33,10 @@ public class FigureTypeVO {
     @Size(max = 100)
     private String name;
 
+    /** 설명 (일반 텍스트) */
+    @Size(max = 1000)
+    private String description;
+
     /** 생성일 */
     private LocalDateTime createdAt;
 
@@ -41,4 +45,7 @@ public class FigureTypeVO {
 
     /** [figure_type_group joined] 상위 형태명 */
     private String figureTypeGroupName;
+
+    /** [thumbnail_image joined] 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) */
+    private String thumbnailUrl;
 }

@@ -60,7 +60,7 @@
         JOIN shop sh ON sh.user_id = f.user_id AND sh.shop_id = f.shop_id
         JOIN shop_group sg ON sg.user_id = sh.user_id AND sg.shop_group_id = sh.shop_group_id
         JOIN maker m ON m.user_id = f.user_id AND m.maker_id = f.maker_id
-        LEFT JOIN thumbnail_image ti ON ti.user_id = f.user_id AND ti.figure_id = f.figure_id
+        LEFT JOIN thumbnail_image ti ON ti.user_id = f.user_id AND ti.target_type = 'FIGURE' AND ti.target_id = f.figure_id
         WHERE f.user_id = #{userId}
         ORDER BY f.figure_id DESC
     </select>
@@ -80,7 +80,7 @@
         JOIN shop sh ON sh.user_id = f.user_id AND sh.shop_id = f.shop_id
         JOIN shop_group sg ON sg.user_id = sh.user_id AND sg.shop_group_id = sh.shop_group_id
         JOIN maker m ON m.user_id = f.user_id AND m.maker_id = f.maker_id
-        LEFT JOIN thumbnail_image ti ON ti.user_id = f.user_id AND ti.figure_id = f.figure_id
+        LEFT JOIN thumbnail_image ti ON ti.user_id = f.user_id AND ti.target_type = 'FIGURE' AND ti.target_id = f.figure_id
         WHERE f.user_id = #{userId} AND f.figure_id = #{figureId}
     </select>
 
@@ -100,7 +100,7 @@
         JOIN shop sh ON sh.user_id = f.user_id AND sh.shop_id = f.shop_id
         JOIN shop_group sg ON sg.user_id = sh.user_id AND sg.shop_group_id = sh.shop_group_id
         JOIN maker m ON m.user_id = f.user_id AND m.maker_id = f.maker_id
-        LEFT JOIN thumbnail_image ti ON ti.user_id = f.user_id AND ti.figure_id = f.figure_id
+        LEFT JOIN thumbnail_image ti ON ti.user_id = f.user_id AND ti.target_type = 'FIGURE' AND ti.target_id = f.figure_id
         WHERE f.user_id = #{userId} AND f.figure_id = #{figureId}
     </select>
 

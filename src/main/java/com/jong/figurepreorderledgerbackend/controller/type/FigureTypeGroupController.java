@@ -30,7 +30,7 @@ public class FigureTypeGroupController {
      * 형태 목록 조회, 하위 형태 하위 중첩 (예: 스케일, 넨도로이드)
      * [GET] 목록 | /api/figure-type-group
      *
-     * @return ApiResponse<List<FigureTypeGroupVO>> figureTypeGroupId, name, children(형태 하위 목록: figureTypeId, figureTypeGroupId, name)
+     * @return ApiResponse<List<FigureTypeGroupVO>> figureTypeGroupId, name, description, thumbnailUrl, children(형태 하위 목록: figureTypeId, figureTypeGroupId, name, description, thumbnailUrl)
      */
     @GetMapping
     public ApiResponse<List<FigureTypeGroupVO>> getTree() {
@@ -41,9 +41,9 @@ public class FigureTypeGroupController {
      * 형태 추가, 기본 하위 '기타' 자동 생성 (예: 스케일, 넨도로이드)
      * [POST] 단일 | /api/figure-type-group
      *
-     * @param request name: 형태 이름 (본문, 필수, 100자 이하)
+     * @param request name: 형태 이름 (본문, 필수, 100자 이하), description: 설명 (본문, 선택, 1000자 이하)
      *
-     * @return ApiResponse<FigureTypeGroupVO> 생성된 figureTypeGroupId, name, children(기본 '기타' 하나)
+     * @return ApiResponse<FigureTypeGroupVO> 생성된 figureTypeGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)
      * @throws 400 이름 중복, 입력값 오류
      */
     @PostMapping
@@ -52,14 +52,14 @@ public class FigureTypeGroupController {
     }
 
     /**
-     * 형태 이름 수정 (예: 스케일, 넨도로이드)
+     * 형태 이름과 설명 수정 (예: 스케일, 넨도로이드)
      * [PUT] 단일 | /api/figure-type-group/{figureTypeGroupId}
      *
      * @param figureTypeGroupId 수정할 형태 id (경로)
-     * @param request           name: 새 이름 (본문, 필수, 100자 이하)
+     * @param request           name: 새 이름 (본문, 필수, 100자 이하), description: 새 설명 (본문, 선택, 1000자 이하, 생략하면 설명 삭제)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
-     * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
+     * @throws 404 대상 없음 | 400 기타 이름 변경 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{figureTypeGroupId}")
     public ApiResponse<Void> update(@PathVariable Long figureTypeGroupId, @Valid @RequestBody FigureTypeGroupVO request) {

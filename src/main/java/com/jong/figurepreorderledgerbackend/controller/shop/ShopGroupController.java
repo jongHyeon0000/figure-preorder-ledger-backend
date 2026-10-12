@@ -30,7 +30,7 @@ public class ShopGroupController {
      * 판매처 채널 목록 조회, 하위 판매처 스토어 중첩 (예: 네이버 스토어)
      * [GET] 목록 | /api/shop-group
      *
-     * @return ApiResponse<List<ShopGroupVO>> shopGroupId, name, children(판매처 스토어 목록: shopId, shopGroupId, name)
+     * @return ApiResponse<List<ShopGroupVO>> shopGroupId, name, description, thumbnailUrl, children(판매처 스토어 목록: shopId, shopGroupId, name, description, thumbnailUrl)
      */
     @GetMapping
     public ApiResponse<List<ShopGroupVO>> getTree() {
@@ -41,9 +41,9 @@ public class ShopGroupController {
      * 판매처 채널 추가, 기본 하위 '기타' 자동 생성 (예: 네이버 스토어)
      * [POST] 단일 | /api/shop-group
      *
-     * @param request name: 판매처 채널 이름 (본문, 필수, 100자 이하)
+     * @param request name: 판매처 채널 이름 (본문, 필수, 100자 이하), description: 설명 (본문, 선택, 1000자 이하)
      *
-     * @return ApiResponse<ShopGroupVO> 생성된 shopGroupId, name, children(기본 '기타' 하나)
+     * @return ApiResponse<ShopGroupVO> 생성된 shopGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)
      * @throws 400 이름 중복, 입력값 오류
      */
     @PostMapping
@@ -52,14 +52,14 @@ public class ShopGroupController {
     }
 
     /**
-     * 판매처 채널 이름 수정 (예: 네이버 스토어)
+     * 판매처 채널 이름과 설명 수정 (예: 네이버 스토어)
      * [PUT] 단일 | /api/shop-group/{shopGroupId}
      *
      * @param shopGroupId 수정할 판매처 채널 id (경로)
-     * @param request     name: 새 이름 (본문, 필수, 100자 이하)
+     * @param request     name: 새 이름 (본문, 필수, 100자 이하), description: 새 설명 (본문, 선택, 1000자 이하, 생략하면 설명 삭제)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
-     * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
+     * @throws 404 대상 없음 | 400 기타 이름 변경 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{shopGroupId}")
     public ApiResponse<Void> update(@PathVariable Long shopGroupId, @Valid @RequestBody ShopGroupVO request) {

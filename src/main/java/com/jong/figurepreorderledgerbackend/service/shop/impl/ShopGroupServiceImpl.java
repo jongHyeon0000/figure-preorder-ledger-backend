@@ -2,10 +2,12 @@ package com.jong.figurepreorderledgerbackend.service.shop.impl;
 
 import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
+import com.jong.figurepreorderledgerbackend.common.constant.ThumbnailTarget;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.shop.ShopGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper;
 import com.jong.figurepreorderledgerbackend.service.shop.ShopGroupService;
+import com.jong.figurepreorderledgerbackend.service.thumbnail.ThumbnailImageService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import com.jong.figurepreorderledgerbackend.vo.shop.ShopGroupVO;
 import com.jong.figurepreorderledgerbackend.vo.shop.ShopVO;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -24,6 +27,7 @@ public class ShopGroupServiceImpl implements ShopGroupService {
 
     private final ShopGroupMapper shopGroupMapper;
     private final ShopMapper shopMapper;
+    private final ThumbnailImageService thumbnailImageService;
 
     @Override
     public List<ShopGroupVO> getTree(Long userId) {
@@ -46,13 +50,13 @@ public class ShopGroupServiceImpl implements ShopGroupService {
     public ShopGroupVO create(Long userId, ShopGroupVO vo) {
         String trimmed = vo.getName().trim();
         try {
-            shopGroupMapper.insert(userId, trimmed);
+            shopGroupMapper.insert(userId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
         ShopGroupVO parent = shopGroupMapper.selectByName(userId, trimmed);
 
-        shopMapper.insert(userId, parent.getShopGroupId(), CategoryConstant.DEFAULT_NAME);
+        shopMapper.insert(userId, parent.getShopGroupId(), CategoryConstant.DEFAULT_NAME, null);
         List<ShopVO> children = new ArrayList<>();
         children.add(shopMapper.selectByParentAndName(userId, parent.getShopGroupId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
@@ -63,11 +67,12 @@ public class ShopGroupServiceImpl implements ShopGroupService {
     @Transactional
     public void update(Long userId, Long shopGroupId, ShopGroupVO vo) {
         ShopGroupVO parent = find(userId, shopGroupId);
-        if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
+        if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())
+                && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            shopGroupMapper.updateName(userId, shopGroupId, vo.getName().trim());
+            shopGroupMapper.update(userId, shopGroupId, vo.getName().trim(), vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -85,7 +90,10 @@ public class ShopGroupServiceImpl implements ShopGroupService {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
         shopGroupMapper.moveUsage(userId, shopGroupId, fallbackId);
+        List<Long> childIds = shopMapper.selectIdsByParent(userId, shopGroupId);   // 상위를 지우면 하위도 CASCADE로 지워지므로 미리 모아 둔다
         shopGroupMapper.delete(userId, shopGroupId);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.SHOP_GROUP, Collections.singletonList(shopGroupId));
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.SHOP, childIds);
     }
 
     @Override

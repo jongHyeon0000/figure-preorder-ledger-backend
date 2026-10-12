@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.thumbnail.ThumbnailImageMapper">
+
+    <select id="selectByTarget" resultType="ThumbnailImageVO">
+        SELECT thumbnail_image_id, user_id, target_type, target_id, file_path, original_name, file_size, created_at
+        FROM thumbnail_image
+        WHERE user_id = #{userId} AND target_type = #{targetType} AND target_id = #{targetId}
+    </select>
+
+    <!-- 대상을 지우기 전에 파일 경로를 모아 둘 때 쓴다 -->
+    <select id="selectFilePathsByTargets" resultType="string">
+        SELECT file_path
+        FROM thumbnail_image
+        WHERE user_id = #{userId} AND target_type = #{targetType}
+          AND target_id IN
+        <foreach collection="targetIds" item="targetId" open="(" separator="," close=")">
+            #{targetId}
+        </foreach>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO thumbnail_image (user_id, target_type, target_id, file_path, original_name, file_size)
+        VALUES (#{userId}, #{targetType}, #{targetId}, #{filePath}, #{originalName}, #{fileSize})
+    </insert>
+
+    <delete id="deleteByTarget">
+        DELETE FROM thumbnail_image
+        WHERE user_id = #{userId} AND target_type = #{targetType} AND target_id = #{targetId}
+    </delete>
+
+    <delete id="deleteByTargets">
+        DELETE FROM thumbnail_image
+        WHERE user_id = #{userId} AND target_type = #{targetType}
+          AND target_id IN
+        <foreach collection="targetIds" item="targetId" open="(" separator="," close=")">
+            #{targetId}
+        </foreach>
+    </delete>
+
+</mapper>

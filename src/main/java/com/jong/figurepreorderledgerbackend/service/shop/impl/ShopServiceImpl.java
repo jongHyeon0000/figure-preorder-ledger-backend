@@ -2,10 +2,12 @@ package com.jong.figurepreorderledgerbackend.service.shop.impl;
 
 import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
+import com.jong.figurepreorderledgerbackend.common.constant.ThumbnailTarget;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.shop.ShopGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper;
 import com.jong.figurepreorderledgerbackend.service.shop.ShopService;
+import com.jong.figurepreorderledgerbackend.service.thumbnail.ThumbnailImageService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import com.jong.figurepreorderledgerbackend.vo.shop.ShopVO;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -22,6 +25,7 @@ public class ShopServiceImpl implements ShopService {
 
     private final ShopMapper shopMapper;
     private final ShopGroupMapper shopGroupMapper;
+    private final ThumbnailImageService thumbnailImageService;
 
     @Override
     public List<ShopVO> getAll(Long userId) {
@@ -40,7 +44,7 @@ public class ShopServiceImpl implements ShopService {
         }
         String trimmed = vo.getName().trim();
         try {
-            shopMapper.insert(userId, shopGroupId, trimmed);
+            shopMapper.insert(userId, shopGroupId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -51,11 +55,12 @@ public class ShopServiceImpl implements ShopService {
     @Transactional
     public void update(Long userId, Long shopId, ShopVO vo) {
         ShopVO child = find(userId, shopId);
-        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
+        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())
+                && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            shopMapper.updateName(userId, shopId, vo.getName().trim());
+            shopMapper.update(userId, shopId, vo.getName().trim(), vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -77,6 +82,7 @@ public class ShopServiceImpl implements ShopService {
         }
         shopMapper.moveUsage(userId, shopId, fallbackId);
         shopMapper.delete(userId, shopId);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.SHOP, Collections.singletonList(shopId));
     }
 
     @Override

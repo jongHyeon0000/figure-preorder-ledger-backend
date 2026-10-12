@@ -15,9 +15,9 @@ public interface GenreCharacterGroupMapper {
 
     GenreCharacterGroupVO selectByName(@Param("userId") Long userId, @Param("name") String name);
 
-    int insert(@Param("userId") Long userId, @Param("name") String name);
+    int insert(@Param("userId") Long userId, @Param("name") String name, @Param("description") String description);
 
-    int updateName(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId, @Param("name") String name);
+    int update(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId, @Param("name") String name, @Param("description") String description);
 
     int delete(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId);
 

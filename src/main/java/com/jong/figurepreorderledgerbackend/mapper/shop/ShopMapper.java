@@ -16,11 +16,13 @@ public interface ShopMapper {
     ShopVO selectByParentAndName(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId,
                                         @Param("name") String name);
 
+    List<Long> selectIdsByParent(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId);
+
     int countByParent(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId);
 
-    int insert(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId, @Param("name") String name);
+    int insert(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId, @Param("name") String name, @Param("description") String description);
 
-    int updateName(@Param("userId") Long userId, @Param("shopId") Long shopId, @Param("name") String name);
+    int update(@Param("userId") Long userId, @Param("shopId") Long shopId, @Param("name") String name, @Param("description") String description);
 
     int delete(@Param("userId") Long userId, @Param("shopId") Long shopId);
 

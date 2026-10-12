@@ -3,31 +3,37 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeGroupMapper">
 
     <select id="selectAll" resultType="FigureTypeGroupVO">
-        SELECT figure_type_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM figure_type_group
-        WHERE user_id = #{userId}
-        ORDER BY figure_type_group_id
+        SELECT e.figure_type_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM figure_type_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'FIGURE_TYPE_GROUP' AND t.target_id = e.figure_type_group_id
+        WHERE e.user_id = #{userId}
+        ORDER BY e.figure_type_group_id
     </select>
 
     <select id="selectById" resultType="FigureTypeGroupVO">
-        SELECT figure_type_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM figure_type_group
-        WHERE user_id = #{userId} AND figure_type_group_id = #{figureTypeGroupId}
+        SELECT e.figure_type_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM figure_type_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'FIGURE_TYPE_GROUP' AND t.target_id = e.figure_type_group_id
+        WHERE e.user_id = #{userId} AND e.figure_type_group_id = #{figureTypeGroupId}
     </select>
 
     <select id="selectByName" resultType="FigureTypeGroupVO">
-        SELECT figure_type_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
-        FROM figure_type_group
-        WHERE user_id = #{userId} AND name = #{name}
+        SELECT e.figure_type_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM figure_type_group e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'FIGURE_TYPE_GROUP' AND t.target_id = e.figure_type_group_id
+        WHERE e.user_id = #{userId} AND e.name = #{name}
     </select>
 
     <insert id="insert">
-        INSERT INTO figure_type_group (user_id, name)
-        VALUES (#{userId}, #{name})
+        INSERT INTO figure_type_group (user_id, name, description)
+        VALUES (#{userId}, #{name}, #{description,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateName">
-        UPDATE figure_type_group SET name = #{name}
+    <update id="update">
+        UPDATE figure_type_group SET name = #{name}, description = #{description,jdbcType=VARCHAR}
         WHERE user_id = #{userId} AND figure_type_group_id = #{figureTypeGroupId}
     </update>
 

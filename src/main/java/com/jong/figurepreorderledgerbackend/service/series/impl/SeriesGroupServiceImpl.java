@@ -2,10 +2,12 @@ package com.jong.figurepreorderledgerbackend.service.series.impl;
 
 import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
+import com.jong.figurepreorderledgerbackend.common.constant.ThumbnailTarget;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.series.SeriesGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.series.SeriesMapper;
 import com.jong.figurepreorderledgerbackend.service.series.SeriesGroupService;
+import com.jong.figurepreorderledgerbackend.service.thumbnail.ThumbnailImageService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import com.jong.figurepreorderledgerbackend.vo.series.SeriesGroupVO;
 import com.jong.figurepreorderledgerbackend.vo.series.SeriesVO;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -24,6 +27,7 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
 
     private final SeriesGroupMapper seriesGroupMapper;
     private final SeriesMapper seriesMapper;
+    private final ThumbnailImageService thumbnailImageService;
 
     @Override
     public List<SeriesGroupVO> getTree(Long userId) {
@@ -46,13 +50,13 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
     public SeriesGroupVO create(Long userId, SeriesGroupVO vo) {
         String trimmed = vo.getName().trim();
         try {
-            seriesGroupMapper.insert(userId, trimmed);
+            seriesGroupMapper.insert(userId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
         SeriesGroupVO parent = seriesGroupMapper.selectByName(userId, trimmed);
 
-        seriesMapper.insert(userId, parent.getSeriesGroupId(), CategoryConstant.DEFAULT_NAME);
+        seriesMapper.insert(userId, parent.getSeriesGroupId(), CategoryConstant.DEFAULT_NAME, null);
         List<SeriesVO> children = new ArrayList<>();
         children.add(seriesMapper.selectByParentAndName(userId, parent.getSeriesGroupId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
@@ -63,11 +67,12 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
     @Transactional
     public void update(Long userId, Long seriesGroupId, SeriesGroupVO vo) {
         SeriesGroupVO parent = find(userId, seriesGroupId);
-        if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
+        if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())
+                && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            seriesGroupMapper.updateName(userId, seriesGroupId, vo.getName().trim());
+            seriesGroupMapper.update(userId, seriesGroupId, vo.getName().trim(), vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -86,7 +91,10 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
         }
         seriesGroupMapper.moveInsertFallback(userId, seriesGroupId, fallbackId);
         seriesGroupMapper.moveDeleteLinks(userId, seriesGroupId);
+        List<Long> childIds = seriesMapper.selectIdsByParent(userId, seriesGroupId);   // 상위를 지우면 하위도 CASCADE로 지워지므로 미리 모아 둔다
         seriesGroupMapper.delete(userId, seriesGroupId);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.SERIES_GROUP, Collections.singletonList(seriesGroupId));
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.SERIES, childIds);
     }
 
     @Override

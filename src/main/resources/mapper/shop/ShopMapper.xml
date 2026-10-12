@@ -3,22 +3,35 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper">
 
     <select id="selectAll" resultType="ShopVO">
-        SELECT shop_id, user_id, shop_group_id, name, created_at, updated_at
-        FROM shop
-        WHERE user_id = #{userId}
-        ORDER BY shop_id
+        SELECT e.shop_id, e.user_id, e.shop_group_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM shop e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SHOP' AND t.target_id = e.shop_id
+        WHERE e.user_id = #{userId}
+        ORDER BY e.shop_id
     </select>
 
     <select id="selectById" resultType="ShopVO">
-        SELECT shop_id, user_id, shop_group_id, name, created_at, updated_at
-        FROM shop
-        WHERE user_id = #{userId} AND shop_id = #{shopId}
+        SELECT e.shop_id, e.user_id, e.shop_group_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM shop e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SHOP' AND t.target_id = e.shop_id
+        WHERE e.user_id = #{userId} AND e.shop_id = #{shopId}
     </select>
 
     <select id="selectByParentAndName" resultType="ShopVO">
-        SELECT shop_id, user_id, shop_group_id, name, created_at, updated_at
+        SELECT e.shop_id, e.user_id, e.shop_group_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM shop e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SHOP' AND t.target_id = e.shop_id
+        WHERE e.user_id = #{userId} AND e.shop_group_id = #{shopGroupId} AND e.name = #{name}
+    </select>
+
+    <!-- 상위를 지울 때 함께 지워지는 하위들의 썸네일을 정리하려고 id만 모은다 -->
+    <select id="selectIdsByParent" resultType="long">
+        SELECT shop_id
         FROM shop
-        WHERE user_id = #{userId} AND shop_group_id = #{shopGroupId} AND name = #{name}
+        WHERE user_id = #{userId} AND shop_group_id = #{shopGroupId}
     </select>
 
     <select id="countByParent" resultType="int">
@@ -28,12 +41,12 @@
     </select>
 
     <insert id="insert">
-        INSERT INTO shop (user_id, shop_group_id, name)
-        VALUES (#{userId}, #{shopGroupId}, #{name})
+        INSERT INTO shop (user_id, shop_group_id, name, description)
+        VALUES (#{userId}, #{shopGroupId}, #{name}, #{description,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateName">
-        UPDATE shop SET name = #{name}
+    <update id="update">
+        UPDATE shop SET name = #{name}, description = #{description,jdbcType=VARCHAR}
         WHERE user_id = #{userId} AND shop_id = #{shopId}
     </update>
 

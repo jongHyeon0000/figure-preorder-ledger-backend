@@ -16,11 +16,13 @@ public interface SeriesMapper {
     SeriesVO selectByParentAndName(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId,
                                         @Param("name") String name);
 
+    List<Long> selectIdsByParent(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId);
+
     int countByParent(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId);
 
-    int insert(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId, @Param("name") String name);
+    int insert(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId, @Param("name") String name, @Param("description") String description);
 
-    int updateName(@Param("userId") Long userId, @Param("seriesId") Long seriesId, @Param("name") String name);
+    int update(@Param("userId") Long userId, @Param("seriesId") Long seriesId, @Param("name") String name, @Param("description") String description);
 
     int delete(@Param("userId") Long userId, @Param("seriesId") Long seriesId);
 

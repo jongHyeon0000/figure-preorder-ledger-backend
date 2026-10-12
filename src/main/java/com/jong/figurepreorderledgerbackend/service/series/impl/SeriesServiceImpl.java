@@ -2,10 +2,12 @@ package com.jong.figurepreorderledgerbackend.service.series.impl;
 
 import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
+import com.jong.figurepreorderledgerbackend.common.constant.ThumbnailTarget;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.series.SeriesGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.series.SeriesMapper;
 import com.jong.figurepreorderledgerbackend.service.series.SeriesService;
+import com.jong.figurepreorderledgerbackend.service.thumbnail.ThumbnailImageService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import com.jong.figurepreorderledgerbackend.vo.series.SeriesVO;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -22,6 +25,7 @@ public class SeriesServiceImpl implements SeriesService {
 
     private final SeriesMapper seriesMapper;
     private final SeriesGroupMapper seriesGroupMapper;
+    private final ThumbnailImageService thumbnailImageService;
 
     @Override
     public List<SeriesVO> getAll(Long userId) {
@@ -40,7 +44,7 @@ public class SeriesServiceImpl implements SeriesService {
         }
         String trimmed = vo.getName().trim();
         try {
-            seriesMapper.insert(userId, seriesGroupId, trimmed);
+            seriesMapper.insert(userId, seriesGroupId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -51,11 +55,12 @@ public class SeriesServiceImpl implements SeriesService {
     @Transactional
     public void update(Long userId, Long seriesId, SeriesVO vo) {
         SeriesVO child = find(userId, seriesId);
-        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
+        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())
+                && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            seriesMapper.updateName(userId, seriesId, vo.getName().trim());
+            seriesMapper.update(userId, seriesId, vo.getName().trim(), vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -78,6 +83,7 @@ public class SeriesServiceImpl implements SeriesService {
         seriesMapper.moveInsertFallback(userId, seriesId, fallbackId);
         seriesMapper.moveDeleteLinks(userId, seriesId);
         seriesMapper.delete(userId, seriesId);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.SERIES, Collections.singletonList(seriesId));
     }
 
     @Override

@@ -2,10 +2,12 @@ package com.jong.figurepreorderledgerbackend.service.type.impl;
 
 import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
+import com.jong.figurepreorderledgerbackend.common.constant.ThumbnailTarget;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeMapper;
 import com.jong.figurepreorderledgerbackend.service.type.FigureTypeService;
+import com.jong.figurepreorderledgerbackend.service.thumbnail.ThumbnailImageService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeVO;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -22,6 +25,7 @@ public class FigureTypeServiceImpl implements FigureTypeService {
 
     private final FigureTypeMapper figureTypeMapper;
     private final FigureTypeGroupMapper figureTypeGroupMapper;
+    private final ThumbnailImageService thumbnailImageService;
 
     @Override
     public List<FigureTypeVO> getAll(Long userId) {
@@ -40,7 +44,7 @@ public class FigureTypeServiceImpl implements FigureTypeService {
         }
         String trimmed = vo.getName().trim();
         try {
-            figureTypeMapper.insert(userId, figureTypeGroupId, trimmed);
+            figureTypeMapper.insert(userId, figureTypeGroupId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -51,11 +55,12 @@ public class FigureTypeServiceImpl implements FigureTypeService {
     @Transactional
     public void update(Long userId, Long figureTypeId, FigureTypeVO vo) {
         FigureTypeVO child = find(userId, figureTypeId);
-        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
+        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())
+                && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            figureTypeMapper.updateName(userId, figureTypeId, vo.getName().trim());
+            figureTypeMapper.update(userId, figureTypeId, vo.getName().trim(), vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -77,6 +82,7 @@ public class FigureTypeServiceImpl implements FigureTypeService {
         }
         figureTypeMapper.moveUsage(userId, figureTypeId, fallbackId);
         figureTypeMapper.delete(userId, figureTypeId);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.FIGURE_TYPE, Collections.singletonList(figureTypeId));
     }
 
     @Override

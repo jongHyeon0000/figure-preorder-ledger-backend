@@ -29,6 +29,7 @@ CREATE TABLE shop_group (
   shop_group_id BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
   user_id       BIGINT       NOT NULL COMMENT '소유 계정',
   name          VARCHAR(100) NOT NULL COMMENT '채널명 (네이버 스토어, 일반 스토어)',
+  description   VARCHAR(1000) NULL COMMENT '설명 (일반 텍스트)',
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (shop_group_id),
@@ -42,6 +43,7 @@ CREATE TABLE shop (
   user_id       BIGINT       NOT NULL COMMENT '소유 계정',
   shop_group_id BIGINT       NOT NULL COMMENT '상위 채널',
   name          VARCHAR(100) NOT NULL COMMENT '스토어명 (굿스마일 pw, 코믹스아트 등)',
+  description   VARCHAR(1000) NULL COMMENT '설명 (일반 텍스트)',
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (shop_id),
@@ -55,6 +57,7 @@ CREATE TABLE figure_type_group (
   figure_type_group_id BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
   user_id              BIGINT       NOT NULL COMMENT '소유 계정',
   name                 VARCHAR(100) NOT NULL COMMENT '형태 상위명 (스케일, 넨도로이드)',
+  description          VARCHAR(1000) NULL COMMENT '설명 (일반 텍스트)',
   created_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (figure_type_group_id),
@@ -68,6 +71,7 @@ CREATE TABLE figure_type (
   user_id              BIGINT       NOT NULL COMMENT '소유 계정',
   figure_type_group_id BIGINT       NOT NULL COMMENT '상위 형태',
   name                 VARCHAR(100) NOT NULL COMMENT '형태 하위명 (푸치, 기타 등)',
+  description          VARCHAR(1000) NULL COMMENT '설명 (일반 텍스트)',
   created_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (figure_type_id),
@@ -81,6 +85,7 @@ CREATE TABLE series_group (
   series_group_id BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
   user_id         BIGINT       NOT NULL COMMENT '소유 계정',
   name            VARCHAR(100) NOT NULL COMMENT '시리즈 상위명 (굿스마일 라인업, 미쿠 시리즈)',
+  description     VARCHAR(1000) NULL COMMENT '설명 (일반 텍스트)',
   created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (series_group_id),
@@ -94,6 +99,7 @@ CREATE TABLE series (
   user_id         BIGINT       NOT NULL COMMENT '소유 계정',
   series_group_id BIGINT       NOT NULL COMMENT '상위 시리즈',
   name            VARCHAR(100) NOT NULL COMMENT '시리즈 하위명 (팝업퍼레이드, 매지컬미라이 등)',
+  description     VARCHAR(1000) NULL COMMENT '설명 (일반 텍스트)',
   created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (series_id),
@@ -107,6 +113,7 @@ CREATE TABLE genre_character_group (
   genre_character_group_id BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
   user_id                  BIGINT       NOT NULL COMMENT '소유 계정',
   name                     VARCHAR(100) NOT NULL COMMENT '장르명 (보컬로이드, 바키 등)',
+  description              VARCHAR(1000) NULL COMMENT '설명 (일반 텍스트)',
   created_at               DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at               DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (genre_character_group_id),
@@ -120,6 +127,7 @@ CREATE TABLE genre_character (
   user_id                  BIGINT       NOT NULL COMMENT '소유 계정',
   genre_character_group_id BIGINT       NOT NULL COMMENT '소속 장르',
   name                     VARCHAR(100) NOT NULL COMMENT '캐릭터명 (하츠네 미쿠 등)',
+  description              VARCHAR(1000) NULL COMMENT '설명 (일반 텍스트)',
   created_at               DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at               DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (genre_character_id),
@@ -133,6 +141,7 @@ CREATE TABLE maker (
   maker_id   BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
   user_id    BIGINT       NOT NULL COMMENT '소유 계정',
   name       VARCHAR(100) NOT NULL COMMENT '제조사명 (세가, 후류 등)',
+  description VARCHAR(1000) NULL COMMENT '설명 (일반 텍스트)',
   created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (maker_id),
@@ -223,17 +232,18 @@ CREATE TABLE figure_editor_image_map (
   CONSTRAINT fk_figure_editor_image_map_editor_image FOREIGN KEY (user_id, editor_image_id) REFERENCES editor_image (user_id, editor_image_id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='상품-에디터 이미지 연결(N:M)';
 
--- ---------------------------------------------------------------- 썸네일 이미지
+-- ---------------------------------------------------------------- 썸네일 이미지 (상품, 분류 공통)
 CREATE TABLE thumbnail_image (
   thumbnail_image_id BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
   user_id            BIGINT       NOT NULL COMMENT '소유 계정',
-  figure_id          BIGINT       NOT NULL COMMENT '썸네일이 속한 상품',
+  target_type        VARCHAR(30)  NOT NULL COMMENT '대상 종류: FIGURE 상품, SHOP_GROUP 판매처 채널, SHOP 판매처 스토어, FIGURE_TYPE_GROUP 형태 상위, FIGURE_TYPE 형태 하위, SERIES_GROUP 시리즈 상위, SERIES 시리즈 하위, GENRE_CHARACTER_GROUP 장르, GENRE_CHARACTER 캐릭터, MAKER 제조사',
+  target_id          BIGINT       NOT NULL COMMENT '대상 행의 id (target_type 테이블의 PK)',
   file_path          VARCHAR(500) NOT NULL COMMENT '서버 저장 경로',
   original_name      VARCHAR(255) NOT NULL COMMENT '원본 파일명',
   file_size          INT UNSIGNED NOT NULL COMMENT '파일 크기(byte)',
   created_at         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '업로드일',
   PRIMARY KEY (thumbnail_image_id),
-  UNIQUE KEY uk_thumbnail_image_figure (user_id, figure_id),
+  UNIQUE KEY uk_thumbnail_image_target (user_id, target_type, target_id),
   CONSTRAINT fk_thumbnail_image_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
-  CONSTRAINT fk_thumbnail_image_figure FOREIGN KEY (user_id, figure_id) REFERENCES figure (user_id, figure_id) ON DELETE CASCADE
-) ENGINE=InnoDB COMMENT='상품 썸네일 이미지';
+  CONSTRAINT ck_thumbnail_image_target_type CHECK (target_type IN ('FIGURE','SHOP_GROUP','SHOP','FIGURE_TYPE_GROUP','FIGURE_TYPE','SERIES_GROUP','SERIES','GENRE_CHARACTER_GROUP','GENRE_CHARACTER','MAKER'))
+) ENGINE=InnoDB COMMENT='썸네일 이미지 (상품, 분류 공통)';
