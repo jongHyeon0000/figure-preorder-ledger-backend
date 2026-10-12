@@ -1,6 +1,6 @@
 package com.jong.figurepreorderledgerbackend.mapper.series;
 
-import com.jong.figurepreorderledgerbackend.vo.series.SeriesResponse;
+import com.jong.figurepreorderledgerbackend.vo.series.response.SeriesResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

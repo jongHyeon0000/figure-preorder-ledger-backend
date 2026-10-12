@@ -7,7 +7,7 @@ import com.jong.figurepreorderledgerbackend.mapper.series.SeriesGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.series.SeriesMapper;
 import com.jong.figurepreorderledgerbackend.service.series.SeriesService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
-import com.jong.figurepreorderledgerbackend.vo.series.SeriesResponse;
+import com.jong.figurepreorderledgerbackend.vo.series.response.SeriesResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;

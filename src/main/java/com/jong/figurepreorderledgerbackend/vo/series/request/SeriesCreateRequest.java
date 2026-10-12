@@ -1,6 +1,7 @@
-package com.jong.figurepreorderledgerbackend.vo.series;
+package com.jong.figurepreorderledgerbackend.vo.series.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SeriesUpdateRequest {
+public class SeriesCreateRequest {
+
+    @NotNull
+    private Long seriesGroupId;
 
     @NotBlank
     @Size(max = 100)

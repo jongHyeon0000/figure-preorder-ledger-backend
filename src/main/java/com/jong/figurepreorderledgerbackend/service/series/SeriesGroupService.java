@@ -1,6 +1,6 @@
 package com.jong.figurepreorderledgerbackend.service.series;
 
-import com.jong.figurepreorderledgerbackend.vo.series.SeriesGroupResponse;
+import com.jong.figurepreorderledgerbackend.vo.series.response.SeriesGroupResponse;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 
 import java.util.List;

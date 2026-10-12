@@ -1,15 +1,17 @@
-package com.jong.figurepreorderledgerbackend.vo.series;
+package com.jong.figurepreorderledgerbackend.vo.series.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class SeriesResponse {
+public class SeriesGroupResponse {
 
-    private Long seriesId;
     private Long seriesGroupId;
     private String name;
+    private List<SeriesResponse> children;
 }
