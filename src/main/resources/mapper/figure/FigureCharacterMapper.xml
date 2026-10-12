@@ -4,28 +4,28 @@
 
     <!-- 여러 상품의 캐릭터를 한 번에 조회 (장르 이름 포함, figure_id로 상품별로 묶는 것은 서비스) -->
     <select id="selectByFigureIds" resultType="FigureCharacterInfo">
-        SELECT fc.figure_id, c.id, c.name, g.id AS genre_id, g.name AS genre_name
-        FROM figure_character fc
-        JOIN genre_character c ON c.user_id = fc.user_id AND c.id = fc.character_id
-        JOIN genre g ON g.user_id = c.user_id AND g.id = c.genre_id
+        SELECT fc.figure_id, c.genre_character_id, c.name, g.genre_character_group_id, g.name AS genre_character_group_name
+        FROM figure_character_map fc
+        JOIN genre_character c ON c.user_id = fc.user_id AND c.genre_character_id = fc.genre_character_id
+        JOIN genre_character_group g ON g.user_id = c.user_id AND g.genre_character_group_id = c.genre_character_group_id
         WHERE fc.user_id = #{userId}
           AND fc.figure_id IN
         <foreach collection="figureIds" item="figureId" open="(" separator="," close=")">
             #{figureId}
         </foreach>
-        ORDER BY fc.figure_id, c.id
+        ORDER BY fc.figure_id, c.genre_character_id
     </select>
 
     <insert id="insertAll">
-        INSERT INTO figure_character (user_id, figure_id, character_id)
+        INSERT INTO figure_character_map (user_id, figure_id, genre_character_id)
         VALUES
-        <foreach collection="characterIds" item="characterId" separator=",">
-            (#{userId}, #{figureId}, #{characterId})
+        <foreach collection="genreCharacterIds" item="genreCharacterId" separator=",">
+            (#{userId}, #{figureId}, #{genreCharacterId})
         </foreach>
     </insert>
 
     <delete id="deleteByFigure">
-        DELETE FROM figure_character
+        DELETE FROM figure_character_map
         WHERE user_id = #{userId} AND figure_id = #{figureId}
     </delete>
 

@@ -1,10 +1,10 @@
 package com.jong.figurepreorderledgerbackend.vo.figure;
 
-import com.jong.figurepreorderledgerbackend.vo.genre.GenreResponse;
+import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterGroupResponse;
 import com.jong.figurepreorderledgerbackend.vo.maker.MakerResponse;
 import com.jong.figurepreorderledgerbackend.vo.series.SeriesGroupResponse;
-import com.jong.figurepreorderledgerbackend.vo.shop.ShopChannelResponse;
-import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeResponse;
+import com.jong.figurepreorderledgerbackend.vo.shop.ShopGroupResponse;
+import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeGroupResponse;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,9 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 public class FigureFormOptionsResponse {
 
-    private List<ShopChannelResponse> shops;
-    private List<FigureTypeResponse> types;
+    private List<ShopGroupResponse> shops;
+    private List<FigureTypeGroupResponse> types;
     private List<SeriesGroupResponse> series;
-    private List<GenreResponse> genres;
+    private List<GenreCharacterGroupResponse> genres;
     private List<MakerResponse> makers;
 }

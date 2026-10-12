@@ -30,7 +30,7 @@ public class SeriesGroupService {
         for (SeriesGroupResponse parent : parents) {
             List<SeriesResponse> own = new ArrayList<>();
             for (SeriesResponse child : children) {
-                if (parent.getId().equals(child.getGroupId())) {
+                if (parent.getSeriesGroupId().equals(child.getSeriesGroupId())) {
                     own.add(child);
                 }
             }
@@ -50,21 +50,21 @@ public class SeriesGroupService {
         }
         SeriesGroupResponse parent = seriesGroupMapper.selectByName(userId, trimmed);
 
-        seriesMapper.insert(userId, parent.getId(), CategoryConstant.DEFAULT_NAME);
+        seriesMapper.insert(userId, parent.getSeriesGroupId(), CategoryConstant.DEFAULT_NAME);
         List<SeriesResponse> children = new ArrayList<>();
-        children.add(seriesMapper.selectByParentAndName(userId, parent.getId(), CategoryConstant.DEFAULT_NAME));
+        children.add(seriesMapper.selectByParentAndName(userId, parent.getSeriesGroupId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
         return parent;
     }
 
     @Transactional
-    public void update(Long userId, Long id, String name) {
-        SeriesGroupResponse parent = find(userId, id);
+    public void update(Long userId, Long seriesGroupId, String name) {
+        SeriesGroupResponse parent = find(userId, seriesGroupId);
         if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            seriesGroupMapper.updateName(userId, id, name.trim());
+            seriesGroupMapper.updateName(userId, seriesGroupId, name.trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -72,8 +72,8 @@ public class SeriesGroupService {
 
     /* 쓰던 상품을 기본 항목(기타 > 기타)으로 옮긴 뒤 삭제한다. 하위는 DB에서 함께 삭제된다 */
     @Transactional
-    public void delete(Long userId, Long id) {
-        SeriesGroupResponse parent = find(userId, id);
+    public void delete(Long userId, Long seriesGroupId) {
+        SeriesGroupResponse parent = find(userId, seriesGroupId);
         if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
@@ -81,18 +81,18 @@ public class SeriesGroupService {
         if (fallbackId == null) {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
-        seriesGroupMapper.moveInsertFallback(userId, id, fallbackId);
-        seriesGroupMapper.moveDeleteLinks(userId, id);
-        seriesGroupMapper.delete(userId, id);
+        seriesGroupMapper.moveInsertFallback(userId, seriesGroupId, fallbackId);
+        seriesGroupMapper.moveDeleteLinks(userId, seriesGroupId);
+        seriesGroupMapper.delete(userId, seriesGroupId);
     }
 
-    public UsageResponse getUsage(Long userId, Long id) {
-        find(userId, id);
-        return new UsageResponse(seriesGroupMapper.countUsage(userId, id));
+    public UsageResponse getUsage(Long userId, Long seriesGroupId) {
+        find(userId, seriesGroupId);
+        return new UsageResponse(seriesGroupMapper.countUsage(userId, seriesGroupId));
     }
 
-    private SeriesGroupResponse find(Long userId, Long id) {
-        SeriesGroupResponse parent = seriesGroupMapper.selectById(userId, id);
+    private SeriesGroupResponse find(Long userId, Long seriesGroupId) {
+        SeriesGroupResponse parent = seriesGroupMapper.selectById(userId, seriesGroupId);
         if (parent == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

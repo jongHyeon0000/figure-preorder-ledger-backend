@@ -9,6 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FigureMakerInfo {
 
-    private Long id;
+    private Long makerId;
     private String name;
 }

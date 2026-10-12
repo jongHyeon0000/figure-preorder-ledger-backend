@@ -13,8 +13,8 @@ public class FigureCharacterInfo {
     /* 상품별로 묶을 때만 쓰고 응답에는 내보내지 않는다 */
     @JsonIgnore
     private Long figureId;
-    private Long id;
+    private Long genreCharacterId;
     private String name;
-    private Long genreId;
-    private String genreName;
+    private Long genreCharacterGroupId;
+    private String genreCharacterGroupName;
 }

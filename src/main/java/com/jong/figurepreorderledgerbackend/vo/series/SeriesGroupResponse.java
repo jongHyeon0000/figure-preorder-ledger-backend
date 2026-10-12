@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class SeriesGroupResponse {
 
-    private Long id;
+    private Long seriesGroupId;
     private String name;
     private List<SeriesResponse> children;
 }

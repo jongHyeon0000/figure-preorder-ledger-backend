@@ -3,78 +3,78 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterMapper">
 
     <select id="selectAll" resultType="GenreCharacterResponse">
-        SELECT id, genre_id, name
+        SELECT genre_character_id, genre_character_group_id, name
         FROM genre_character
         WHERE user_id = #{userId}
-        ORDER BY id
+        ORDER BY genre_character_id
     </select>
 
     <select id="selectById" resultType="GenreCharacterResponse">
-        SELECT id, genre_id, name
+        SELECT genre_character_id, genre_character_group_id, name
         FROM genre_character
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND genre_character_id = #{genreCharacterId}
     </select>
 
     <select id="selectByParentAndName" resultType="GenreCharacterResponse">
-        SELECT id, genre_id, name
+        SELECT genre_character_id, genre_character_group_id, name
         FROM genre_character
-        WHERE user_id = #{userId} AND genre_id = #{parentId} AND name = #{name}
+        WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId} AND name = #{name}
     </select>
 
     <select id="countByParent" resultType="int">
         SELECT COUNT(*)
         FROM genre_character
-        WHERE user_id = #{userId} AND genre_id = #{parentId}
+        WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId}
     </select>
 
     <insert id="insert">
-        INSERT INTO genre_character (user_id, genre_id, name)
-        VALUES (#{userId}, #{parentId}, #{name})
+        INSERT INTO genre_character (user_id, genre_character_group_id, name)
+        VALUES (#{userId}, #{genreCharacterGroupId}, #{name})
     </insert>
 
     <update id="updateName">
         UPDATE genre_character SET name = #{name}
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND genre_character_id = #{genreCharacterId}
     </update>
 
     <delete id="delete">
         DELETE FROM genre_character
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND genre_character_id = #{genreCharacterId}
     </delete>
 
     <!-- 상품을 옮겨 갈 기본 항목: 이름이 기타인 상위 아래의 기타 하위 -->
     <select id="selectDefaultId" resultType="long">
-        SELECT c.id
+        SELECT c.genre_character_id
         FROM genre_character c
-        JOIN genre p ON p.id = c.genre_id AND p.user_id = c.user_id
+        JOIN genre_character_group p ON p.genre_character_group_id = c.genre_character_group_id AND p.user_id = c.user_id
         WHERE c.user_id = #{userId} AND p.name = #{defaultName} AND c.name = #{defaultName}
     </select>
 
     <!-- 이 하위를 쓰는 상품의 수 -->
     <select id="countUsage" resultType="int">
         SELECT COUNT(DISTINCT figure_id)
-        FROM figure_character
-        WHERE user_id = #{userId} AND character_id = #{id}
+        FROM figure_character_map
+        WHERE user_id = #{userId} AND genre_character_id = #{genreCharacterId}
     </select>
 
     <!-- 1단계: 이 하위만 가지고 있던 상품에 기본 항목을 연결한다. 다른 항목이 남은 상품에는 추가하지 않는다 -->
     <insert id="moveInsertFallback">
-        INSERT INTO figure_character (user_id, figure_id, character_id)
+        INSERT INTO figure_character_map (user_id, figure_id, genre_character_id)
         SELECT DISTINCT l.user_id, l.figure_id, #{fallbackId}
-        FROM figure_character l
+        FROM figure_character_map l
         WHERE l.user_id = #{userId}
-          AND l.character_id = #{id}
+          AND l.genre_character_id = #{genreCharacterId}
           AND NOT EXISTS (
-              SELECT 1 FROM figure_character o
+              SELECT 1 FROM figure_character_map o
               WHERE o.user_id = l.user_id AND o.figure_id = l.figure_id
-                AND o.character_id &lt;&gt; #{id}
+                AND o.genre_character_id &lt;&gt; #{genreCharacterId}
           )
     </insert>
 
     <!-- 2단계: 이 하위에 대한 연결을 지운다 -->
     <delete id="moveDeleteLinks">
-        DELETE FROM figure_character
-        WHERE user_id = #{userId} AND character_id = #{id}
+        DELETE FROM figure_character_map
+        WHERE user_id = #{userId} AND genre_character_id = #{genreCharacterId}
     </delete>
 
 </mapper>

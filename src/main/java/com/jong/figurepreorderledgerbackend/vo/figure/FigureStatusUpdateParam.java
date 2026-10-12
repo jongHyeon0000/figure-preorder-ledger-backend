@@ -15,7 +15,7 @@ import java.time.LocalDate;
 public class FigureStatusUpdateParam {
 
     private Long userId;
-    private Long id;
+    private Long figureId;
     private FigureStatus status;
     private PaymentType paymentType;
     private Integer depositAmount;

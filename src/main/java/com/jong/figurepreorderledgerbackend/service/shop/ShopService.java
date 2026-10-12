@@ -4,7 +4,7 @@ import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper;
-import com.jong.figurepreorderledgerbackend.mapper.shop.ShopChannelMapper;
+import com.jong.figurepreorderledgerbackend.mapper.shop.ShopGroupMapper;
 import com.jong.figurepreorderledgerbackend.vo.shop.ShopResponse;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,34 +20,34 @@ import java.util.List;
 public class ShopService {
 
     private final ShopMapper shopMapper;
-    private final ShopChannelMapper shopChannelMapper;
+    private final ShopGroupMapper shopGroupMapper;
 
     public List<ShopResponse> getAll(Long userId) {
         return shopMapper.selectAll(userId);
     }
 
     @Transactional
-    public ShopResponse create(Long userId, Long channelId, String name) {
-        if (shopChannelMapper.selectById(userId, channelId) == null) {
+    public ShopResponse create(Long userId, Long shopGroupId, String name) {
+        if (shopGroupMapper.selectById(userId, shopGroupId) == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
         String trimmed = name.trim();
         try {
-            shopMapper.insert(userId, channelId, trimmed);
+            shopMapper.insert(userId, shopGroupId, trimmed);
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
-        return shopMapper.selectByParentAndName(userId, channelId, trimmed);
+        return shopMapper.selectByParentAndName(userId, shopGroupId, trimmed);
     }
 
     @Transactional
-    public void update(Long userId, Long id, String name) {
-        ShopResponse child = find(userId, id);
+    public void update(Long userId, Long shopId, String name) {
+        ShopResponse child = find(userId, shopId);
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            shopMapper.updateName(userId, id, name.trim());
+            shopMapper.updateName(userId, shopId, name.trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -55,29 +55,29 @@ public class ShopService {
 
     /* 쓰던 상품을 기본 항목(기타 > 기타)으로 옮긴 뒤 삭제한다 */
     @Transactional
-    public void delete(Long userId, Long id) {
-        ShopResponse child = find(userId, id);
+    public void delete(Long userId, Long shopId) {
+        ShopResponse child = find(userId, shopId);
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
-        if (shopMapper.countByParent(userId, child.getChannelId()) <= 1) {
+        if (shopMapper.countByParent(userId, child.getShopGroupId()) <= 1) {
             throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
         }
         Long fallbackId = shopMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
         if (fallbackId == null) {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
-        shopMapper.moveUsage(userId, id, fallbackId);
-        shopMapper.delete(userId, id);
+        shopMapper.moveUsage(userId, shopId, fallbackId);
+        shopMapper.delete(userId, shopId);
     }
 
-    public UsageResponse getUsage(Long userId, Long id) {
-        find(userId, id);
-        return new UsageResponse(shopMapper.countUsage(userId, id));
+    public UsageResponse getUsage(Long userId, Long shopId) {
+        find(userId, shopId);
+        return new UsageResponse(shopMapper.countUsage(userId, shopId));
     }
 
-    private ShopResponse find(Long userId, Long id) {
-        ShopResponse child = shopMapper.selectById(userId, id);
+    private ShopResponse find(Long userId, Long shopId) {
+        ShopResponse child = shopMapper.selectById(userId, shopId);
         if (child == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

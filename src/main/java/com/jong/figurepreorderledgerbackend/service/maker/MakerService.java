@@ -36,13 +36,13 @@ public class MakerService {
     }
 
     @Transactional
-    public void update(Long userId, Long id, String name) {
-        MakerResponse maker = find(userId, id);
+    public void update(Long userId, Long makerId, String name) {
+        MakerResponse maker = find(userId, makerId);
         if (CategoryConstant.DEFAULT_NAME.equals(maker.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            makerMapper.updateName(userId, id, name.trim());
+            makerMapper.updateName(userId, makerId, name.trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -50,8 +50,8 @@ public class MakerService {
 
     /* 쓰던 상품을 기본 항목(기타)으로 옮긴 뒤 삭제한다 */
     @Transactional
-    public void delete(Long userId, Long id) {
-        MakerResponse maker = find(userId, id);
+    public void delete(Long userId, Long makerId) {
+        MakerResponse maker = find(userId, makerId);
         if (CategoryConstant.DEFAULT_NAME.equals(maker.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
@@ -59,17 +59,17 @@ public class MakerService {
         if (fallbackId == null) {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
-        makerMapper.moveUsage(userId, id, fallbackId);
-        makerMapper.delete(userId, id);
+        makerMapper.moveUsage(userId, makerId, fallbackId);
+        makerMapper.delete(userId, makerId);
     }
 
-    public UsageResponse getUsage(Long userId, Long id) {
-        find(userId, id);
-        return new UsageResponse(makerMapper.countUsage(userId, id));
+    public UsageResponse getUsage(Long userId, Long makerId) {
+        find(userId, makerId);
+        return new UsageResponse(makerMapper.countUsage(userId, makerId));
     }
 
-    private MakerResponse find(Long userId, Long id) {
-        MakerResponse maker = makerMapper.selectById(userId, id);
+    private MakerResponse find(Long userId, Long makerId) {
+        MakerResponse maker = makerMapper.selectById(userId, makerId);
         if (maker == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

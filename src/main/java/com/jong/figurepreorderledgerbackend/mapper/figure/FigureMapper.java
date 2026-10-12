@@ -17,24 +17,24 @@ public interface FigureMapper {
 
     List<FigureListResponse> selectList(@Param("userId") Long userId);
 
-    FigureListResponse selectListById(@Param("userId") Long userId, @Param("id") Long id);
+    FigureListResponse selectListById(@Param("userId") Long userId, @Param("figureId") Long figureId);
 
-    FigureDetailResponse selectDetailById(@Param("userId") Long userId, @Param("id") Long id);
+    FigureDetailResponse selectDetailById(@Param("userId") Long userId, @Param("figureId") Long figureId);
 
     int insert(@Param("userId") Long userId, @Param("status") FigureStatus status,
                @Param("request") FigureCreateRequest request);
 
     Long selectLastInsertId();
 
-    int update(@Param("userId") Long userId, @Param("id") Long id, @Param("request") FigureUpdateRequest request);
+    int update(@Param("userId") Long userId, @Param("figureId") Long figureId, @Param("request") FigureUpdateRequest request);
 
-    int delete(@Param("userId") Long userId, @Param("id") Long id);
+    int delete(@Param("userId") Long userId, @Param("figureId") Long figureId);
 
-    int deleteByIds(@Param("userId") Long userId, @Param("ids") List<Long> ids);
+    int deleteByIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);
 
-    FigureCurrentStatus selectCurrentStatus(@Param("userId") Long userId, @Param("id") Long id);
+    FigureCurrentStatus selectCurrentStatus(@Param("userId") Long userId, @Param("figureId") Long figureId);
 
-    List<FigureCurrentStatus> selectCurrentStatusByIds(@Param("userId") Long userId, @Param("ids") List<Long> ids);
+    List<FigureCurrentStatus> selectCurrentStatusByIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);
 
     int updateStatus(FigureStatusUpdateParam param);
 }

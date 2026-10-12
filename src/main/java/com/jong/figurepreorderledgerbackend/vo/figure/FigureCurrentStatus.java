@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FigureCurrentStatus {
 
-    private Long id;
+    private Long figureId;
     private FigureStatus status;
     private PaymentType paymentType;
 }

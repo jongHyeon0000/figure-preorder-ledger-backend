@@ -11,24 +11,24 @@ public interface GenreCharacterMapper {
 
     List<GenreCharacterResponse> selectAll(@Param("userId") Long userId);
 
-    GenreCharacterResponse selectById(@Param("userId") Long userId, @Param("id") Long id);
+    GenreCharacterResponse selectById(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId);
 
-    GenreCharacterResponse selectByParentAndName(@Param("userId") Long userId, @Param("parentId") Long parentId,
+    GenreCharacterResponse selectByParentAndName(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId,
                                         @Param("name") String name);
 
-    int countByParent(@Param("userId") Long userId, @Param("parentId") Long parentId);
+    int countByParent(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId);
 
-    int insert(@Param("userId") Long userId, @Param("parentId") Long parentId, @Param("name") String name);
+    int insert(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId, @Param("name") String name);
 
-    int updateName(@Param("userId") Long userId, @Param("id") Long id, @Param("name") String name);
+    int updateName(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId, @Param("name") String name);
 
-    int delete(@Param("userId") Long userId, @Param("id") Long id);
+    int delete(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId);
 
     Long selectDefaultId(@Param("userId") Long userId, @Param("defaultName") String defaultName);
 
-    int countUsage(@Param("userId") Long userId, @Param("id") Long id);
+    int countUsage(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId);
 
-    int moveInsertFallback(@Param("userId") Long userId, @Param("id") Long id, @Param("fallbackId") Long fallbackId);
+    int moveInsertFallback(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId, @Param("fallbackId") Long fallbackId);
 
-    int moveDeleteLinks(@Param("userId") Long userId, @Param("id") Long id);
+    int moveDeleteLinks(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId);
 }

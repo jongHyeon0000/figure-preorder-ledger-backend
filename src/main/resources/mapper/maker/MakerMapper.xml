@@ -3,20 +3,20 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.maker.MakerMapper">
 
     <select id="selectAll" resultType="MakerResponse">
-        SELECT id, name
+        SELECT maker_id, name
         FROM maker
         WHERE user_id = #{userId}
-        ORDER BY id
+        ORDER BY maker_id
     </select>
 
     <select id="selectById" resultType="MakerResponse">
-        SELECT id, name
+        SELECT maker_id, name
         FROM maker
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND maker_id = #{makerId}
     </select>
 
     <select id="selectByName" resultType="MakerResponse">
-        SELECT id, name
+        SELECT maker_id, name
         FROM maker
         WHERE user_id = #{userId} AND name = #{name}
     </select>
@@ -28,17 +28,17 @@
 
     <update id="updateName">
         UPDATE maker SET name = #{name}
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND maker_id = #{makerId}
     </update>
 
     <delete id="delete">
         DELETE FROM maker
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND maker_id = #{makerId}
     </delete>
 
     <!-- 상품을 옮겨 갈 기본 항목: 이름이 기타인 제조사 -->
     <select id="selectDefaultId" resultType="long">
-        SELECT id
+        SELECT maker_id
         FROM maker
         WHERE user_id = #{userId} AND name = #{defaultName}
     </select>
@@ -47,13 +47,13 @@
     <select id="countUsage" resultType="int">
         SELECT COUNT(*)
         FROM figure
-        WHERE user_id = #{userId} AND maker_id = #{id}
+        WHERE user_id = #{userId} AND maker_id = #{makerId}
     </select>
 
     <!-- 이 제조사를 쓰던 상품을 기본 항목으로 바꾼다 -->
     <update id="moveUsage">
         UPDATE figure SET maker_id = #{fallbackId}
-        WHERE user_id = #{userId} AND maker_id = #{id}
+        WHERE user_id = #{userId} AND maker_id = #{makerId}
     </update>
 
 </mapper>

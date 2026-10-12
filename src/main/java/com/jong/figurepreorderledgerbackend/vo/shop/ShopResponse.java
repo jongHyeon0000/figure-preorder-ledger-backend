@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ShopResponse {
 
-    private Long id;
-    private Long channelId;
+    private Long shopId;
+    private Long shopGroupId;
     private String name;
 }

@@ -13,7 +13,7 @@ import lombok.Setter;
 public class ShopCreateRequest {
 
     @NotNull
-    private Long channelId;
+    private Long shopGroupId;
 
     @NotBlank
     @Size(max = 100)

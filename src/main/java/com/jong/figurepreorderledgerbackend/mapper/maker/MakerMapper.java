@@ -11,19 +11,19 @@ public interface MakerMapper {
 
     List<MakerResponse> selectAll(@Param("userId") Long userId);
 
-    MakerResponse selectById(@Param("userId") Long userId, @Param("id") Long id);
+    MakerResponse selectById(@Param("userId") Long userId, @Param("makerId") Long makerId);
 
     MakerResponse selectByName(@Param("userId") Long userId, @Param("name") String name);
 
     int insert(@Param("userId") Long userId, @Param("name") String name);
 
-    int updateName(@Param("userId") Long userId, @Param("id") Long id, @Param("name") String name);
+    int updateName(@Param("userId") Long userId, @Param("makerId") Long makerId, @Param("name") String name);
 
-    int delete(@Param("userId") Long userId, @Param("id") Long id);
+    int delete(@Param("userId") Long userId, @Param("makerId") Long makerId);
 
     Long selectDefaultId(@Param("userId") Long userId, @Param("defaultName") String defaultName);
 
-    int countUsage(@Param("userId") Long userId, @Param("id") Long id);
+    int countUsage(@Param("userId") Long userId, @Param("makerId") Long makerId);
 
-    int moveUsage(@Param("userId") Long userId, @Param("id") Long id, @Param("fallbackId") Long fallbackId);
+    int moveUsage(@Param("userId") Long userId, @Param("makerId") Long makerId, @Param("fallbackId") Long fallbackId);
 }

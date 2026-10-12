@@ -11,22 +11,22 @@ public interface ShopMapper {
 
     List<ShopResponse> selectAll(@Param("userId") Long userId);
 
-    ShopResponse selectById(@Param("userId") Long userId, @Param("id") Long id);
+    ShopResponse selectById(@Param("userId") Long userId, @Param("shopId") Long shopId);
 
-    ShopResponse selectByParentAndName(@Param("userId") Long userId, @Param("parentId") Long parentId,
+    ShopResponse selectByParentAndName(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId,
                                         @Param("name") String name);
 
-    int countByParent(@Param("userId") Long userId, @Param("parentId") Long parentId);
+    int countByParent(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId);
 
-    int insert(@Param("userId") Long userId, @Param("parentId") Long parentId, @Param("name") String name);
+    int insert(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId, @Param("name") String name);
 
-    int updateName(@Param("userId") Long userId, @Param("id") Long id, @Param("name") String name);
+    int updateName(@Param("userId") Long userId, @Param("shopId") Long shopId, @Param("name") String name);
 
-    int delete(@Param("userId") Long userId, @Param("id") Long id);
+    int delete(@Param("userId") Long userId, @Param("shopId") Long shopId);
 
     Long selectDefaultId(@Param("userId") Long userId, @Param("defaultName") String defaultName);
 
-    int countUsage(@Param("userId") Long userId, @Param("id") Long id);
+    int countUsage(@Param("userId") Long userId, @Param("shopId") Long shopId);
 
-    int moveUsage(@Param("userId") Long userId, @Param("id") Long id, @Param("fallbackId") Long fallbackId);
+    int moveUsage(@Param("userId") Long userId, @Param("shopId") Long shopId, @Param("fallbackId") Long fallbackId);
 }

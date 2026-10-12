@@ -4,14 +4,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 public class FigureTypeResponse {
 
-    private Long id;
+    private Long figureTypeId;
+    private Long figureTypeGroupId;
     private String name;
-    private List<FigureSubtypeResponse> children;
 }

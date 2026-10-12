@@ -4,104 +4,110 @@
 
     <!-- 목록용: 설명(HTML) 제외. 시리즈와 캐릭터는 서비스가 따로 조회해 채운다 -->
     <resultMap id="listMap" type="FigureListResponse" autoMapping="true">
-        <id property="id" column="id"/>
-        <association property="subtype" javaType="FigureSubtypeInfo">
-            <id property="id" column="subtype_id"/>
-            <result property="name" column="subtype_name"/>
-            <result property="typeId" column="type_id"/>
-            <result property="typeName" column="type_name"/>
+        <id property="figureId" column="figure_id"/>
+        <association property="figureType" javaType="FigureTypeInfo">
+            <id property="figureTypeId" column="figure_type_id"/>
+            <result property="name" column="figure_type_name"/>
+            <result property="figureTypeGroupId" column="figure_type_group_id"/>
+            <result property="figureTypeGroupName" column="figure_type_group_name"/>
         </association>
         <association property="shop" javaType="FigureShopInfo">
-            <id property="id" column="shop_id"/>
+            <id property="shopId" column="shop_id"/>
             <result property="name" column="shop_name"/>
-            <result property="channelId" column="channel_id"/>
-            <result property="channelName" column="channel_name"/>
+            <result property="shopGroupId" column="shop_group_id"/>
+            <result property="shopGroupName" column="shop_group_name"/>
         </association>
         <association property="maker" javaType="FigureMakerInfo">
-            <id property="id" column="maker_id"/>
+            <id property="makerId" column="maker_id"/>
             <result property="name" column="maker_name"/>
         </association>
     </resultMap>
 
     <!-- 상세용: 목록 항목 + 설명(HTML), 생성일, 수정일 -->
     <resultMap id="detailMap" type="FigureDetailResponse" autoMapping="true">
-        <id property="id" column="id"/>
-        <association property="subtype" javaType="FigureSubtypeInfo">
-            <id property="id" column="subtype_id"/>
-            <result property="name" column="subtype_name"/>
-            <result property="typeId" column="type_id"/>
-            <result property="typeName" column="type_name"/>
+        <id property="figureId" column="figure_id"/>
+        <association property="figureType" javaType="FigureTypeInfo">
+            <id property="figureTypeId" column="figure_type_id"/>
+            <result property="name" column="figure_type_name"/>
+            <result property="figureTypeGroupId" column="figure_type_group_id"/>
+            <result property="figureTypeGroupName" column="figure_type_group_name"/>
         </association>
         <association property="shop" javaType="FigureShopInfo">
-            <id property="id" column="shop_id"/>
+            <id property="shopId" column="shop_id"/>
             <result property="name" column="shop_name"/>
-            <result property="channelId" column="channel_id"/>
-            <result property="channelName" column="channel_name"/>
+            <result property="shopGroupId" column="shop_group_id"/>
+            <result property="shopGroupName" column="shop_group_name"/>
         </association>
         <association property="maker" javaType="FigureMakerInfo">
-            <id property="id" column="maker_id"/>
+            <id property="makerId" column="maker_id"/>
             <result property="name" column="maker_name"/>
         </association>
     </resultMap>
 
     <select id="selectList" resultMap="listMap">
-        SELECT f.id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
+        SELECT f.figure_id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
                f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
                f.paid_at, f.delivered_at, f.purchase_link, f.thumbnail_url,
-               st.id AS subtype_id, st.name AS subtype_name, t.id AS type_id, t.name AS type_name,
-               sh.id AS shop_id, sh.name AS shop_name, ch.id AS channel_id, ch.name AS channel_name,
-               m.id AS maker_id, m.name AS maker_name
+               ft.figure_type_id, ft.name AS figure_type_name,
+               ftg.figure_type_group_id, ftg.name AS figure_type_group_name,
+               sh.shop_id, sh.name AS shop_name,
+               sg.shop_group_id, sg.name AS shop_group_name,
+               m.maker_id, m.name AS maker_name
         FROM figure f
-        JOIN figure_subtype st ON st.user_id = f.user_id AND st.id = f.subtype_id
-        JOIN figure_type t ON t.user_id = st.user_id AND t.id = st.type_id
-        JOIN shop sh ON sh.user_id = f.user_id AND sh.id = f.shop_id
-        JOIN shop_channel ch ON ch.user_id = sh.user_id AND ch.id = sh.channel_id
-        JOIN maker m ON m.user_id = f.user_id AND m.id = f.maker_id
+        JOIN figure_type ft ON ft.user_id = f.user_id AND ft.figure_type_id = f.figure_type_id
+        JOIN figure_type_group ftg ON ftg.user_id = ft.user_id AND ftg.figure_type_group_id = ft.figure_type_group_id
+        JOIN shop sh ON sh.user_id = f.user_id AND sh.shop_id = f.shop_id
+        JOIN shop_group sg ON sg.user_id = sh.user_id AND sg.shop_group_id = sh.shop_group_id
+        JOIN maker m ON m.user_id = f.user_id AND m.maker_id = f.maker_id
         WHERE f.user_id = #{userId}
-        ORDER BY f.id DESC
+        ORDER BY f.figure_id DESC
     </select>
 
     <select id="selectListById" resultMap="listMap">
-        SELECT f.id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
+        SELECT f.figure_id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
                f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
                f.paid_at, f.delivered_at, f.purchase_link, f.thumbnail_url,
-               st.id AS subtype_id, st.name AS subtype_name, t.id AS type_id, t.name AS type_name,
-               sh.id AS shop_id, sh.name AS shop_name, ch.id AS channel_id, ch.name AS channel_name,
-               m.id AS maker_id, m.name AS maker_name
+               ft.figure_type_id, ft.name AS figure_type_name,
+               ftg.figure_type_group_id, ftg.name AS figure_type_group_name,
+               sh.shop_id, sh.name AS shop_name,
+               sg.shop_group_id, sg.name AS shop_group_name,
+               m.maker_id, m.name AS maker_name
         FROM figure f
-        JOIN figure_subtype st ON st.user_id = f.user_id AND st.id = f.subtype_id
-        JOIN figure_type t ON t.user_id = st.user_id AND t.id = st.type_id
-        JOIN shop sh ON sh.user_id = f.user_id AND sh.id = f.shop_id
-        JOIN shop_channel ch ON ch.user_id = sh.user_id AND ch.id = sh.channel_id
-        JOIN maker m ON m.user_id = f.user_id AND m.id = f.maker_id
-        WHERE f.user_id = #{userId} AND f.id = #{id}
+        JOIN figure_type ft ON ft.user_id = f.user_id AND ft.figure_type_id = f.figure_type_id
+        JOIN figure_type_group ftg ON ftg.user_id = ft.user_id AND ftg.figure_type_group_id = ft.figure_type_group_id
+        JOIN shop sh ON sh.user_id = f.user_id AND sh.shop_id = f.shop_id
+        JOIN shop_group sg ON sg.user_id = sh.user_id AND sg.shop_group_id = sh.shop_group_id
+        JOIN maker m ON m.user_id = f.user_id AND m.maker_id = f.maker_id
+        WHERE f.user_id = #{userId} AND f.figure_id = #{figureId}
     </select>
 
     <select id="selectDetailById" resultMap="detailMap">
-        SELECT f.id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
+        SELECT f.figure_id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
                f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
                f.paid_at, f.delivered_at, f.purchase_link, f.thumbnail_url,
                f.description, f.created_at, f.updated_at,
-               st.id AS subtype_id, st.name AS subtype_name, t.id AS type_id, t.name AS type_name,
-               sh.id AS shop_id, sh.name AS shop_name, ch.id AS channel_id, ch.name AS channel_name,
-               m.id AS maker_id, m.name AS maker_name
+               ft.figure_type_id, ft.name AS figure_type_name,
+               ftg.figure_type_group_id, ftg.name AS figure_type_group_name,
+               sh.shop_id, sh.name AS shop_name,
+               sg.shop_group_id, sg.name AS shop_group_name,
+               m.maker_id, m.name AS maker_name
         FROM figure f
-        JOIN figure_subtype st ON st.user_id = f.user_id AND st.id = f.subtype_id
-        JOIN figure_type t ON t.user_id = st.user_id AND t.id = st.type_id
-        JOIN shop sh ON sh.user_id = f.user_id AND sh.id = f.shop_id
-        JOIN shop_channel ch ON ch.user_id = sh.user_id AND ch.id = sh.channel_id
-        JOIN maker m ON m.user_id = f.user_id AND m.id = f.maker_id
-        WHERE f.user_id = #{userId} AND f.id = #{id}
+        JOIN figure_type ft ON ft.user_id = f.user_id AND ft.figure_type_id = f.figure_type_id
+        JOIN figure_type_group ftg ON ftg.user_id = ft.user_id AND ftg.figure_type_group_id = ft.figure_type_group_id
+        JOIN shop sh ON sh.user_id = f.user_id AND sh.shop_id = f.shop_id
+        JOIN shop_group sg ON sg.user_id = sh.user_id AND sg.shop_group_id = sh.shop_group_id
+        JOIN maker m ON m.user_id = f.user_id AND m.maker_id = f.maker_id
+        WHERE f.user_id = #{userId} AND f.figure_id = #{figureId}
     </select>
 
     <!-- 결제 방식과 결제 관련 칸은 등록할 때 비워 두고 상태 전이에서 채운다 -->
     <insert id="insert">
         INSERT INTO figure (user_id, status, name, delivery_month, reservation_deadline, price, quantity,
-                            subtype_id, shop_id, maker_id, purchase_link, thumbnail_url, description)
+                            figure_type_id, shop_id, maker_id, purchase_link, thumbnail_url, description)
         VALUES (#{userId}, #{status}, #{request.name},
                 #{request.deliveryMonth,jdbcType=DATE}, #{request.reservationDeadline,jdbcType=DATE},
                 #{request.price}, #{request.quantity},
-                #{request.subtypeId}, #{request.shopId}, #{request.makerId},
+                #{request.figureTypeId}, #{request.shopId}, #{request.makerId},
                 #{request.purchaseLink,jdbcType=VARCHAR}, #{request.thumbnailUrl,jdbcType=VARCHAR},
                 #{request.description,jdbcType=LONGVARCHAR})
     </insert>
@@ -119,42 +125,42 @@
             reservation_deadline = #{request.reservationDeadline,jdbcType=DATE},
             price = #{request.price},
             quantity = #{request.quantity},
-            subtype_id = #{request.subtypeId},
+            figure_type_id = #{request.figureTypeId},
             shop_id = #{request.shopId},
             maker_id = #{request.makerId},
             purchase_link = #{request.purchaseLink,jdbcType=VARCHAR},
             thumbnail_url = #{request.thumbnailUrl,jdbcType=VARCHAR},
             description = #{request.description,jdbcType=LONGVARCHAR}
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND figure_id = #{figureId}
     </update>
 
     <!-- 연결 행(시리즈, 캐릭터, 에디터 이미지)은 DB가 함께 삭제한다 -->
     <delete id="delete">
         DELETE FROM figure
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND figure_id = #{figureId}
     </delete>
 
     <delete id="deleteByIds">
         DELETE FROM figure
         WHERE user_id = #{userId}
-          AND id IN
-        <foreach collection="ids" item="figureId" open="(" separator="," close=")">
+          AND figure_id IN
+        <foreach collection="figureIds" item="figureId" open="(" separator="," close=")">
             #{figureId}
         </foreach>
     </delete>
 
     <select id="selectCurrentStatus" resultType="FigureCurrentStatus">
-        SELECT id, status, payment_type
+        SELECT figure_id, status, payment_type
         FROM figure
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND figure_id = #{figureId}
     </select>
 
     <select id="selectCurrentStatusByIds" resultType="FigureCurrentStatus">
-        SELECT id, status, payment_type
+        SELECT figure_id, status, payment_type
         FROM figure
         WHERE user_id = #{userId}
-          AND id IN
-        <foreach collection="ids" item="figureId" open="(" separator="," close=")">
+          AND figure_id IN
+        <foreach collection="figureIds" item="figureId" open="(" separator="," close=")">
             #{figureId}
         </foreach>
     </select>
@@ -169,7 +175,7 @@
             balance_due_date = COALESCE(#{balanceDueDate,jdbcType=DATE}, balance_due_date),
             paid_at = COALESCE(#{paidAt,jdbcType=DATE}, paid_at),
             delivered_at = COALESCE(#{deliveredAt,jdbcType=DATE}, delivered_at)
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND figure_id = #{figureId}
     </update>
 
 </mapper>

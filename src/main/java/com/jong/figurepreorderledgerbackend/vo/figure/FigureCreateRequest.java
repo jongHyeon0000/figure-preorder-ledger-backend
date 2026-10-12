@@ -46,7 +46,7 @@ public class FigureCreateRequest {
     private String description;
 
     @NotNull
-    private Long subtypeId;
+    private Long figureTypeId;
 
     @NotNull
     private Long shopId;

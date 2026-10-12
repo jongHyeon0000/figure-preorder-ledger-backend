@@ -32,7 +32,7 @@ public class GenreCharacterController {
      * 캐릭터 목록 조회 (예: 하츠네 미쿠)
      * [GET] 목록 | /api/genre-character
      *
-     * @return ApiResponse<List<GenreCharacterResponse>> id, genreId(상위 장르 id), name
+     * @return ApiResponse<List<GenreCharacterResponse>> genreCharacterId, genreCharacterGroupId(상위 장르 id), name
      */
     @GetMapping
     public ApiResponse<List<GenreCharacterResponse>> getAll() {
@@ -43,58 +43,58 @@ public class GenreCharacterController {
      * 캐릭터 추가 (예: 하츠네 미쿠)
      * [POST] 단일 | /api/genre-character
      *
-     * @param request genreId: 상위 장르 id, name: 캐릭터 이름 (본문, 둘 다 필수, 이름은 100자 이하)
+     * @param request genreCharacterGroupId: 상위 장르 id, name: 캐릭터 이름 (본문, 둘 다 필수, 이름은 100자 이하)
      *
-     * @return ApiResponse<GenreCharacterResponse> 생성된 id, genreId, name
+     * @return ApiResponse<GenreCharacterResponse> 생성된 genreCharacterId, genreCharacterGroupId, name
      * @throws 404 상위 장르 없음 | 400 이름 중복, 입력값 오류
      */
     @PostMapping
     public ApiResponse<GenreCharacterResponse> create(@Valid @RequestBody GenreCharacterCreateRequest request) {
-        return ApiResponse.ok(genreCharacterService.create(currentUser.getId(), request.getGenreId(), request.getName()));
+        return ApiResponse.ok(genreCharacterService.create(currentUser.getId(), request.getGenreCharacterGroupId(), request.getName()));
     }
 
     /**
      * 캐릭터 이름 수정 (예: 하츠네 미쿠)
-     * [PUT] 단일 | /api/genre-character/{id}
+     * [PUT] 단일 | /api/genre-character/{genreCharacterId}
      *
-     * @param id      수정할 캐릭터 id (경로)
-     * @param request name: 새 이름 (본문, 필수, 100자 이하)
+     * @param genreCharacterId 수정할 캐릭터 id (경로)
+     * @param request          name: 새 이름 (본문, 필수, 100자 이하)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
      * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
      */
-    @PutMapping("/{id}")
-    public ApiResponse<Void> update(@PathVariable Long id, @Valid @RequestBody GenreCharacterUpdateRequest request) {
-        genreCharacterService.update(currentUser.getId(), id, request.getName());
+    @PutMapping("/{genreCharacterId}")
+    public ApiResponse<Void> update(@PathVariable Long genreCharacterId, @Valid @RequestBody GenreCharacterUpdateRequest request) {
+        genreCharacterService.update(currentUser.getId(), genreCharacterId, request.getName());
         return ApiResponse.ok();
     }
 
     /**
      * 캐릭터 삭제, 쓰던 상품은 '기타'로 이동 (예: 하츠네 미쿠)
-     * [DELETE] 없음 | /api/genre-character/{id}
+     * [DELETE] 없음 | /api/genre-character/{genreCharacterId}
      *
-     * @param id 삭제할 캐릭터 id (경로)
+     * @param genreCharacterId 삭제할 캐릭터 id (경로)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
      * @throws 404 대상 없음 | 400 기타 삭제 불가, 상위의 마지막 하위 삭제 불가
      */
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
-        genreCharacterService.delete(currentUser.getId(), id);
+    @DeleteMapping("/{genreCharacterId}")
+    public ApiResponse<Void> delete(@PathVariable Long genreCharacterId) {
+        genreCharacterService.delete(currentUser.getId(), genreCharacterId);
         return ApiResponse.ok();
     }
 
     /**
      * 캐릭터 삭제 전 영향 상품 수 조회 (예: 하츠네 미쿠)
-     * [GET] 단일 | /api/genre-character/{id}/usage
+     * [GET] 단일 | /api/genre-character/{genreCharacterId}/usage
      *
-     * @param id 조회할 캐릭터 id (경로)
+     * @param genreCharacterId 조회할 캐릭터 id (경로)
      *
      * @return ApiResponse<UsageResponse> count: 이 캐릭터를 쓰는 상품 수
      * @throws 404 대상 없음
      */
-    @GetMapping("/{id}/usage")
-    public ApiResponse<UsageResponse> getUsage(@PathVariable Long id) {
-        return ApiResponse.ok(genreCharacterService.getUsage(currentUser.getId(), id));
+    @GetMapping("/{genreCharacterId}/usage")
+    public ApiResponse<UsageResponse> getUsage(@PathVariable Long genreCharacterId) {
+        return ApiResponse.ok(genreCharacterService.getUsage(currentUser.getId(), genreCharacterId));
     }
 }

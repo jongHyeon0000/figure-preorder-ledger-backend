@@ -3,78 +3,78 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.series.SeriesMapper">
 
     <select id="selectAll" resultType="SeriesResponse">
-        SELECT id, group_id, name
+        SELECT series_id, series_group_id, name
         FROM series
         WHERE user_id = #{userId}
-        ORDER BY id
+        ORDER BY series_id
     </select>
 
     <select id="selectById" resultType="SeriesResponse">
-        SELECT id, group_id, name
+        SELECT series_id, series_group_id, name
         FROM series
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND series_id = #{seriesId}
     </select>
 
     <select id="selectByParentAndName" resultType="SeriesResponse">
-        SELECT id, group_id, name
+        SELECT series_id, series_group_id, name
         FROM series
-        WHERE user_id = #{userId} AND group_id = #{parentId} AND name = #{name}
+        WHERE user_id = #{userId} AND series_group_id = #{seriesGroupId} AND name = #{name}
     </select>
 
     <select id="countByParent" resultType="int">
         SELECT COUNT(*)
         FROM series
-        WHERE user_id = #{userId} AND group_id = #{parentId}
+        WHERE user_id = #{userId} AND series_group_id = #{seriesGroupId}
     </select>
 
     <insert id="insert">
-        INSERT INTO series (user_id, group_id, name)
-        VALUES (#{userId}, #{parentId}, #{name})
+        INSERT INTO series (user_id, series_group_id, name)
+        VALUES (#{userId}, #{seriesGroupId}, #{name})
     </insert>
 
     <update id="updateName">
         UPDATE series SET name = #{name}
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND series_id = #{seriesId}
     </update>
 
     <delete id="delete">
         DELETE FROM series
-        WHERE user_id = #{userId} AND id = #{id}
+        WHERE user_id = #{userId} AND series_id = #{seriesId}
     </delete>
 
     <!-- 상품을 옮겨 갈 기본 항목: 이름이 기타인 상위 아래의 기타 하위 -->
     <select id="selectDefaultId" resultType="long">
-        SELECT c.id
+        SELECT c.series_id
         FROM series c
-        JOIN series_group p ON p.id = c.group_id AND p.user_id = c.user_id
+        JOIN series_group p ON p.series_group_id = c.series_group_id AND p.user_id = c.user_id
         WHERE c.user_id = #{userId} AND p.name = #{defaultName} AND c.name = #{defaultName}
     </select>
 
     <!-- 이 하위를 쓰는 상품의 수 -->
     <select id="countUsage" resultType="int">
         SELECT COUNT(DISTINCT figure_id)
-        FROM figure_series
-        WHERE user_id = #{userId} AND series_id = #{id}
+        FROM figure_series_map
+        WHERE user_id = #{userId} AND series_id = #{seriesId}
     </select>
 
     <!-- 1단계: 이 하위만 가지고 있던 상품에 기본 항목을 연결한다. 다른 항목이 남은 상품에는 추가하지 않는다 -->
     <insert id="moveInsertFallback">
-        INSERT INTO figure_series (user_id, figure_id, series_id)
+        INSERT INTO figure_series_map (user_id, figure_id, series_id)
         SELECT DISTINCT l.user_id, l.figure_id, #{fallbackId}
-        FROM figure_series l
+        FROM figure_series_map l
         WHERE l.user_id = #{userId}
-          AND l.series_id = #{id}
+          AND l.series_id = #{seriesId}
           AND NOT EXISTS (
-              SELECT 1 FROM figure_series o
+              SELECT 1 FROM figure_series_map o
               WHERE o.user_id = l.user_id AND o.figure_id = l.figure_id
-                AND o.series_id &lt;&gt; #{id}
+                AND o.series_id &lt;&gt; #{seriesId}
           )
     </insert>
 
     <!-- 2단계: 이 하위에 대한 연결을 지운다 -->
     <delete id="moveDeleteLinks">
-        DELETE FROM figure_series
-        WHERE user_id = #{userId} AND series_id = #{id}
+        DELETE FROM figure_series_map
+        WHERE user_id = #{userId} AND series_id = #{seriesId}
     </delete>
 
 </mapper>

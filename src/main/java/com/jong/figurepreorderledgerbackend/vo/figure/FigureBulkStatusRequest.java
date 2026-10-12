@@ -17,7 +17,7 @@ import java.util.List;
 public class FigureBulkStatusRequest {
 
     @NotEmpty
-    private List<@NotNull Long> ids;
+    private List<@NotNull Long> figureIds;
 
     @NotNull
     private FigureStatus status;

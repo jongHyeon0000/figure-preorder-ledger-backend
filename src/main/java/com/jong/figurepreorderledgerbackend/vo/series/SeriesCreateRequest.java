@@ -13,7 +13,7 @@ import lombok.Setter;
 public class SeriesCreateRequest {
 
     @NotNull
-    private Long groupId;
+    private Long seriesGroupId;
 
     @NotBlank
     @Size(max = 100)

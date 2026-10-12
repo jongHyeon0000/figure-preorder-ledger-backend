@@ -42,7 +42,7 @@ public class FigureUpdateRequest {
     private String description;
 
     @NotNull
-    private Long subtypeId;
+    private Long figureTypeId;
 
     @NotNull
     private Long shopId;

@@ -11,24 +11,24 @@ public interface SeriesMapper {
 
     List<SeriesResponse> selectAll(@Param("userId") Long userId);
 
-    SeriesResponse selectById(@Param("userId") Long userId, @Param("id") Long id);
+    SeriesResponse selectById(@Param("userId") Long userId, @Param("seriesId") Long seriesId);
 
-    SeriesResponse selectByParentAndName(@Param("userId") Long userId, @Param("parentId") Long parentId,
+    SeriesResponse selectByParentAndName(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId,
                                         @Param("name") String name);
 
-    int countByParent(@Param("userId") Long userId, @Param("parentId") Long parentId);
+    int countByParent(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId);
 
-    int insert(@Param("userId") Long userId, @Param("parentId") Long parentId, @Param("name") String name);
+    int insert(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId, @Param("name") String name);
 
-    int updateName(@Param("userId") Long userId, @Param("id") Long id, @Param("name") String name);
+    int updateName(@Param("userId") Long userId, @Param("seriesId") Long seriesId, @Param("name") String name);
 
-    int delete(@Param("userId") Long userId, @Param("id") Long id);
+    int delete(@Param("userId") Long userId, @Param("seriesId") Long seriesId);
 
     Long selectDefaultId(@Param("userId") Long userId, @Param("defaultName") String defaultName);
 
-    int countUsage(@Param("userId") Long userId, @Param("id") Long id);
+    int countUsage(@Param("userId") Long userId, @Param("seriesId") Long seriesId);
 
-    int moveInsertFallback(@Param("userId") Long userId, @Param("id") Long id, @Param("fallbackId") Long fallbackId);
+    int moveInsertFallback(@Param("userId") Long userId, @Param("seriesId") Long seriesId, @Param("fallbackId") Long fallbackId);
 
-    int moveDeleteLinks(@Param("userId") Long userId, @Param("id") Long id);
+    int moveDeleteLinks(@Param("userId") Long userId, @Param("seriesId") Long seriesId);
 }

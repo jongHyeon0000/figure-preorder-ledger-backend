@@ -3,9 +3,8 @@ package com.jong.figurepreorderledgerbackend.service.type;
 import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
-import com.jong.figurepreorderledgerbackend.mapper.type.FigureSubtypeMapper;
 import com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeMapper;
-import com.jong.figurepreorderledgerbackend.vo.type.FigureSubtypeResponse;
+import com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeGroupMapper;
 import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeResponse;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,79 +20,67 @@ import java.util.List;
 public class FigureTypeService {
 
     private final FigureTypeMapper figureTypeMapper;
-    private final FigureSubtypeMapper figureSubtypeMapper;
+    private final FigureTypeGroupMapper figureTypeGroupMapper;
 
-    public List<FigureTypeResponse> getTree(Long userId) {
-        List<FigureTypeResponse> parents = figureTypeMapper.selectAll(userId);
-        List<FigureSubtypeResponse> children = figureSubtypeMapper.selectAll(userId);
-        for (FigureTypeResponse parent : parents) {
-            List<FigureSubtypeResponse> own = new ArrayList<>();
-            for (FigureSubtypeResponse child : children) {
-                if (parent.getId().equals(child.getTypeId())) {
-                    own.add(child);
-                }
-            }
-            parent.setChildren(own);
-        }
-        return parents;
+    public List<FigureTypeResponse> getAll(Long userId) {
+        return figureTypeMapper.selectAll(userId);
     }
 
-    /* 상위를 만들면 기본 하위(기타)도 같이 만든다 */
     @Transactional
-    public FigureTypeResponse create(Long userId, String name) {
+    public FigureTypeResponse create(Long userId, Long figureTypeGroupId, String name) {
+        if (figureTypeGroupMapper.selectById(userId, figureTypeGroupId) == null) {
+            throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
+        }
         String trimmed = name.trim();
         try {
-            figureTypeMapper.insert(userId, trimmed);
+            figureTypeMapper.insert(userId, figureTypeGroupId, trimmed);
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
-        FigureTypeResponse parent = figureTypeMapper.selectByName(userId, trimmed);
-
-        figureSubtypeMapper.insert(userId, parent.getId(), CategoryConstant.DEFAULT_NAME);
-        List<FigureSubtypeResponse> children = new ArrayList<>();
-        children.add(figureSubtypeMapper.selectByParentAndName(userId, parent.getId(), CategoryConstant.DEFAULT_NAME));
-        parent.setChildren(children);
-        return parent;
+        return figureTypeMapper.selectByParentAndName(userId, figureTypeGroupId, trimmed);
     }
 
     @Transactional
-    public void update(Long userId, Long id, String name) {
-        FigureTypeResponse parent = find(userId, id);
-        if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
+    public void update(Long userId, Long figureTypeId, String name) {
+        FigureTypeResponse child = find(userId, figureTypeId);
+        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            figureTypeMapper.updateName(userId, id, name.trim());
+            figureTypeMapper.updateName(userId, figureTypeId, name.trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
     }
 
-    /* 쓰던 상품을 기본 항목(기타 > 기타)으로 옮긴 뒤 삭제한다. 하위는 DB에서 함께 삭제된다 */
+    /* 쓰던 상품을 기본 항목(기타 > 기타)으로 옮긴 뒤 삭제한다 */
     @Transactional
-    public void delete(Long userId, Long id) {
-        FigureTypeResponse parent = find(userId, id);
-        if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
+    public void delete(Long userId, Long figureTypeId) {
+        FigureTypeResponse child = find(userId, figureTypeId);
+        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
-        Long fallbackId = figureTypeMapper.selectDefaultChildId(userId, CategoryConstant.DEFAULT_NAME);
+        if (figureTypeMapper.countByParent(userId, child.getFigureTypeGroupId()) <= 1) {
+            throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
+        }
+        Long fallbackId = figureTypeMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
         if (fallbackId == null) {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
-        figureTypeMapper.moveUsage(userId, id, fallbackId);
-        figureTypeMapper.delete(userId, id);
+        figureTypeMapper.moveUsage(userId, figureTypeId, fallbackId);
+        figureTypeMapper.delete(userId, figureTypeId);
     }
 
-    public UsageResponse getUsage(Long userId, Long id) {
-        find(userId, id);
-        return new UsageResponse(figureTypeMapper.countUsage(userId, id));
+    public UsageResponse getUsage(Long userId, Long figureTypeId) {
+        find(userId, figureTypeId);
+        return new UsageResponse(figureTypeMapper.countUsage(userId, figureTypeId));
     }
 
-    private FigureTypeResponse find(Long userId, Long id) {
-        FigureTypeResponse parent = figureTypeMapper.selectById(userId, id);
-        if (parent == null) {
+    private FigureTypeResponse find(Long userId, Long figureTypeId) {
+        FigureTypeResponse child = figureTypeMapper.selectById(userId, figureTypeId);
+        if (child == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
-        return parent;
+        return child;
     }
 }

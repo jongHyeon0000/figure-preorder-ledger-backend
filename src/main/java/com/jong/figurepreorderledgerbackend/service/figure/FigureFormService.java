@@ -1,10 +1,10 @@
 package com.jong.figurepreorderledgerbackend.service.figure;
 
-import com.jong.figurepreorderledgerbackend.service.genre.GenreService;
+import com.jong.figurepreorderledgerbackend.service.genre.GenreCharacterGroupService;
 import com.jong.figurepreorderledgerbackend.service.maker.MakerService;
 import com.jong.figurepreorderledgerbackend.service.series.SeriesGroupService;
-import com.jong.figurepreorderledgerbackend.service.shop.ShopChannelService;
-import com.jong.figurepreorderledgerbackend.service.type.FigureTypeService;
+import com.jong.figurepreorderledgerbackend.service.shop.ShopGroupService;
+import com.jong.figurepreorderledgerbackend.service.type.FigureTypeGroupService;
 import com.jong.figurepreorderledgerbackend.vo.figure.FigureFormOptionsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,18 +16,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class FigureFormService {
 
-    private final ShopChannelService shopChannelService;
-    private final FigureTypeService figureTypeService;
+    private final ShopGroupService shopGroupService;
+    private final FigureTypeGroupService figureTypeGroupService;
     private final SeriesGroupService seriesGroupService;
-    private final GenreService genreService;
+    private final GenreCharacterGroupService genreCharacterGroupService;
     private final MakerService makerService;
 
     public FigureFormOptionsResponse getOptions(Long userId) {
         FigureFormOptionsResponse options = new FigureFormOptionsResponse();
-        options.setShops(shopChannelService.getTree(userId));
-        options.setTypes(figureTypeService.getTree(userId));
+        options.setShops(shopGroupService.getTree(userId));
+        options.setTypes(figureTypeGroupService.getTree(userId));
         options.setSeries(seriesGroupService.getTree(userId));
-        options.setGenres(genreService.getTree(userId));
+        options.setGenres(genreCharacterGroupService.getTree(userId));
         options.setMakers(makerService.getAll(userId));
         return options;
     }

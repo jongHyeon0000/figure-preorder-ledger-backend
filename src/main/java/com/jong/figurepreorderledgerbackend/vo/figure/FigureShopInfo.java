@@ -9,8 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FigureShopInfo {
 
-    private Long id;
+    private Long shopId;
     private String name;
-    private Long channelId;
-    private String channelName;
+    private Long shopGroupId;
+    private String shopGroupName;
 }

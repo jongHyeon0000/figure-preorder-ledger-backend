@@ -13,7 +13,7 @@ import lombok.Setter;
 public class GenreCharacterCreateRequest {
 
     @NotNull
-    private Long genreId;
+    private Long genreCharacterGroupId;
 
     @NotBlank
     @Size(max = 100)

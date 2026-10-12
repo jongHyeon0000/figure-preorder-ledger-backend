@@ -32,7 +32,7 @@ public class ShopController {
      * 판매처 스토어 목록 조회 (예: 굿스마일 pw)
      * [GET] 목록 | /api/shop
      *
-     * @return ApiResponse<List<ShopResponse>> id, channelId(상위 판매처 채널 id), name
+     * @return ApiResponse<List<ShopResponse>> shopId, shopGroupId(상위 판매처 채널 id), name
      */
     @GetMapping
     public ApiResponse<List<ShopResponse>> getAll() {
@@ -43,58 +43,58 @@ public class ShopController {
      * 판매처 스토어 추가 (예: 굿스마일 pw)
      * [POST] 단일 | /api/shop
      *
-     * @param request channelId: 상위 판매처 채널 id, name: 판매처 스토어 이름 (본문, 둘 다 필수, 이름은 100자 이하)
+     * @param request shopGroupId: 상위 판매처 채널 id, name: 판매처 스토어 이름 (본문, 둘 다 필수, 이름은 100자 이하)
      *
-     * @return ApiResponse<ShopResponse> 생성된 id, channelId, name
+     * @return ApiResponse<ShopResponse> 생성된 shopId, shopGroupId, name
      * @throws 404 상위 판매처 채널 없음 | 400 이름 중복, 입력값 오류
      */
     @PostMapping
     public ApiResponse<ShopResponse> create(@Valid @RequestBody ShopCreateRequest request) {
-        return ApiResponse.ok(shopService.create(currentUser.getId(), request.getChannelId(), request.getName()));
+        return ApiResponse.ok(shopService.create(currentUser.getId(), request.getShopGroupId(), request.getName()));
     }
 
     /**
      * 판매처 스토어 이름 수정 (예: 굿스마일 pw)
-     * [PUT] 단일 | /api/shop/{id}
+     * [PUT] 단일 | /api/shop/{shopId}
      *
-     * @param id      수정할 판매처 스토어 id (경로)
+     * @param shopId  수정할 판매처 스토어 id (경로)
      * @param request name: 새 이름 (본문, 필수, 100자 이하)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
      * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
      */
-    @PutMapping("/{id}")
-    public ApiResponse<Void> update(@PathVariable Long id, @Valid @RequestBody ShopUpdateRequest request) {
-        shopService.update(currentUser.getId(), id, request.getName());
+    @PutMapping("/{shopId}")
+    public ApiResponse<Void> update(@PathVariable Long shopId, @Valid @RequestBody ShopUpdateRequest request) {
+        shopService.update(currentUser.getId(), shopId, request.getName());
         return ApiResponse.ok();
     }
 
     /**
      * 판매처 스토어 삭제, 쓰던 상품은 '기타'로 이동 (예: 굿스마일 pw)
-     * [DELETE] 없음 | /api/shop/{id}
+     * [DELETE] 없음 | /api/shop/{shopId}
      *
-     * @param id 삭제할 판매처 스토어 id (경로)
+     * @param shopId 삭제할 판매처 스토어 id (경로)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
      * @throws 404 대상 없음 | 400 기타 삭제 불가, 상위의 마지막 하위 삭제 불가
      */
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
-        shopService.delete(currentUser.getId(), id);
+    @DeleteMapping("/{shopId}")
+    public ApiResponse<Void> delete(@PathVariable Long shopId) {
+        shopService.delete(currentUser.getId(), shopId);
         return ApiResponse.ok();
     }
 
     /**
      * 판매처 스토어 삭제 전 영향 상품 수 조회 (예: 굿스마일 pw)
-     * [GET] 단일 | /api/shop/{id}/usage
+     * [GET] 단일 | /api/shop/{shopId}/usage
      *
-     * @param id 조회할 판매처 스토어 id (경로)
+     * @param shopId 조회할 판매처 스토어 id (경로)
      *
      * @return ApiResponse<UsageResponse> count: 이 판매처 스토어를 쓰는 상품 수
      * @throws 404 대상 없음
      */
-    @GetMapping("/{id}/usage")
-    public ApiResponse<UsageResponse> getUsage(@PathVariable Long id) {
-        return ApiResponse.ok(shopService.getUsage(currentUser.getId(), id));
+    @GetMapping("/{shopId}/usage")
+    public ApiResponse<UsageResponse> getUsage(@PathVariable Long shopId) {
+        return ApiResponse.ok(shopService.getUsage(currentUser.getId(), shopId));
     }
 }

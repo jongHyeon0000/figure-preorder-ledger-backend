@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class GenreCharacterResponse {
 
-    private Long id;
-    private Long genreId;
+    private Long genreCharacterId;
+    private Long genreCharacterGroupId;
     private String name;
 }

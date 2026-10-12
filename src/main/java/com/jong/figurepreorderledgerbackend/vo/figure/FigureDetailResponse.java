@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class FigureDetailResponse {
 
-    private Long id;
+    private Long figureId;
     private FigureStatus status;
     private PaymentType paymentType;
     private String name;
@@ -33,7 +33,7 @@ public class FigureDetailResponse {
     private String description;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private FigureSubtypeInfo subtype;
+    private FigureTypeInfo figureType;
     private FigureShopInfo shop;
     private FigureMakerInfo maker;
     private List<FigureSeriesInfo> series;

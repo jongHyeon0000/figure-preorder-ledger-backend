@@ -3,8 +3,9 @@ package com.jong.figurepreorderledgerbackend.controller.type;
 import com.jong.figurepreorderledgerbackend.common.response.ApiResponse;
 import com.jong.figurepreorderledgerbackend.common.security.CurrentUser;
 import com.jong.figurepreorderledgerbackend.service.type.FigureTypeService;
-import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeRequest;
+import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeCreateRequest;
 import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeResponse;
+import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeUpdateRequest;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,72 +29,72 @@ public class FigureTypeController {
     private final CurrentUser currentUser;
 
     /**
-     * 형태 목록 조회, 하위 형태 하위 중첩 (예: 스케일, 넨도로이드)
+     * 형태 하위 목록 조회 (예: 푸치)
      * [GET] 목록 | /api/figure-type
      *
-     * @return ApiResponse<List<FigureTypeResponse>> id, name, children(형태 하위 목록: id, typeId, name)
+     * @return ApiResponse<List<FigureTypeResponse>> figureTypeId, figureTypeGroupId(상위 형태 id), name
      */
     @GetMapping
-    public ApiResponse<List<FigureTypeResponse>> getTree() {
-        return ApiResponse.ok(figureTypeService.getTree(currentUser.getId()));
+    public ApiResponse<List<FigureTypeResponse>> getAll() {
+        return ApiResponse.ok(figureTypeService.getAll(currentUser.getId()));
     }
 
     /**
-     * 형태 추가, 기본 하위 '기타' 자동 생성 (예: 스케일, 넨도로이드)
+     * 형태 하위 추가 (예: 푸치)
      * [POST] 단일 | /api/figure-type
      *
-     * @param request name: 형태 이름 (본문, 필수, 100자 이하)
+     * @param request figureTypeGroupId: 상위 형태 id, name: 형태 하위 이름 (본문, 둘 다 필수, 이름은 100자 이하)
      *
-     * @return ApiResponse<FigureTypeResponse> 생성된 id, name, children(기본 '기타' 하나)
-     * @throws 400 이름 중복, 입력값 오류
+     * @return ApiResponse<FigureTypeResponse> 생성된 figureTypeId, figureTypeGroupId, name
+     * @throws 404 상위 형태 없음 | 400 이름 중복, 입력값 오류
      */
     @PostMapping
-    public ApiResponse<FigureTypeResponse> create(@Valid @RequestBody FigureTypeRequest request) {
-        return ApiResponse.ok(figureTypeService.create(currentUser.getId(), request.getName()));
+    public ApiResponse<FigureTypeResponse> create(@Valid @RequestBody FigureTypeCreateRequest request) {
+        return ApiResponse.ok(figureTypeService.create(currentUser.getId(), request.getFigureTypeGroupId(), request.getName()));
     }
 
     /**
-     * 형태 이름 수정 (예: 스케일, 넨도로이드)
-     * [PUT] 단일 | /api/figure-type/{id}
+     * 형태 하위 이름 수정 (예: 푸치)
+     * [PUT] 단일 | /api/figure-type/{figureTypeId}
      *
-     * @param id      수정할 형태 id (경로)
-     * @param request name: 새 이름 (본문, 필수, 100자 이하)
+     * @param figureTypeId 수정할 형태 하위 id (경로)
+     * @param request      name: 새 이름 (본문, 필수, 100자 이하)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
      * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
      */
-    @PutMapping("/{id}")
-    public ApiResponse<Void> update(@PathVariable Long id, @Valid @RequestBody FigureTypeRequest request) {
-        figureTypeService.update(currentUser.getId(), id, request.getName());
+    @PutMapping("/{figureTypeId}")
+    public ApiResponse<Void> update(@PathVariable Long figureTypeId, @Valid @RequestBody FigureTypeUpdateRequest request) {
+        figureTypeService.update(currentUser.getId(), figureTypeId, request.getName());
         return ApiResponse.ok();
     }
 
     /**
-     * 형태 삭제, 하위와 쓰던 상품은 '기타'로 이동 (예: 스케일, 넨도로이드)
-     * [DELETE] 없음 | /api/figure-type/{id}
+     * 형태 하위 삭제, 쓰던 상품은 '기타'로 이동 (예: 푸치)
+     * [DELETE] 없음 | /api/figure-type/{figureTypeId}
      *
-     * @param id 삭제할 형태 id (경로)
+     * @param figureTypeId 삭제할 형태 하위 id (경로)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
-     * @throws 404 대상 없음 | 400 기타 삭제 불가
+     * @throws 404 대상 없음 | 400 기타 삭제 불가, 상위의 마지막 하위 삭제 불가
      */
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
-        figureTypeService.delete(currentUser.getId(), id);
+    @DeleteMapping("/{figureTypeId}")
+    public ApiResponse<Void> delete(@PathVariable Long figureTypeId) {
+        figureTypeService.delete(currentUser.getId(), figureTypeId);
         return ApiResponse.ok();
     }
 
     /**
-     * 형태 삭제 전 영향 상품 수 조회 (예: 스케일, 넨도로이드)
-     * [GET] 단일 | /api/figure-type/{id}/usage
+     * 형태 하위 삭제 전 영향 상품 수 조회 (예: 푸치)
+     * [GET] 단일 | /api/figure-type/{figureTypeId}/usage
      *
-     * @param id 조회할 형태 id (경로)
+     * @param figureTypeId 조회할 형태 하위 id (경로)
      *
-     * @return ApiResponse<UsageResponse> count: 이 형태의 하위를 쓰는 상품 수
+     * @return ApiResponse<UsageResponse> count: 이 형태 하위를 쓰는 상품 수
      * @throws 404 대상 없음
      */
-    @GetMapping("/{id}/usage")
-    public ApiResponse<UsageResponse> getUsage(@PathVariable Long id) {
-        return ApiResponse.ok(figureTypeService.getUsage(currentUser.getId(), id));
+    @GetMapping("/{figureTypeId}/usage")
+    public ApiResponse<UsageResponse> getUsage(@PathVariable Long figureTypeId) {
+        return ApiResponse.ok(figureTypeService.getUsage(currentUser.getId(), figureTypeId));
     }
 }

@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SeriesResponse {
 
-    private Long id;
-    private Long groupId;
+    private Long seriesId;
+    private Long seriesGroupId;
     private String name;
 }

@@ -31,7 +31,7 @@ public class MakerController {
      * 제조사 목록 조회 (예: 세가, 후류)
      * [GET] 목록 | /api/maker
      *
-     * @return ApiResponse<List<MakerResponse>> id, name
+     * @return ApiResponse<List<MakerResponse>> makerId, name
      */
     @GetMapping
     public ApiResponse<List<MakerResponse>> getAll() {
@@ -44,7 +44,7 @@ public class MakerController {
      *
      * @param request name: 제조사 이름 (본문, 필수, 100자 이하)
      *
-     * @return ApiResponse<MakerResponse> 생성된 id, name
+     * @return ApiResponse<MakerResponse> 생성된 makerId, name
      * @throws 400 이름 중복, 입력값 오류
      */
     @PostMapping
@@ -54,46 +54,46 @@ public class MakerController {
 
     /**
      * 제조사 이름 수정 (예: 세가, 후류)
-     * [PUT] 단일 | /api/maker/{id}
+     * [PUT] 단일 | /api/maker/{makerId}
      *
-     * @param id      수정할 제조사 id (경로)
+     * @param makerId 수정할 제조사 id (경로)
      * @param request name: 새 이름 (본문, 필수, 100자 이하)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
      * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
      */
-    @PutMapping("/{id}")
-    public ApiResponse<Void> update(@PathVariable Long id, @Valid @RequestBody MakerRequest request) {
-        makerService.update(currentUser.getId(), id, request.getName());
+    @PutMapping("/{makerId}")
+    public ApiResponse<Void> update(@PathVariable Long makerId, @Valid @RequestBody MakerRequest request) {
+        makerService.update(currentUser.getId(), makerId, request.getName());
         return ApiResponse.ok();
     }
 
     /**
      * 제조사 삭제, 쓰던 상품은 '기타'로 이동 (예: 세가, 후류)
-     * [DELETE] 없음 | /api/maker/{id}
+     * [DELETE] 없음 | /api/maker/{makerId}
      *
-     * @param id 삭제할 제조사 id (경로)
+     * @param makerId 삭제할 제조사 id (경로)
      *
      * @return ApiResponse<Void> 성공 시 data 없음
      * @throws 404 대상 없음 | 400 기타 삭제 불가
      */
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
-        makerService.delete(currentUser.getId(), id);
+    @DeleteMapping("/{makerId}")
+    public ApiResponse<Void> delete(@PathVariable Long makerId) {
+        makerService.delete(currentUser.getId(), makerId);
         return ApiResponse.ok();
     }
 
     /**
      * 제조사 삭제 전 영향 상품 수 조회 (예: 세가, 후류)
-     * [GET] 단일 | /api/maker/{id}/usage
+     * [GET] 단일 | /api/maker/{makerId}/usage
      *
-     * @param id 조회할 제조사 id (경로)
+     * @param makerId 조회할 제조사 id (경로)
      *
      * @return ApiResponse<UsageResponse> count: 이 제조사를 쓰는 상품 수
      * @throws 404 대상 없음
      */
-    @GetMapping("/{id}/usage")
-    public ApiResponse<UsageResponse> getUsage(@PathVariable Long id) {
-        return ApiResponse.ok(makerService.getUsage(currentUser.getId(), id));
+    @GetMapping("/{makerId}/usage")
+    public ApiResponse<UsageResponse> getUsage(@PathVariable Long makerId) {
+        return ApiResponse.ok(makerService.getUsage(currentUser.getId(), makerId));
     }
 }

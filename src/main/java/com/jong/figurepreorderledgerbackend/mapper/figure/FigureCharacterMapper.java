@@ -12,7 +12,7 @@ public interface FigureCharacterMapper {
     List<FigureCharacterInfo> selectByFigureIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);
 
     int insertAll(@Param("userId") Long userId, @Param("figureId") Long figureId,
-                  @Param("characterIds") List<Long> characterIds);
+                  @Param("genreCharacterIds") List<Long> genreCharacterIds);
 
     int deleteByFigure(@Param("userId") Long userId, @Param("figureId") Long figureId);
 }

@@ -31,8 +31,8 @@ public class FigureStatusService {
 
     /* 상품 한 건의 상태를 전이하고 변경된 상품을 목록 항목 모양으로 돌려준다 */
     @Transactional
-    public FigureListResponse change(Long userId, Long id, FigureStatusRequest request) {
-        FigureCurrentStatus current = figureMapper.selectCurrentStatus(userId, id);
+    public FigureListResponse change(Long userId, Long figureId, FigureStatusRequest request) {
+        FigureCurrentStatus current = figureMapper.selectCurrentStatus(userId, figureId);
         if (current == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
@@ -40,7 +40,7 @@ public class FigureStatusService {
                 request.getDepositAmount(), request.getDepositPaidAt(), request.getBalanceDueDate(),
                 request.getPaidAt(), request.getDeliveredAt());
         figureMapper.updateStatus(param);
-        return figureService.getListItem(userId, id);
+        return figureService.getListItem(userId, figureId);
     }
 
     /*
@@ -52,37 +52,37 @@ public class FigureStatusService {
         if (request.getStatus() == FigureStatus.RESERVED) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "예약금 결제는 일괄 변경할 수 없습니다");
         }
-        List<Long> ids = new ArrayList<>(new LinkedHashSet<>(request.getIds()));
+        List<Long> figureIds = new ArrayList<>(new LinkedHashSet<>(request.getFigureIds()));
 
         Map<Long, FigureCurrentStatus> currentById = new HashMap<>();
-        for (FigureCurrentStatus current : figureMapper.selectCurrentStatusByIds(userId, ids)) {
-            currentById.put(current.getId(), current);
+        for (FigureCurrentStatus current : figureMapper.selectCurrentStatusByIds(userId, figureIds)) {
+            currentById.put(current.getFigureId(), current);
         }
 
         List<FigureStatusUpdateParam> params = new ArrayList<>();
         List<Long> problemIds = new ArrayList<>();
-        for (Long id : ids) {
-            FigureCurrentStatus current = currentById.get(id);
+        for (Long figureId : figureIds) {
+            FigureCurrentStatus current = currentById.get(figureId);
             if (current == null) {
-                problemIds.add(id);
+                problemIds.add(figureId);
                 continue;
             }
             try {
                 params.add(buildParam(userId, current, request.getStatus(), request.getPaymentType(),
                         null, null, null, request.getPaidAt(), request.getDeliveredAt()));
             } catch (BusinessException e) {
-                problemIds.add(id);
+                problemIds.add(figureId);
             }
         }
         if (!problemIds.isEmpty()) {
             throw new BusinessException(GlobalExceptionCode.INVALID_STATUS_TRANSITION,
-                    "변경할 수 없는 상품이 있어 아무것도 바꾸지 않았습니다. 문제 id: " + problemIds);
+                    "변경할 수 없는 상품이 있어 아무것도 바꾸지 않았습니다. 문제 figureId: " + problemIds);
         }
 
         for (FigureStatusUpdateParam param : params) {
             figureMapper.updateStatus(param);
         }
-        return ids;
+        return figureIds;
     }
 
     /*
@@ -106,7 +106,7 @@ public class FigureStatusService {
         LocalDate today = LocalDate.now();
         FigureStatusUpdateParam param = new FigureStatusUpdateParam();
         param.setUserId(userId);
-        param.setId(current.getId());
+        param.setFigureId(current.getFigureId());
         param.setStatus(next);
 
         if (next == FigureStatus.RESERVED) {

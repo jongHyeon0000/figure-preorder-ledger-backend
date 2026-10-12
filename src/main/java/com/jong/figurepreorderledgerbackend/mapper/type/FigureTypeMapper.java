@@ -11,19 +11,22 @@ public interface FigureTypeMapper {
 
     List<FigureTypeResponse> selectAll(@Param("userId") Long userId);
 
-    FigureTypeResponse selectById(@Param("userId") Long userId, @Param("id") Long id);
+    FigureTypeResponse selectById(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId);
 
-    FigureTypeResponse selectByName(@Param("userId") Long userId, @Param("name") String name);
+    FigureTypeResponse selectByParentAndName(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId,
+                                        @Param("name") String name);
 
-    int insert(@Param("userId") Long userId, @Param("name") String name);
+    int countByParent(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId);
 
-    int updateName(@Param("userId") Long userId, @Param("id") Long id, @Param("name") String name);
+    int insert(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId, @Param("name") String name);
 
-    int delete(@Param("userId") Long userId, @Param("id") Long id);
+    int updateName(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId, @Param("name") String name);
 
-    Long selectDefaultChildId(@Param("userId") Long userId, @Param("defaultName") String defaultName);
+    int delete(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId);
 
-    int countUsage(@Param("userId") Long userId, @Param("id") Long id);
+    Long selectDefaultId(@Param("userId") Long userId, @Param("defaultName") String defaultName);
 
-    int moveUsage(@Param("userId") Long userId, @Param("id") Long id, @Param("fallbackId") Long fallbackId);
+    int countUsage(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId);
+
+    int moveUsage(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId, @Param("fallbackId") Long fallbackId);
 }
