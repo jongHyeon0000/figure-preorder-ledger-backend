@@ -161,7 +161,6 @@ CREATE TABLE figure (
   shop_id              BIGINT       NOT NULL COMMENT '구매처(스토어)',
   maker_id             BIGINT       NOT NULL COMMENT '제조사',
   purchase_link        VARCHAR(2000) NULL COMMENT '구매 링크',
-  thumbnail_url        VARCHAR(2000) NULL COMMENT '썸네일 외부 링크',
   description          MEDIUMTEXT   NULL COMMENT '상세 설명 (에디터 HTML)',
   created_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
@@ -216,3 +215,18 @@ CREATE TABLE editor_image (
   CONSTRAINT fk_editor_image_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
   CONSTRAINT fk_editor_image_figure FOREIGN KEY (user_id, figure_id) REFERENCES figure (user_id, figure_id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='에디터 본문 이미지';
+
+-- ---------------------------------------------------------------- 썸네일 이미지
+CREATE TABLE thumbnail_image (
+  thumbnail_image_id BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  user_id            BIGINT       NOT NULL COMMENT '소유 계정',
+  figure_id          BIGINT       NOT NULL COMMENT '썸네일이 속한 상품',
+  file_path          VARCHAR(500) NOT NULL COMMENT '서버 저장 경로',
+  original_name      VARCHAR(255) NOT NULL COMMENT '원본 파일명',
+  file_size          INT UNSIGNED NOT NULL COMMENT '파일 크기(byte)',
+  created_at         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '업로드일',
+  PRIMARY KEY (thumbnail_image_id),
+  UNIQUE KEY uk_thumbnail_image_figure (user_id, figure_id),
+  CONSTRAINT fk_thumbnail_image_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_thumbnail_image_figure FOREIGN KEY (user_id, figure_id) REFERENCES figure (user_id, figure_id) ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='상품 썸네일 이미지';

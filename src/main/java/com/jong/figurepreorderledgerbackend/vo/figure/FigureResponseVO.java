@@ -29,6 +29,9 @@ public class FigureResponseVO extends FigureVO {
     /** [maker joined] 제조사 (maker_id로 조회) */
     private MakerVO maker;
 
+    /** [thumbnail_image joined] 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) */
+    private String thumbnailUrl;
+
     /** [series joined] 시리즈 목록 (figure_series_map, 상위 시리즈명 포함) */
     private List<SeriesVO> series;
 

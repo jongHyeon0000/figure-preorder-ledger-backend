@@ -62,10 +62,6 @@ public class FigureSaveRequestVO {
     @Size(max = 2000)
     private String purchaseLink;
 
-    /** 썸네일 외부 링크 */
-    @Size(max = 2000)
-    private String thumbnailUrl;
-
     /** 상세 설명 (에디터 HTML) */
     private String description;
 

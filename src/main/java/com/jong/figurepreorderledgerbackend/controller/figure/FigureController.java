@@ -62,7 +62,7 @@ public class FigureController {
      *
      * @param request name: 상품명, price: 개당 가격, quantity: 수량, figureTypeId: 형태 하위 id, shopId: 판매처 스토어 id, makerId: 제조사 id,
      *                seriesIds: 시리즈 id 목록(1개 이상), characterIds: 캐릭터 id 목록(1개 이상) (본문, 필수),
-     *                status: CART 또는 UNPURCHASED (생략 시 CART), deliveryMonth, reservationDeadline, purchaseLink, thumbnailUrl, description (본문, 선택)
+     *                status: CART 또는 UNPURCHASED (생략 시 CART), deliveryMonth, reservationDeadline, purchaseLink, description (본문, 선택)
      *
      * @return ApiResponse<FigureResponseVO> 등록된 상품 한 건 (목록 항목 모양)
      * @throws 404 분류 id가 없거나 다른 사용자의 것 | 400 허용되지 않는 등록 상태, 입력값 오류

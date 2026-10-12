@@ -74,9 +74,6 @@ public class FigureVO {
     /** 구매 링크 */
     private String purchaseLink;
 
-    /** 썸네일 외부 링크 */
-    private String thumbnailUrl;
-
     /** 상세 설명 (에디터 HTML) */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;

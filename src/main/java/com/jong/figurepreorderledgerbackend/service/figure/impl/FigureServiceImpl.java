@@ -2,10 +2,13 @@ package com.jong.figurepreorderledgerbackend.service.figure.impl;
 
 import com.jong.figurepreorderledgerbackend.common.constant.FigureStatus;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
+import com.jong.figurepreorderledgerbackend.common.constant.UploadConstant;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
+import com.jong.figurepreorderledgerbackend.config.properties.UploadProperties;
 import com.jong.figurepreorderledgerbackend.mapper.figure.FigureCharacterMapper;
 import com.jong.figurepreorderledgerbackend.mapper.figure.FigureMapper;
 import com.jong.figurepreorderledgerbackend.mapper.figure.FigureSeriesMapper;
+import com.jong.figurepreorderledgerbackend.mapper.figure.ThumbnailImageMapper;
 import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterMapper;
 import com.jong.figurepreorderledgerbackend.mapper.maker.MakerMapper;
 import com.jong.figurepreorderledgerbackend.mapper.series.SeriesMapper;
@@ -18,9 +21,13 @@ import com.jong.figurepreorderledgerbackend.vo.figure.FigureSaveRequestVO;
 import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterVO;
 import com.jong.figurepreorderledgerbackend.vo.series.SeriesVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +36,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -43,6 +51,8 @@ public class FigureServiceImpl implements FigureService {
     private final SeriesMapper seriesMapper;
     private final GenreCharacterMapper genreCharacterMapper;
     private final EditorImageService editorImageService;
+    private final ThumbnailImageMapper thumbnailImageMapper;
+    private final UploadProperties uploadProperties;
 
     @Override
     public List<FigureResponseVO> getList(Long userId) {
@@ -65,6 +75,7 @@ public class FigureServiceImpl implements FigureService {
         for (FigureResponseVO figure : figures) {
             figure.setSeries(seriesByFigure.getOrDefault(figure.getFigureId(), new ArrayList<>()));
             figure.setCharacters(charactersByFigure.getOrDefault(figure.getFigureId(), new ArrayList<>()));
+            applyThumbnailUrl(figure);
         }
         return figures;
     }
@@ -78,6 +89,7 @@ public class FigureServiceImpl implements FigureService {
         List<Long> figureIds = Collections.singletonList(figureId);
         figure.setSeries(figureSeriesMapper.selectByFigureIds(userId, figureIds));
         figure.setCharacters(figureCharacterMapper.selectByFigureIds(userId, figureIds));
+        applyThumbnailUrl(figure);
         return figure;
     }
 
@@ -90,6 +102,7 @@ public class FigureServiceImpl implements FigureService {
         List<Long> figureIds = Collections.singletonList(figureId);
         figure.setSeries(figureSeriesMapper.selectByFigureIds(userId, figureIds));
         figure.setCharacters(figureCharacterMapper.selectByFigureIds(userId, figureIds));
+        applyThumbnailUrl(figure);
         return figure;
     }
 
@@ -140,9 +153,12 @@ public class FigureServiceImpl implements FigureService {
     @Override
     @Transactional
     public void delete(Long userId, Long figureId) {
+        List<String> thumbnailPaths = thumbnailImageMapper.selectFilePathsByFigureIds(userId,
+                Collections.singletonList(figureId));
         if (figureMapper.delete(userId, figureId) == 0) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+        deleteThumbnailFiles(thumbnailPaths);
     }
 
     @Override
@@ -152,8 +168,34 @@ public class FigureServiceImpl implements FigureService {
         if (distinctIds.isEmpty()) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "삭제할 상품 id가 필요합니다");
         }
+        List<String> thumbnailPaths = thumbnailImageMapper.selectFilePathsByFigureIds(userId, distinctIds);
         if (figureMapper.deleteByIds(userId, distinctIds) != distinctIds.size()) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
+        }
+        deleteThumbnailFiles(thumbnailPaths);
+    }
+
+    /* DB에는 상대 경로만 있으므로 응답에서 /uploads/ 를 붙인다 */
+    private void applyThumbnailUrl(FigureResponseVO figure) {
+        if (figure.getThumbnailUrl() != null) {
+            figure.setThumbnailUrl(UploadConstant.URL_PREFIX + figure.getThumbnailUrl());
+        }
+    }
+
+    /* 상품 삭제로 썸네일 행은 DB가 지웠으므로 파일만 지운다. 실패해도 삭제 결과는 그대로 두고 로그만 남긴다 */
+    private void deleteThumbnailFiles(List<String> filePaths) {
+        Path root = uploadProperties.getDir().toAbsolutePath().normalize();
+        for (String filePath : filePaths) {
+            Path target = root.resolve(filePath).normalize();
+            if (!target.startsWith(root)) {
+                log.warn("업로드 폴더 밖 경로라 지우지 않음: {}", filePath);
+                continue;
+            }
+            try {
+                Files.deleteIfExists(target);
+            } catch (IOException e) {
+                log.warn("썸네일 파일 정리 실패: {}", target, e);
+            }
         }
     }
 

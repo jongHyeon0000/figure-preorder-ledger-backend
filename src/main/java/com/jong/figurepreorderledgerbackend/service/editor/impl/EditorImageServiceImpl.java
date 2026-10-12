@@ -103,11 +103,11 @@ public class EditorImageServiceImpl implements EditorImageService {
         return Jsoup.parseBodyFragment(html == null ? "" : html);
     }
 
-    /* 저장 경로는 서버가 만든다: {userId}/{yyyy}/{MM}/{UUID}.{확장자} (원본 파일명은 경로에 쓰지 않는다) */
+    /* 저장 경로는 서버가 만든다: {userId}/editor-image/{yyyy}/{MM}/{UUID}.{확장자} (원본 파일명은 경로에 쓰지 않는다) */
     private String buildFilePath(Long userId, String extension) {
         LocalDate today = LocalDate.now();
-        return String.format("%d/%d/%02d/%s.%s", userId, today.getYear(), today.getMonthValue(),
-                UUID.randomUUID(), extension);
+        return String.format("%d/%s/%d/%02d/%s.%s", userId, UploadConstant.EDITOR_IMAGE_DIR, today.getYear(),
+                today.getMonthValue(), UUID.randomUUID(), extension);
     }
 
     /* 업로드 폴더 밖으로 나가는 경로는 허용하지 않는다 */

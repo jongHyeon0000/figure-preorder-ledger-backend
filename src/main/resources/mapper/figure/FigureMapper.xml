@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.figure.FigureMapper">
 
+    <!-- thumbnail_url 칸에는 thumbnail_image.file_path(상대 경로)가 오고, 서비스가 /uploads/ 를 붙여 준다 -->
     <!-- 목록용: 설명(HTML) 제외. 시리즈와 캐릭터는 서비스가 따로 조회해 채운다 -->
     <resultMap id="listMap" type="FigureResponseVO" autoMapping="true">
         <id property="figureId" column="figure_id"/>
@@ -47,7 +48,7 @@
     <select id="selectList" resultMap="listMap">
         SELECT f.figure_id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
                f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
-               f.paid_at, f.delivered_at, f.purchase_link, f.thumbnail_url,
+               f.paid_at, f.delivered_at, f.purchase_link, ti.file_path AS thumbnail_url,
                ft.figure_type_id, ft.name AS figure_type_name,
                ftg.figure_type_group_id, ftg.name AS figure_type_group_name,
                sh.shop_id, sh.name AS shop_name,
@@ -59,6 +60,7 @@
         JOIN shop sh ON sh.user_id = f.user_id AND sh.shop_id = f.shop_id
         JOIN shop_group sg ON sg.user_id = sh.user_id AND sg.shop_group_id = sh.shop_group_id
         JOIN maker m ON m.user_id = f.user_id AND m.maker_id = f.maker_id
+        LEFT JOIN thumbnail_image ti ON ti.user_id = f.user_id AND ti.figure_id = f.figure_id
         WHERE f.user_id = #{userId}
         ORDER BY f.figure_id DESC
     </select>
@@ -66,7 +68,7 @@
     <select id="selectListById" resultMap="listMap">
         SELECT f.figure_id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
                f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
-               f.paid_at, f.delivered_at, f.purchase_link, f.thumbnail_url,
+               f.paid_at, f.delivered_at, f.purchase_link, ti.file_path AS thumbnail_url,
                ft.figure_type_id, ft.name AS figure_type_name,
                ftg.figure_type_group_id, ftg.name AS figure_type_group_name,
                sh.shop_id, sh.name AS shop_name,
@@ -78,13 +80,14 @@
         JOIN shop sh ON sh.user_id = f.user_id AND sh.shop_id = f.shop_id
         JOIN shop_group sg ON sg.user_id = sh.user_id AND sg.shop_group_id = sh.shop_group_id
         JOIN maker m ON m.user_id = f.user_id AND m.maker_id = f.maker_id
+        LEFT JOIN thumbnail_image ti ON ti.user_id = f.user_id AND ti.figure_id = f.figure_id
         WHERE f.user_id = #{userId} AND f.figure_id = #{figureId}
     </select>
 
     <select id="selectDetailById" resultMap="detailMap">
         SELECT f.figure_id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
                f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
-               f.paid_at, f.delivered_at, f.purchase_link, f.thumbnail_url,
+               f.paid_at, f.delivered_at, f.purchase_link, ti.file_path AS thumbnail_url,
                f.description, f.created_at, f.updated_at,
                ft.figure_type_id, ft.name AS figure_type_name,
                ftg.figure_type_group_id, ftg.name AS figure_type_group_name,
@@ -97,18 +100,19 @@
         JOIN shop sh ON sh.user_id = f.user_id AND sh.shop_id = f.shop_id
         JOIN shop_group sg ON sg.user_id = sh.user_id AND sg.shop_group_id = sh.shop_group_id
         JOIN maker m ON m.user_id = f.user_id AND m.maker_id = f.maker_id
+        LEFT JOIN thumbnail_image ti ON ti.user_id = f.user_id AND ti.figure_id = f.figure_id
         WHERE f.user_id = #{userId} AND f.figure_id = #{figureId}
     </select>
 
     <!-- 결제 방식과 결제 관련 칸은 등록할 때 비워 두고 상태 전이에서 채운다 -->
     <insert id="insert">
         INSERT INTO figure (user_id, status, name, delivery_month, reservation_deadline, price, quantity,
-                            figure_type_id, shop_id, maker_id, purchase_link, thumbnail_url, description)
+                            figure_type_id, shop_id, maker_id, purchase_link, description)
         VALUES (#{userId}, #{status}, #{request.name},
                 #{request.deliveryMonth,jdbcType=DATE}, #{request.reservationDeadline,jdbcType=DATE},
                 #{request.price}, #{request.quantity},
                 #{request.figureTypeId}, #{request.shopId}, #{request.makerId},
-                #{request.purchaseLink,jdbcType=VARCHAR}, #{request.thumbnailUrl,jdbcType=VARCHAR},
+                #{request.purchaseLink,jdbcType=VARCHAR},
                 #{request.description,jdbcType=LONGVARCHAR})
     </insert>
 
@@ -129,12 +133,11 @@
             shop_id = #{request.shopId},
             maker_id = #{request.makerId},
             purchase_link = #{request.purchaseLink,jdbcType=VARCHAR},
-            thumbnail_url = #{request.thumbnailUrl,jdbcType=VARCHAR},
             description = #{request.description,jdbcType=LONGVARCHAR}
         WHERE user_id = #{userId} AND figure_id = #{figureId}
     </update>
 
-    <!-- 연결 행(시리즈, 캐릭터, 에디터 이미지)은 DB가 함께 삭제한다 -->
+    <!-- 연결 행(시리즈, 캐릭터, 썸네일 이미지)은 DB가 함께 삭제한다. 썸네일 파일은 서비스가 지운다 -->
     <delete id="delete">
         DELETE FROM figure
         WHERE user_id = #{userId} AND figure_id = #{figureId}
