@@ -1,4 +1,4 @@
-package com.jong.figurepreorderledgerbackend.config;
+package com.jong.figurepreorderledgerbackend.config.editor;
 
 import com.jong.figurepreorderledgerbackend.common.constant.UploadConstant;
 import com.jong.figurepreorderledgerbackend.config.properties.UploadProperties;

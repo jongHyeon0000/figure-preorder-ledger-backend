@@ -1,4 +1,4 @@
-package com.jong.figurepreorderledgerbackend.config;
+package com.jong.figurepreorderledgerbackend.config.security;
 
 import com.jong.figurepreorderledgerbackend.config.properties.CorsProperties;
 import lombok.RequiredArgsConstructor;

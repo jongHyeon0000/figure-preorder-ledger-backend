@@ -1,4 +1,4 @@
-package com.jong.figurepreorderledgerbackend.config;
+package com.jong.figurepreorderledgerbackend.config.security;
 
 import com.jong.figurepreorderledgerbackend.common.security.CurrentUser;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,87 +1,20 @@
 package com.jong.figurepreorderledgerbackend.service.genre;
 
-import com.jong.figurepreorderledgerbackend.common.constant.CategoryConstant;
-import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
-import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
-import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterMapper;
-import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterGroupMapper;
 import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterResponse;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class GenreCharacterService {
+public interface GenreCharacterService {
 
-    private final GenreCharacterMapper genreCharacterMapper;
-    private final GenreCharacterGroupMapper genreCharacterGroupMapper;
+    List<GenreCharacterResponse> getAll(Long userId);
 
-    public List<GenreCharacterResponse> getAll(Long userId) {
-        return genreCharacterMapper.selectAll(userId);
-    }
+    GenreCharacterResponse create(Long userId, Long genreCharacterGroupId, String name);
 
-    @Transactional
-    public GenreCharacterResponse create(Long userId, Long genreCharacterGroupId, String name) {
-        if (genreCharacterGroupMapper.selectById(userId, genreCharacterGroupId) == null) {
-            throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
-        }
-        String trimmed = name.trim();
-        try {
-            genreCharacterMapper.insert(userId, genreCharacterGroupId, trimmed);
-        } catch (DuplicateKeyException e) {
-            throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
-        }
-        return genreCharacterMapper.selectByParentAndName(userId, genreCharacterGroupId, trimmed);
-    }
-
-    @Transactional
-    public void update(Long userId, Long genreCharacterId, String name) {
-        GenreCharacterResponse child = find(userId, genreCharacterId);
-        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
-            throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
-        }
-        try {
-            genreCharacterMapper.updateName(userId, genreCharacterId, name.trim());
-        } catch (DuplicateKeyException e) {
-            throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
-        }
-    }
+    void update(Long userId, Long genreCharacterId, String name);
 
     /* 쓰던 상품을 기본 항목(기타 > 기타)으로 옮긴 뒤 삭제한다 */
-    @Transactional
-    public void delete(Long userId, Long genreCharacterId) {
-        GenreCharacterResponse child = find(userId, genreCharacterId);
-        if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
-            throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
-        }
-        if (genreCharacterMapper.countByParent(userId, child.getGenreCharacterGroupId()) <= 1) {
-            throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
-        }
-        Long fallbackId = genreCharacterMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
-        if (fallbackId == null) {
-            throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
-        }
-        genreCharacterMapper.moveInsertFallback(userId, genreCharacterId, fallbackId);
-        genreCharacterMapper.moveDeleteLinks(userId, genreCharacterId);
-        genreCharacterMapper.delete(userId, genreCharacterId);
-    }
+    void delete(Long userId, Long genreCharacterId);
 
-    public UsageResponse getUsage(Long userId, Long genreCharacterId) {
-        find(userId, genreCharacterId);
-        return new UsageResponse(genreCharacterMapper.countUsage(userId, genreCharacterId));
-    }
-
-    private GenreCharacterResponse find(Long userId, Long genreCharacterId) {
-        GenreCharacterResponse child = genreCharacterMapper.selectById(userId, genreCharacterId);
-        if (child == null) {
-            throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
-        }
-        return child;
-    }
+    UsageResponse getUsage(Long userId, Long genreCharacterId);
 }

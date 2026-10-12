@@ -1,4 +1,4 @@
-package com.jong.figurepreorderledgerbackend.config;
+package com.jong.figurepreorderledgerbackend.config.database;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Configuration;
