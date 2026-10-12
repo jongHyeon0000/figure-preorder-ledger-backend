@@ -3,7 +3,6 @@ package com.jong.figurepreorderledgerbackend.service.figure.impl;
 import com.jong.figurepreorderledgerbackend.common.constant.FigureStatus;
 import com.jong.figurepreorderledgerbackend.common.constant.GlobalExceptionCode;
 import com.jong.figurepreorderledgerbackend.common.constant.ThumbnailTarget;
-import com.jong.figurepreorderledgerbackend.common.constant.UploadConstant;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.figure.FigureCharacterMapper;
 import com.jong.figurepreorderledgerbackend.mapper.figure.FigureEditorImageMapper;
@@ -71,7 +70,6 @@ public class FigureServiceImpl implements FigureService {
         for (FigureResponseVO figure : figures) {
             figure.setSeries(seriesByFigure.getOrDefault(figure.getFigureId(), new ArrayList<>()));
             figure.setCharacters(charactersByFigure.getOrDefault(figure.getFigureId(), new ArrayList<>()));
-            applyThumbnailUrl(figure);
         }
         return figures;
     }
@@ -85,7 +83,6 @@ public class FigureServiceImpl implements FigureService {
         List<Long> figureIds = Collections.singletonList(figureId);
         figure.setSeries(figureSeriesMapper.selectByFigureIds(userId, figureIds));
         figure.setCharacters(figureCharacterMapper.selectByFigureIds(userId, figureIds));
-        applyThumbnailUrl(figure);
         return figure;
     }
 
@@ -98,7 +95,6 @@ public class FigureServiceImpl implements FigureService {
         List<Long> figureIds = Collections.singletonList(figureId);
         figure.setSeries(figureSeriesMapper.selectByFigureIds(userId, figureIds));
         figure.setCharacters(figureCharacterMapper.selectByFigureIds(userId, figureIds));
-        applyThumbnailUrl(figure);
         return figure;
     }
 
@@ -176,13 +172,6 @@ public class FigureServiceImpl implements FigureService {
         List<String> filePaths = editorImageService.extractFilePaths(description);
         if (!filePaths.isEmpty()) {
             figureEditorImageMapper.insertAllByFilePaths(userId, figureId, filePaths);
-        }
-    }
-
-    /* DB에는 상대 경로만 있으므로 응답에서 /uploads/ 를 붙인다 */
-    private void applyThumbnailUrl(FigureResponseVO figure) {
-        if (figure.getThumbnailUrl() != null) {
-            figure.setThumbnailUrl(UploadConstant.URL_PREFIX + figure.getThumbnailUrl());
         }
     }
 

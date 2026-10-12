@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.figure.FigureMapper">
 
-    <!-- thumbnail_url 칸에는 thumbnail_image.file_path(상대 경로)가 오고, 서비스가 /uploads/ 를 붙여 준다 -->
+    <!-- thumbnail_url: thumbnail_image.file_path(상대 경로) 앞에 /uploads/ 를 붙인 웹 주소 (썸네일이 없으면 NULL). 분류 매퍼도 같은 방식 -->
     <!-- 목록용: 설명(HTML) 제외. 시리즈와 캐릭터는 서비스가 따로 조회해 채운다 -->
     <resultMap id="listMap" type="FigureResponseVO" autoMapping="true">
         <id property="figureId" column="figure_id"/>
@@ -48,7 +48,7 @@
     <select id="selectList" resultMap="listMap">
         SELECT f.figure_id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
                f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
-               f.paid_at, f.delivered_at, f.purchase_link, ti.file_path AS thumbnail_url,
+               f.paid_at, f.delivered_at, f.purchase_link, CONCAT('/uploads/', ti.file_path) AS thumbnail_url,
                ft.figure_type_id, ft.name AS figure_type_name,
                ftg.figure_type_group_id, ftg.name AS figure_type_group_name,
                sh.shop_id, sh.name AS shop_name,
@@ -68,7 +68,7 @@
     <select id="selectListById" resultMap="listMap">
         SELECT f.figure_id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
                f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
-               f.paid_at, f.delivered_at, f.purchase_link, ti.file_path AS thumbnail_url,
+               f.paid_at, f.delivered_at, f.purchase_link, CONCAT('/uploads/', ti.file_path) AS thumbnail_url,
                ft.figure_type_id, ft.name AS figure_type_name,
                ftg.figure_type_group_id, ftg.name AS figure_type_group_name,
                sh.shop_id, sh.name AS shop_name,
@@ -87,7 +87,7 @@
     <select id="selectDetailById" resultMap="detailMap">
         SELECT f.figure_id, f.status, f.payment_type, f.name, f.delivery_month, f.reservation_deadline,
                f.price, f.quantity, f.deposit_amount, f.balance_due_date, f.deposit_paid_at,
-               f.paid_at, f.delivered_at, f.purchase_link, ti.file_path AS thumbnail_url,
+               f.paid_at, f.delivered_at, f.purchase_link, CONCAT('/uploads/', ti.file_path) AS thumbnail_url,
                f.description, f.created_at, f.updated_at,
                ft.figure_type_id, ft.name AS figure_type_name,
                ftg.figure_type_group_id, ftg.name AS figure_type_group_name,
