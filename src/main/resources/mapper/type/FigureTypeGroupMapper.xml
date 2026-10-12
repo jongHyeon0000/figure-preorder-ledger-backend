@@ -2,21 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeGroupMapper">
 
-    <select id="selectAll" resultType="FigureTypeGroupResponse">
-        SELECT figure_type_group_id, name
+    <select id="selectAll" resultType="FigureTypeGroupVO">
+        SELECT figure_type_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
         FROM figure_type_group
         WHERE user_id = #{userId}
         ORDER BY figure_type_group_id
     </select>
 
-    <select id="selectById" resultType="FigureTypeGroupResponse">
-        SELECT figure_type_group_id, name
+    <select id="selectById" resultType="FigureTypeGroupVO">
+        SELECT figure_type_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
         FROM figure_type_group
         WHERE user_id = #{userId} AND figure_type_group_id = #{figureTypeGroupId}
     </select>
 
-    <select id="selectByName" resultType="FigureTypeGroupResponse">
-        SELECT figure_type_group_id, name
+    <select id="selectByName" resultType="FigureTypeGroupVO">
+        SELECT figure_type_group_id, user_id, user_id, name, created_at, updated_at, created_at, updated_at
         FROM figure_type_group
         WHERE user_id = #{userId} AND name = #{name}
     </select>

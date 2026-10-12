@@ -7,7 +7,7 @@ import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterGroupMapp
 import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterMapper;
 import com.jong.figurepreorderledgerbackend.service.genre.GenreCharacterService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
-import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterResponse;
+import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -24,17 +24,21 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
     private final GenreCharacterGroupMapper genreCharacterGroupMapper;
 
     @Override
-    public List<GenreCharacterResponse> getAll(Long userId) {
+    public List<GenreCharacterVO> getAll(Long userId) {
         return genreCharacterMapper.selectAll(userId);
     }
 
     @Override
     @Transactional
-    public GenreCharacterResponse create(Long userId, Long genreCharacterGroupId, String name) {
+    public GenreCharacterVO create(Long userId, GenreCharacterVO vo) {
+        Long genreCharacterGroupId = vo.getGenreCharacterGroupId();
+        if (genreCharacterGroupId == null) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "genreCharacterGroupId: 필수 값입니다");
+        }
         if (genreCharacterGroupMapper.selectById(userId, genreCharacterGroupId) == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
-        String trimmed = name.trim();
+        String trimmed = vo.getName().trim();
         try {
             genreCharacterMapper.insert(userId, genreCharacterGroupId, trimmed);
         } catch (DuplicateKeyException e) {
@@ -45,13 +49,13 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
 
     @Override
     @Transactional
-    public void update(Long userId, Long genreCharacterId, String name) {
-        GenreCharacterResponse child = find(userId, genreCharacterId);
+    public void update(Long userId, Long genreCharacterId, GenreCharacterVO vo) {
+        GenreCharacterVO child = find(userId, genreCharacterId);
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            genreCharacterMapper.updateName(userId, genreCharacterId, name.trim());
+            genreCharacterMapper.updateName(userId, genreCharacterId, vo.getName().trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -60,7 +64,7 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
     @Override
     @Transactional
     public void delete(Long userId, Long genreCharacterId) {
-        GenreCharacterResponse child = find(userId, genreCharacterId);
+        GenreCharacterVO child = find(userId, genreCharacterId);
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
@@ -82,8 +86,8 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
         return new UsageResponse(genreCharacterMapper.countUsage(userId, genreCharacterId));
     }
 
-    private GenreCharacterResponse find(Long userId, Long genreCharacterId) {
-        GenreCharacterResponse child = genreCharacterMapper.selectById(userId, genreCharacterId);
+    private GenreCharacterVO find(Long userId, Long genreCharacterId) {
+        GenreCharacterVO child = genreCharacterMapper.selectById(userId, genreCharacterId);
         if (child == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

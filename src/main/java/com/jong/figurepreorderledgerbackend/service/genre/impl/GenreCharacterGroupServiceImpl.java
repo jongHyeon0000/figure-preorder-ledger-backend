@@ -7,8 +7,8 @@ import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterGroupMapp
 import com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterMapper;
 import com.jong.figurepreorderledgerbackend.service.genre.GenreCharacterGroupService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
-import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterGroupResponse;
-import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterResponse;
+import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterGroupVO;
+import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -26,12 +26,12 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
     private final GenreCharacterMapper genreCharacterMapper;
 
     @Override
-    public List<GenreCharacterGroupResponse> getTree(Long userId) {
-        List<GenreCharacterGroupResponse> parents = genreCharacterGroupMapper.selectAll(userId);
-        List<GenreCharacterResponse> children = genreCharacterMapper.selectAll(userId);
-        for (GenreCharacterGroupResponse parent : parents) {
-            List<GenreCharacterResponse> own = new ArrayList<>();
-            for (GenreCharacterResponse child : children) {
+    public List<GenreCharacterGroupVO> getTree(Long userId) {
+        List<GenreCharacterGroupVO> parents = genreCharacterGroupMapper.selectAll(userId);
+        List<GenreCharacterVO> children = genreCharacterMapper.selectAll(userId);
+        for (GenreCharacterGroupVO parent : parents) {
+            List<GenreCharacterVO> own = new ArrayList<>();
+            for (GenreCharacterVO child : children) {
                 if (parent.getGenreCharacterGroupId().equals(child.getGenreCharacterGroupId())) {
                     own.add(child);
                 }
@@ -43,17 +43,17 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
 
     @Override
     @Transactional
-    public GenreCharacterGroupResponse create(Long userId, String name) {
-        String trimmed = name.trim();
+    public GenreCharacterGroupVO create(Long userId, GenreCharacterGroupVO vo) {
+        String trimmed = vo.getName().trim();
         try {
             genreCharacterGroupMapper.insert(userId, trimmed);
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
-        GenreCharacterGroupResponse parent = genreCharacterGroupMapper.selectByName(userId, trimmed);
+        GenreCharacterGroupVO parent = genreCharacterGroupMapper.selectByName(userId, trimmed);
 
         genreCharacterMapper.insert(userId, parent.getGenreCharacterGroupId(), CategoryConstant.DEFAULT_NAME);
-        List<GenreCharacterResponse> children = new ArrayList<>();
+        List<GenreCharacterVO> children = new ArrayList<>();
         children.add(genreCharacterMapper.selectByParentAndName(userId, parent.getGenreCharacterGroupId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
         return parent;
@@ -61,13 +61,13 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
 
     @Override
     @Transactional
-    public void update(Long userId, Long genreCharacterGroupId, String name) {
-        GenreCharacterGroupResponse parent = find(userId, genreCharacterGroupId);
+    public void update(Long userId, Long genreCharacterGroupId, GenreCharacterGroupVO vo) {
+        GenreCharacterGroupVO parent = find(userId, genreCharacterGroupId);
         if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            genreCharacterGroupMapper.updateName(userId, genreCharacterGroupId, name.trim());
+            genreCharacterGroupMapper.updateName(userId, genreCharacterGroupId, vo.getName().trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -76,7 +76,7 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
     @Override
     @Transactional
     public void delete(Long userId, Long genreCharacterGroupId) {
-        GenreCharacterGroupResponse parent = find(userId, genreCharacterGroupId);
+        GenreCharacterGroupVO parent = find(userId, genreCharacterGroupId);
         if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
@@ -95,8 +95,8 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
         return new UsageResponse(genreCharacterGroupMapper.countUsage(userId, genreCharacterGroupId));
     }
 
-    private GenreCharacterGroupResponse find(Long userId, Long genreCharacterGroupId) {
-        GenreCharacterGroupResponse parent = genreCharacterGroupMapper.selectById(userId, genreCharacterGroupId);
+    private GenreCharacterGroupVO find(Long userId, Long genreCharacterGroupId) {
+        GenreCharacterGroupVO parent = genreCharacterGroupMapper.selectById(userId, genreCharacterGroupId);
         if (parent == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

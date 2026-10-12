@@ -3,9 +3,8 @@ package com.jong.figurepreorderledgerbackend.controller.type;
 import com.jong.figurepreorderledgerbackend.common.response.ApiResponse;
 import com.jong.figurepreorderledgerbackend.common.security.CurrentUser;
 import com.jong.figurepreorderledgerbackend.service.type.FigureTypeGroupService;
-import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeGroupRequest;
-import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeGroupResponse;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
+import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeGroupVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,10 +30,10 @@ public class FigureTypeGroupController {
      * 형태 목록 조회, 하위 형태 하위 중첩 (예: 스케일, 넨도로이드)
      * [GET] 목록 | /api/figure-type-group
      *
-     * @return ApiResponse<List<FigureTypeGroupResponse>> figureTypeGroupId, name, children(형태 하위 목록: figureTypeId, figureTypeGroupId, name)
+     * @return ApiResponse<List<FigureTypeGroupVO>> figureTypeGroupId, name, children(형태 하위 목록: figureTypeId, figureTypeGroupId, name)
      */
     @GetMapping
-    public ApiResponse<List<FigureTypeGroupResponse>> getTree() {
+    public ApiResponse<List<FigureTypeGroupVO>> getTree() {
         return ApiResponse.ok(figureTypeGroupService.getTree(currentUser.getId()));
     }
 
@@ -44,12 +43,12 @@ public class FigureTypeGroupController {
      *
      * @param request name: 형태 이름 (본문, 필수, 100자 이하)
      *
-     * @return ApiResponse<FigureTypeGroupResponse> 생성된 figureTypeGroupId, name, children(기본 '기타' 하나)
+     * @return ApiResponse<FigureTypeGroupVO> 생성된 figureTypeGroupId, name, children(기본 '기타' 하나)
      * @throws 400 이름 중복, 입력값 오류
      */
     @PostMapping
-    public ApiResponse<FigureTypeGroupResponse> create(@Valid @RequestBody FigureTypeGroupRequest request) {
-        return ApiResponse.ok(figureTypeGroupService.create(currentUser.getId(), request.getName()));
+    public ApiResponse<FigureTypeGroupVO> create(@Valid @RequestBody FigureTypeGroupVO request) {
+        return ApiResponse.ok(figureTypeGroupService.create(currentUser.getId(), request));
     }
 
     /**
@@ -63,8 +62,8 @@ public class FigureTypeGroupController {
      * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{figureTypeGroupId}")
-    public ApiResponse<Void> update(@PathVariable Long figureTypeGroupId, @Valid @RequestBody FigureTypeGroupRequest request) {
-        figureTypeGroupService.update(currentUser.getId(), figureTypeGroupId, request.getName());
+    public ApiResponse<Void> update(@PathVariable Long figureTypeGroupId, @Valid @RequestBody FigureTypeGroupVO request) {
+        figureTypeGroupService.update(currentUser.getId(), figureTypeGroupId, request);
         return ApiResponse.ok();
     }
 

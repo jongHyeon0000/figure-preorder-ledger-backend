@@ -2,21 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterMapper">
 
-    <select id="selectAll" resultType="GenreCharacterResponse">
-        SELECT genre_character_id, genre_character_group_id, name
+    <select id="selectAll" resultType="GenreCharacterVO">
+        SELECT genre_character_id, user_id, genre_character_group_id, name, created_at, updated_at
         FROM genre_character
         WHERE user_id = #{userId}
         ORDER BY genre_character_id
     </select>
 
-    <select id="selectById" resultType="GenreCharacterResponse">
-        SELECT genre_character_id, genre_character_group_id, name
+    <select id="selectById" resultType="GenreCharacterVO">
+        SELECT genre_character_id, user_id, genre_character_group_id, name, created_at, updated_at
         FROM genre_character
         WHERE user_id = #{userId} AND genre_character_id = #{genreCharacterId}
     </select>
 
-    <select id="selectByParentAndName" resultType="GenreCharacterResponse">
-        SELECT genre_character_id, genre_character_group_id, name
+    <select id="selectByParentAndName" resultType="GenreCharacterVO">
+        SELECT genre_character_id, user_id, genre_character_group_id, name, created_at, updated_at
         FROM genre_character
         WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId} AND name = #{name}
     </select>

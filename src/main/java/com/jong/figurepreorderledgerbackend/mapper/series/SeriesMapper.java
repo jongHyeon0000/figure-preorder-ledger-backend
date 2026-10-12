@@ -1,6 +1,6 @@
 package com.jong.figurepreorderledgerbackend.mapper.series;
 
-import com.jong.figurepreorderledgerbackend.vo.series.response.SeriesResponse;
+import com.jong.figurepreorderledgerbackend.vo.series.SeriesVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,11 +9,11 @@ import java.util.List;
 @Mapper
 public interface SeriesMapper {
 
-    List<SeriesResponse> selectAll(@Param("userId") Long userId);
+    List<SeriesVO> selectAll(@Param("userId") Long userId);
 
-    SeriesResponse selectById(@Param("userId") Long userId, @Param("seriesId") Long seriesId);
+    SeriesVO selectById(@Param("userId") Long userId, @Param("seriesId") Long seriesId);
 
-    SeriesResponse selectByParentAndName(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId,
+    SeriesVO selectByParentAndName(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId,
                                         @Param("name") String name);
 
     int countByParent(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId);

@@ -1,6 +1,6 @@
 package com.jong.figurepreorderledgerbackend.mapper.shop;
 
-import com.jong.figurepreorderledgerbackend.vo.shop.ShopGroupResponse;
+import com.jong.figurepreorderledgerbackend.vo.shop.ShopGroupVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,11 +9,11 @@ import java.util.List;
 @Mapper
 public interface ShopGroupMapper {
 
-    List<ShopGroupResponse> selectAll(@Param("userId") Long userId);
+    List<ShopGroupVO> selectAll(@Param("userId") Long userId);
 
-    ShopGroupResponse selectById(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId);
+    ShopGroupVO selectById(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId);
 
-    ShopGroupResponse selectByName(@Param("userId") Long userId, @Param("name") String name);
+    ShopGroupVO selectByName(@Param("userId") Long userId, @Param("name") String name);
 
     int insert(@Param("userId") Long userId, @Param("name") String name);
 

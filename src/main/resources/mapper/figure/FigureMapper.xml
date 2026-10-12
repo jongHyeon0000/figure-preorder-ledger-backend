@@ -3,42 +3,42 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.figure.FigureMapper">
 
     <!-- 목록용: 설명(HTML) 제외. 시리즈와 캐릭터는 서비스가 따로 조회해 채운다 -->
-    <resultMap id="listMap" type="FigureListResponse" autoMapping="true">
+    <resultMap id="listMap" type="FigureResponseVO" autoMapping="true">
         <id property="figureId" column="figure_id"/>
-        <association property="figureType" javaType="FigureTypeInfo">
+        <association property="figureType" javaType="FigureTypeVO">
             <id property="figureTypeId" column="figure_type_id"/>
             <result property="name" column="figure_type_name"/>
             <result property="figureTypeGroupId" column="figure_type_group_id"/>
             <result property="figureTypeGroupName" column="figure_type_group_name"/>
         </association>
-        <association property="shop" javaType="FigureShopInfo">
+        <association property="shop" javaType="ShopVO">
             <id property="shopId" column="shop_id"/>
             <result property="name" column="shop_name"/>
             <result property="shopGroupId" column="shop_group_id"/>
             <result property="shopGroupName" column="shop_group_name"/>
         </association>
-        <association property="maker" javaType="FigureMakerInfo">
+        <association property="maker" javaType="MakerVO">
             <id property="makerId" column="maker_id"/>
             <result property="name" column="maker_name"/>
         </association>
     </resultMap>
 
     <!-- 상세용: 목록 항목 + 설명(HTML), 생성일, 수정일 -->
-    <resultMap id="detailMap" type="FigureDetailResponse" autoMapping="true">
+    <resultMap id="detailMap" type="FigureResponseVO" autoMapping="true">
         <id property="figureId" column="figure_id"/>
-        <association property="figureType" javaType="FigureTypeInfo">
+        <association property="figureType" javaType="FigureTypeVO">
             <id property="figureTypeId" column="figure_type_id"/>
             <result property="name" column="figure_type_name"/>
             <result property="figureTypeGroupId" column="figure_type_group_id"/>
             <result property="figureTypeGroupName" column="figure_type_group_name"/>
         </association>
-        <association property="shop" javaType="FigureShopInfo">
+        <association property="shop" javaType="ShopVO">
             <id property="shopId" column="shop_id"/>
             <result property="name" column="shop_name"/>
             <result property="shopGroupId" column="shop_group_id"/>
             <result property="shopGroupName" column="shop_group_name"/>
         </association>
-        <association property="maker" javaType="FigureMakerInfo">
+        <association property="maker" javaType="MakerVO">
             <id property="makerId" column="maker_id"/>
             <result property="name" column="maker_name"/>
         </association>
@@ -149,13 +149,13 @@
         </foreach>
     </delete>
 
-    <select id="selectCurrentStatus" resultType="FigureCurrentStatus">
+    <select id="selectCurrentStatus" resultType="FigureVO">
         SELECT figure_id, status, payment_type
         FROM figure
         WHERE user_id = #{userId} AND figure_id = #{figureId}
     </select>
 
-    <select id="selectCurrentStatusByIds" resultType="FigureCurrentStatus">
+    <select id="selectCurrentStatusByIds" resultType="FigureVO">
         SELECT figure_id, status, payment_type
         FROM figure
         WHERE user_id = #{userId}

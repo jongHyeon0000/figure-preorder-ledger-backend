@@ -3,7 +3,7 @@ package com.jong.figurepreorderledgerbackend.controller.editor;
 import com.jong.figurepreorderledgerbackend.common.response.ApiResponse;
 import com.jong.figurepreorderledgerbackend.common.security.CurrentUser;
 import com.jong.figurepreorderledgerbackend.service.editor.EditorImageService;
-import com.jong.figurepreorderledgerbackend.vo.editor.EditorImageUploadResponse;
+import com.jong.figurepreorderledgerbackend.vo.editor.EditorImageVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,11 +26,11 @@ public class EditorImageController {
      *
      * @param file 업로드할 이미지 파일 (본문 multipart, 필드명 file, 필수, jpg/jpeg/png/gif/webp, 최대 5MB)
      *
-     * @return ApiResponse<EditorImageUploadResponse> editorImageId, url(에디터가 이미지 src로 쓸 /uploads/ 주소)
+     * @return ApiResponse<EditorImageVO> editorImageId, url(에디터가 이미지 src로 쓸 /uploads/ 주소)
      * @throws 400 파일 없음, 허용하지 않는 확장자, 파일 내용이 확장자와 다름, 크기 초과
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<EditorImageUploadResponse> upload(@RequestParam("file") MultipartFile file) {
+    public ApiResponse<EditorImageVO> upload(@RequestParam("file") MultipartFile file) {
         return ApiResponse.ok(editorImageService.upload(currentUser.getId(), file));
     }
 }

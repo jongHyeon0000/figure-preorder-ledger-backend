@@ -3,9 +3,8 @@ package com.jong.figurepreorderledgerbackend.controller.shop;
 import com.jong.figurepreorderledgerbackend.common.response.ApiResponse;
 import com.jong.figurepreorderledgerbackend.common.security.CurrentUser;
 import com.jong.figurepreorderledgerbackend.service.shop.ShopGroupService;
-import com.jong.figurepreorderledgerbackend.vo.shop.ShopGroupRequest;
-import com.jong.figurepreorderledgerbackend.vo.shop.ShopGroupResponse;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
+import com.jong.figurepreorderledgerbackend.vo.shop.ShopGroupVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,10 +30,10 @@ public class ShopGroupController {
      * 판매처 채널 목록 조회, 하위 판매처 스토어 중첩 (예: 네이버 스토어)
      * [GET] 목록 | /api/shop-group
      *
-     * @return ApiResponse<List<ShopGroupResponse>> shopGroupId, name, children(판매처 스토어 목록: shopId, shopGroupId, name)
+     * @return ApiResponse<List<ShopGroupVO>> shopGroupId, name, children(판매처 스토어 목록: shopId, shopGroupId, name)
      */
     @GetMapping
-    public ApiResponse<List<ShopGroupResponse>> getTree() {
+    public ApiResponse<List<ShopGroupVO>> getTree() {
         return ApiResponse.ok(shopGroupService.getTree(currentUser.getId()));
     }
 
@@ -44,12 +43,12 @@ public class ShopGroupController {
      *
      * @param request name: 판매처 채널 이름 (본문, 필수, 100자 이하)
      *
-     * @return ApiResponse<ShopGroupResponse> 생성된 shopGroupId, name, children(기본 '기타' 하나)
+     * @return ApiResponse<ShopGroupVO> 생성된 shopGroupId, name, children(기본 '기타' 하나)
      * @throws 400 이름 중복, 입력값 오류
      */
     @PostMapping
-    public ApiResponse<ShopGroupResponse> create(@Valid @RequestBody ShopGroupRequest request) {
-        return ApiResponse.ok(shopGroupService.create(currentUser.getId(), request.getName()));
+    public ApiResponse<ShopGroupVO> create(@Valid @RequestBody ShopGroupVO request) {
+        return ApiResponse.ok(shopGroupService.create(currentUser.getId(), request));
     }
 
     /**
@@ -63,8 +62,8 @@ public class ShopGroupController {
      * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{shopGroupId}")
-    public ApiResponse<Void> update(@PathVariable Long shopGroupId, @Valid @RequestBody ShopGroupRequest request) {
-        shopGroupService.update(currentUser.getId(), shopGroupId, request.getName());
+    public ApiResponse<Void> update(@PathVariable Long shopGroupId, @Valid @RequestBody ShopGroupVO request) {
+        shopGroupService.update(currentUser.getId(), shopGroupId, request);
         return ApiResponse.ok();
     }
 

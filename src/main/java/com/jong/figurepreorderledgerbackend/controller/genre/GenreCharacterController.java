@@ -3,10 +3,8 @@ package com.jong.figurepreorderledgerbackend.controller.genre;
 import com.jong.figurepreorderledgerbackend.common.response.ApiResponse;
 import com.jong.figurepreorderledgerbackend.common.security.CurrentUser;
 import com.jong.figurepreorderledgerbackend.service.genre.GenreCharacterService;
-import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterCreateRequest;
-import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterResponse;
-import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterUpdateRequest;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
+import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,10 +30,10 @@ public class GenreCharacterController {
      * 캐릭터 목록 조회 (예: 하츠네 미쿠)
      * [GET] 목록 | /api/genre-character
      *
-     * @return ApiResponse<List<GenreCharacterResponse>> genreCharacterId, genreCharacterGroupId(상위 장르 id), name
+     * @return ApiResponse<List<GenreCharacterVO>> genreCharacterId, genreCharacterGroupId(상위 장르 id), name
      */
     @GetMapping
-    public ApiResponse<List<GenreCharacterResponse>> getAll() {
+    public ApiResponse<List<GenreCharacterVO>> getAll() {
         return ApiResponse.ok(genreCharacterService.getAll(currentUser.getId()));
     }
 
@@ -45,12 +43,12 @@ public class GenreCharacterController {
      *
      * @param request genreCharacterGroupId: 상위 장르 id, name: 캐릭터 이름 (본문, 둘 다 필수, 이름은 100자 이하)
      *
-     * @return ApiResponse<GenreCharacterResponse> 생성된 genreCharacterId, genreCharacterGroupId, name
+     * @return ApiResponse<GenreCharacterVO> 생성된 genreCharacterId, genreCharacterGroupId, name
      * @throws 404 상위 장르 없음 | 400 이름 중복, 입력값 오류
      */
     @PostMapping
-    public ApiResponse<GenreCharacterResponse> create(@Valid @RequestBody GenreCharacterCreateRequest request) {
-        return ApiResponse.ok(genreCharacterService.create(currentUser.getId(), request.getGenreCharacterGroupId(), request.getName()));
+    public ApiResponse<GenreCharacterVO> create(@Valid @RequestBody GenreCharacterVO request) {
+        return ApiResponse.ok(genreCharacterService.create(currentUser.getId(), request));
     }
 
     /**
@@ -64,8 +62,8 @@ public class GenreCharacterController {
      * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{genreCharacterId}")
-    public ApiResponse<Void> update(@PathVariable Long genreCharacterId, @Valid @RequestBody GenreCharacterUpdateRequest request) {
-        genreCharacterService.update(currentUser.getId(), genreCharacterId, request.getName());
+    public ApiResponse<Void> update(@PathVariable Long genreCharacterId, @Valid @RequestBody GenreCharacterVO request) {
+        genreCharacterService.update(currentUser.getId(), genreCharacterId, request);
         return ApiResponse.ok();
     }
 

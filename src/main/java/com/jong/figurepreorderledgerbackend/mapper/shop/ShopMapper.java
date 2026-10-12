@@ -1,6 +1,6 @@
 package com.jong.figurepreorderledgerbackend.mapper.shop;
 
-import com.jong.figurepreorderledgerbackend.vo.shop.ShopResponse;
+import com.jong.figurepreorderledgerbackend.vo.shop.ShopVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,11 +9,11 @@ import java.util.List;
 @Mapper
 public interface ShopMapper {
 
-    List<ShopResponse> selectAll(@Param("userId") Long userId);
+    List<ShopVO> selectAll(@Param("userId") Long userId);
 
-    ShopResponse selectById(@Param("userId") Long userId, @Param("shopId") Long shopId);
+    ShopVO selectById(@Param("userId") Long userId, @Param("shopId") Long shopId);
 
-    ShopResponse selectByParentAndName(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId,
+    ShopVO selectByParentAndName(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId,
                                         @Param("name") String name);
 
     int countByParent(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId);

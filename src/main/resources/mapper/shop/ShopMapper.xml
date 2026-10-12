@@ -2,21 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper">
 
-    <select id="selectAll" resultType="ShopResponse">
-        SELECT shop_id, shop_group_id, name
+    <select id="selectAll" resultType="ShopVO">
+        SELECT shop_id, user_id, shop_group_id, name, created_at, updated_at
         FROM shop
         WHERE user_id = #{userId}
         ORDER BY shop_id
     </select>
 
-    <select id="selectById" resultType="ShopResponse">
-        SELECT shop_id, shop_group_id, name
+    <select id="selectById" resultType="ShopVO">
+        SELECT shop_id, user_id, shop_group_id, name, created_at, updated_at
         FROM shop
         WHERE user_id = #{userId} AND shop_id = #{shopId}
     </select>
 
-    <select id="selectByParentAndName" resultType="ShopResponse">
-        SELECT shop_id, shop_group_id, name
+    <select id="selectByParentAndName" resultType="ShopVO">
+        SELECT shop_id, user_id, shop_group_id, name, created_at, updated_at
         FROM shop
         WHERE user_id = #{userId} AND shop_group_id = #{shopGroupId} AND name = #{name}
     </select>

@@ -7,8 +7,8 @@ import com.jong.figurepreorderledgerbackend.mapper.shop.ShopGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper;
 import com.jong.figurepreorderledgerbackend.service.shop.ShopGroupService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
-import com.jong.figurepreorderledgerbackend.vo.shop.ShopGroupResponse;
-import com.jong.figurepreorderledgerbackend.vo.shop.ShopResponse;
+import com.jong.figurepreorderledgerbackend.vo.shop.ShopGroupVO;
+import com.jong.figurepreorderledgerbackend.vo.shop.ShopVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -26,12 +26,12 @@ public class ShopGroupServiceImpl implements ShopGroupService {
     private final ShopMapper shopMapper;
 
     @Override
-    public List<ShopGroupResponse> getTree(Long userId) {
-        List<ShopGroupResponse> parents = shopGroupMapper.selectAll(userId);
-        List<ShopResponse> children = shopMapper.selectAll(userId);
-        for (ShopGroupResponse parent : parents) {
-            List<ShopResponse> own = new ArrayList<>();
-            for (ShopResponse child : children) {
+    public List<ShopGroupVO> getTree(Long userId) {
+        List<ShopGroupVO> parents = shopGroupMapper.selectAll(userId);
+        List<ShopVO> children = shopMapper.selectAll(userId);
+        for (ShopGroupVO parent : parents) {
+            List<ShopVO> own = new ArrayList<>();
+            for (ShopVO child : children) {
                 if (parent.getShopGroupId().equals(child.getShopGroupId())) {
                     own.add(child);
                 }
@@ -43,17 +43,17 @@ public class ShopGroupServiceImpl implements ShopGroupService {
 
     @Override
     @Transactional
-    public ShopGroupResponse create(Long userId, String name) {
-        String trimmed = name.trim();
+    public ShopGroupVO create(Long userId, ShopGroupVO vo) {
+        String trimmed = vo.getName().trim();
         try {
             shopGroupMapper.insert(userId, trimmed);
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
-        ShopGroupResponse parent = shopGroupMapper.selectByName(userId, trimmed);
+        ShopGroupVO parent = shopGroupMapper.selectByName(userId, trimmed);
 
         shopMapper.insert(userId, parent.getShopGroupId(), CategoryConstant.DEFAULT_NAME);
-        List<ShopResponse> children = new ArrayList<>();
+        List<ShopVO> children = new ArrayList<>();
         children.add(shopMapper.selectByParentAndName(userId, parent.getShopGroupId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
         return parent;
@@ -61,13 +61,13 @@ public class ShopGroupServiceImpl implements ShopGroupService {
 
     @Override
     @Transactional
-    public void update(Long userId, Long shopGroupId, String name) {
-        ShopGroupResponse parent = find(userId, shopGroupId);
+    public void update(Long userId, Long shopGroupId, ShopGroupVO vo) {
+        ShopGroupVO parent = find(userId, shopGroupId);
         if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            shopGroupMapper.updateName(userId, shopGroupId, name.trim());
+            shopGroupMapper.updateName(userId, shopGroupId, vo.getName().trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -76,7 +76,7 @@ public class ShopGroupServiceImpl implements ShopGroupService {
     @Override
     @Transactional
     public void delete(Long userId, Long shopGroupId) {
-        ShopGroupResponse parent = find(userId, shopGroupId);
+        ShopGroupVO parent = find(userId, shopGroupId);
         if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
@@ -94,8 +94,8 @@ public class ShopGroupServiceImpl implements ShopGroupService {
         return new UsageResponse(shopGroupMapper.countUsage(userId, shopGroupId));
     }
 
-    private ShopGroupResponse find(Long userId, Long shopGroupId) {
-        ShopGroupResponse parent = shopGroupMapper.selectById(userId, shopGroupId);
+    private ShopGroupVO find(Long userId, Long shopGroupId) {
+        ShopGroupVO parent = shopGroupMapper.selectById(userId, shopGroupId);
         if (parent == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

@@ -7,7 +7,7 @@ import com.jong.figurepreorderledgerbackend.mapper.series.SeriesGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.series.SeriesMapper;
 import com.jong.figurepreorderledgerbackend.service.series.SeriesService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
-import com.jong.figurepreorderledgerbackend.vo.series.response.SeriesResponse;
+import com.jong.figurepreorderledgerbackend.vo.series.SeriesVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -24,17 +24,21 @@ public class SeriesServiceImpl implements SeriesService {
     private final SeriesGroupMapper seriesGroupMapper;
 
     @Override
-    public List<SeriesResponse> getAll(Long userId) {
+    public List<SeriesVO> getAll(Long userId) {
         return seriesMapper.selectAll(userId);
     }
 
     @Override
     @Transactional
-    public SeriesResponse create(Long userId, Long seriesGroupId, String name) {
+    public SeriesVO create(Long userId, SeriesVO vo) {
+        Long seriesGroupId = vo.getSeriesGroupId();
+        if (seriesGroupId == null) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "seriesGroupId: 필수 값입니다");
+        }
         if (seriesGroupMapper.selectById(userId, seriesGroupId) == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
-        String trimmed = name.trim();
+        String trimmed = vo.getName().trim();
         try {
             seriesMapper.insert(userId, seriesGroupId, trimmed);
         } catch (DuplicateKeyException e) {
@@ -45,13 +49,13 @@ public class SeriesServiceImpl implements SeriesService {
 
     @Override
     @Transactional
-    public void update(Long userId, Long seriesId, String name) {
-        SeriesResponse child = find(userId, seriesId);
+    public void update(Long userId, Long seriesId, SeriesVO vo) {
+        SeriesVO child = find(userId, seriesId);
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            seriesMapper.updateName(userId, seriesId, name.trim());
+            seriesMapper.updateName(userId, seriesId, vo.getName().trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -60,7 +64,7 @@ public class SeriesServiceImpl implements SeriesService {
     @Override
     @Transactional
     public void delete(Long userId, Long seriesId) {
-        SeriesResponse child = find(userId, seriesId);
+        SeriesVO child = find(userId, seriesId);
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
@@ -82,8 +86,8 @@ public class SeriesServiceImpl implements SeriesService {
         return new UsageResponse(seriesMapper.countUsage(userId, seriesId));
     }
 
-    private SeriesResponse find(Long userId, Long seriesId) {
-        SeriesResponse child = seriesMapper.selectById(userId, seriesId);
+    private SeriesVO find(Long userId, Long seriesId) {
+        SeriesVO child = seriesMapper.selectById(userId, seriesId);
         if (child == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

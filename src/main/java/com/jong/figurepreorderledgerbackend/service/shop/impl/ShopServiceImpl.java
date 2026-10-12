@@ -7,7 +7,7 @@ import com.jong.figurepreorderledgerbackend.mapper.shop.ShopGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper;
 import com.jong.figurepreorderledgerbackend.service.shop.ShopService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
-import com.jong.figurepreorderledgerbackend.vo.shop.ShopResponse;
+import com.jong.figurepreorderledgerbackend.vo.shop.ShopVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -24,17 +24,21 @@ public class ShopServiceImpl implements ShopService {
     private final ShopGroupMapper shopGroupMapper;
 
     @Override
-    public List<ShopResponse> getAll(Long userId) {
+    public List<ShopVO> getAll(Long userId) {
         return shopMapper.selectAll(userId);
     }
 
     @Override
     @Transactional
-    public ShopResponse create(Long userId, Long shopGroupId, String name) {
+    public ShopVO create(Long userId, ShopVO vo) {
+        Long shopGroupId = vo.getShopGroupId();
+        if (shopGroupId == null) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "shopGroupId: 필수 값입니다");
+        }
         if (shopGroupMapper.selectById(userId, shopGroupId) == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
-        String trimmed = name.trim();
+        String trimmed = vo.getName().trim();
         try {
             shopMapper.insert(userId, shopGroupId, trimmed);
         } catch (DuplicateKeyException e) {
@@ -45,13 +49,13 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     @Transactional
-    public void update(Long userId, Long shopId, String name) {
-        ShopResponse child = find(userId, shopId);
+    public void update(Long userId, Long shopId, ShopVO vo) {
+        ShopVO child = find(userId, shopId);
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            shopMapper.updateName(userId, shopId, name.trim());
+            shopMapper.updateName(userId, shopId, vo.getName().trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -60,7 +64,7 @@ public class ShopServiceImpl implements ShopService {
     @Override
     @Transactional
     public void delete(Long userId, Long shopId) {
-        ShopResponse child = find(userId, shopId);
+        ShopVO child = find(userId, shopId);
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
@@ -81,8 +85,8 @@ public class ShopServiceImpl implements ShopService {
         return new UsageResponse(shopMapper.countUsage(userId, shopId));
     }
 
-    private ShopResponse find(Long userId, Long shopId) {
-        ShopResponse child = shopMapper.selectById(userId, shopId);
+    private ShopVO find(Long userId, Long shopId) {
+        ShopVO child = shopMapper.selectById(userId, shopId);
         if (child == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

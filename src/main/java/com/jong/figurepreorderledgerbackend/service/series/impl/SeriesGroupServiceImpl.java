@@ -7,8 +7,8 @@ import com.jong.figurepreorderledgerbackend.mapper.series.SeriesGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.series.SeriesMapper;
 import com.jong.figurepreorderledgerbackend.service.series.SeriesGroupService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
-import com.jong.figurepreorderledgerbackend.vo.series.response.SeriesGroupResponse;
-import com.jong.figurepreorderledgerbackend.vo.series.response.SeriesResponse;
+import com.jong.figurepreorderledgerbackend.vo.series.SeriesGroupVO;
+import com.jong.figurepreorderledgerbackend.vo.series.SeriesVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -26,12 +26,12 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
     private final SeriesMapper seriesMapper;
 
     @Override
-    public List<SeriesGroupResponse> getTree(Long userId) {
-        List<SeriesGroupResponse> parents = seriesGroupMapper.selectAll(userId);
-        List<SeriesResponse> children = seriesMapper.selectAll(userId);
-        for (SeriesGroupResponse parent : parents) {
-            List<SeriesResponse> own = new ArrayList<>();
-            for (SeriesResponse child : children) {
+    public List<SeriesGroupVO> getTree(Long userId) {
+        List<SeriesGroupVO> parents = seriesGroupMapper.selectAll(userId);
+        List<SeriesVO> children = seriesMapper.selectAll(userId);
+        for (SeriesGroupVO parent : parents) {
+            List<SeriesVO> own = new ArrayList<>();
+            for (SeriesVO child : children) {
                 if (parent.getSeriesGroupId().equals(child.getSeriesGroupId())) {
                     own.add(child);
                 }
@@ -43,17 +43,17 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
 
     @Override
     @Transactional
-    public SeriesGroupResponse create(Long userId, String name) {
-        String trimmed = name.trim();
+    public SeriesGroupVO create(Long userId, SeriesGroupVO vo) {
+        String trimmed = vo.getName().trim();
         try {
             seriesGroupMapper.insert(userId, trimmed);
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
-        SeriesGroupResponse parent = seriesGroupMapper.selectByName(userId, trimmed);
+        SeriesGroupVO parent = seriesGroupMapper.selectByName(userId, trimmed);
 
         seriesMapper.insert(userId, parent.getSeriesGroupId(), CategoryConstant.DEFAULT_NAME);
-        List<SeriesResponse> children = new ArrayList<>();
+        List<SeriesVO> children = new ArrayList<>();
         children.add(seriesMapper.selectByParentAndName(userId, parent.getSeriesGroupId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
         return parent;
@@ -61,13 +61,13 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
 
     @Override
     @Transactional
-    public void update(Long userId, Long seriesGroupId, String name) {
-        SeriesGroupResponse parent = find(userId, seriesGroupId);
+    public void update(Long userId, Long seriesGroupId, SeriesGroupVO vo) {
+        SeriesGroupVO parent = find(userId, seriesGroupId);
         if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            seriesGroupMapper.updateName(userId, seriesGroupId, name.trim());
+            seriesGroupMapper.updateName(userId, seriesGroupId, vo.getName().trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -76,7 +76,7 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
     @Override
     @Transactional
     public void delete(Long userId, Long seriesGroupId) {
-        SeriesGroupResponse parent = find(userId, seriesGroupId);
+        SeriesGroupVO parent = find(userId, seriesGroupId);
         if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
@@ -95,8 +95,8 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
         return new UsageResponse(seriesGroupMapper.countUsage(userId, seriesGroupId));
     }
 
-    private SeriesGroupResponse find(Long userId, Long seriesGroupId) {
-        SeriesGroupResponse parent = seriesGroupMapper.selectById(userId, seriesGroupId);
+    private SeriesGroupVO find(Long userId, Long seriesGroupId) {
+        SeriesGroupVO parent = seriesGroupMapper.selectById(userId, seriesGroupId);
         if (parent == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

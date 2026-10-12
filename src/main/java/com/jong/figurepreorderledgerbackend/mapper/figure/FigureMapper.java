@@ -1,12 +1,9 @@
 package com.jong.figurepreorderledgerbackend.mapper.figure;
 
 import com.jong.figurepreorderledgerbackend.common.constant.FigureStatus;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureCreateRequest;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureCurrentStatus;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureDetailResponse;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureListResponse;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureStatusUpdateParam;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureUpdateRequest;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureResponseVO;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureSaveRequestVO;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,26 +12,26 @@ import java.util.List;
 @Mapper
 public interface FigureMapper {
 
-    List<FigureListResponse> selectList(@Param("userId") Long userId);
+    List<FigureResponseVO> selectList(@Param("userId") Long userId);
 
-    FigureListResponse selectListById(@Param("userId") Long userId, @Param("figureId") Long figureId);
+    FigureResponseVO selectListById(@Param("userId") Long userId, @Param("figureId") Long figureId);
 
-    FigureDetailResponse selectDetailById(@Param("userId") Long userId, @Param("figureId") Long figureId);
+    FigureResponseVO selectDetailById(@Param("userId") Long userId, @Param("figureId") Long figureId);
 
     int insert(@Param("userId") Long userId, @Param("status") FigureStatus status,
-               @Param("request") FigureCreateRequest request);
+               @Param("request") FigureSaveRequestVO request);
 
     Long selectLastInsertId();
 
-    int update(@Param("userId") Long userId, @Param("figureId") Long figureId, @Param("request") FigureUpdateRequest request);
+    int update(@Param("userId") Long userId, @Param("figureId") Long figureId, @Param("request") FigureSaveRequestVO request);
 
     int delete(@Param("userId") Long userId, @Param("figureId") Long figureId);
 
     int deleteByIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);
 
-    FigureCurrentStatus selectCurrentStatus(@Param("userId") Long userId, @Param("figureId") Long figureId);
+    FigureVO selectCurrentStatus(@Param("userId") Long userId, @Param("figureId") Long figureId);
 
-    List<FigureCurrentStatus> selectCurrentStatusByIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);
+    List<FigureVO> selectCurrentStatusByIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);
 
-    int updateStatus(FigureStatusUpdateParam param);
+    int updateStatus(FigureVO param);
 }

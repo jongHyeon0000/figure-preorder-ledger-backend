@@ -1,6 +1,6 @@
 package com.jong.figurepreorderledgerbackend.mapper.genre;
 
-import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterResponse;
+import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,11 +9,11 @@ import java.util.List;
 @Mapper
 public interface GenreCharacterMapper {
 
-    List<GenreCharacterResponse> selectAll(@Param("userId") Long userId);
+    List<GenreCharacterVO> selectAll(@Param("userId") Long userId);
 
-    GenreCharacterResponse selectById(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId);
+    GenreCharacterVO selectById(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId);
 
-    GenreCharacterResponse selectByParentAndName(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId,
+    GenreCharacterVO selectByParentAndName(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId,
                                         @Param("name") String name);
 
     int countByParent(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId);

@@ -6,7 +6,7 @@ import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.maker.MakerMapper;
 import com.jong.figurepreorderledgerbackend.service.maker.MakerService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
-import com.jong.figurepreorderledgerbackend.vo.maker.MakerResponse;
+import com.jong.figurepreorderledgerbackend.vo.maker.MakerVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -22,14 +22,14 @@ public class MakerServiceImpl implements MakerService {
     private final MakerMapper makerMapper;
 
     @Override
-    public List<MakerResponse> getAll(Long userId) {
+    public List<MakerVO> getAll(Long userId) {
         return makerMapper.selectAll(userId);
     }
 
     @Override
     @Transactional
-    public MakerResponse create(Long userId, String name) {
-        String trimmed = name.trim();
+    public MakerVO create(Long userId, MakerVO vo) {
+        String trimmed = vo.getName().trim();
         try {
             makerMapper.insert(userId, trimmed);
         } catch (DuplicateKeyException e) {
@@ -40,13 +40,13 @@ public class MakerServiceImpl implements MakerService {
 
     @Override
     @Transactional
-    public void update(Long userId, Long makerId, String name) {
-        MakerResponse maker = find(userId, makerId);
+    public void update(Long userId, Long makerId, MakerVO vo) {
+        MakerVO maker = find(userId, makerId);
         if (CategoryConstant.DEFAULT_NAME.equals(maker.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            makerMapper.updateName(userId, makerId, name.trim());
+            makerMapper.updateName(userId, makerId, vo.getName().trim());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -55,7 +55,7 @@ public class MakerServiceImpl implements MakerService {
     @Override
     @Transactional
     public void delete(Long userId, Long makerId) {
-        MakerResponse maker = find(userId, makerId);
+        MakerVO maker = find(userId, makerId);
         if (CategoryConstant.DEFAULT_NAME.equals(maker.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
@@ -73,8 +73,8 @@ public class MakerServiceImpl implements MakerService {
         return new UsageResponse(makerMapper.countUsage(userId, makerId));
     }
 
-    private MakerResponse find(Long userId, Long makerId) {
-        MakerResponse maker = makerMapper.selectById(userId, makerId);
+    private MakerVO find(Long userId, Long makerId) {
+        MakerVO maker = makerMapper.selectById(userId, makerId);
         if (maker == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

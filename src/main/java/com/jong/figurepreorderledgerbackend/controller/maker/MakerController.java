@@ -4,8 +4,7 @@ import com.jong.figurepreorderledgerbackend.common.response.ApiResponse;
 import com.jong.figurepreorderledgerbackend.common.security.CurrentUser;
 import com.jong.figurepreorderledgerbackend.service.maker.MakerService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
-import com.jong.figurepreorderledgerbackend.vo.maker.MakerRequest;
-import com.jong.figurepreorderledgerbackend.vo.maker.MakerResponse;
+import com.jong.figurepreorderledgerbackend.vo.maker.MakerVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,10 +30,10 @@ public class MakerController {
      * 제조사 목록 조회 (예: 세가, 후류)
      * [GET] 목록 | /api/maker
      *
-     * @return ApiResponse<List<MakerResponse>> makerId, name
+     * @return ApiResponse<List<MakerVO>> makerId, name
      */
     @GetMapping
-    public ApiResponse<List<MakerResponse>> getAll() {
+    public ApiResponse<List<MakerVO>> getAll() {
         return ApiResponse.ok(makerService.getAll(currentUser.getId()));
     }
 
@@ -44,12 +43,12 @@ public class MakerController {
      *
      * @param request name: 제조사 이름 (본문, 필수, 100자 이하)
      *
-     * @return ApiResponse<MakerResponse> 생성된 makerId, name
+     * @return ApiResponse<MakerVO> 생성된 makerId, name
      * @throws 400 이름 중복, 입력값 오류
      */
     @PostMapping
-    public ApiResponse<MakerResponse> create(@Valid @RequestBody MakerRequest request) {
-        return ApiResponse.ok(makerService.create(currentUser.getId(), request.getName()));
+    public ApiResponse<MakerVO> create(@Valid @RequestBody MakerVO request) {
+        return ApiResponse.ok(makerService.create(currentUser.getId(), request));
     }
 
     /**
@@ -63,8 +62,8 @@ public class MakerController {
      * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{makerId}")
-    public ApiResponse<Void> update(@PathVariable Long makerId, @Valid @RequestBody MakerRequest request) {
-        makerService.update(currentUser.getId(), makerId, request.getName());
+    public ApiResponse<Void> update(@PathVariable Long makerId, @Valid @RequestBody MakerVO request) {
+        makerService.update(currentUser.getId(), makerId, request);
         return ApiResponse.ok();
     }
 

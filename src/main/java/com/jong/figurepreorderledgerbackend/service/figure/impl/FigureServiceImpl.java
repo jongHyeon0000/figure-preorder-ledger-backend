@@ -13,12 +13,10 @@ import com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper;
 import com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeMapper;
 import com.jong.figurepreorderledgerbackend.service.editor.EditorImageService;
 import com.jong.figurepreorderledgerbackend.service.figure.FigureService;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureCharacterInfo;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureCreateRequest;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureDetailResponse;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureListResponse;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureSeriesInfo;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureUpdateRequest;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureResponseVO;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureSaveRequestVO;
+import com.jong.figurepreorderledgerbackend.vo.genre.GenreCharacterVO;
+import com.jong.figurepreorderledgerbackend.vo.series.SeriesVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,24 +45,24 @@ public class FigureServiceImpl implements FigureService {
     private final EditorImageService editorImageService;
 
     @Override
-    public List<FigureListResponse> getList(Long userId) {
-        List<FigureListResponse> figures = figureMapper.selectList(userId);
+    public List<FigureResponseVO> getList(Long userId) {
+        List<FigureResponseVO> figures = figureMapper.selectList(userId);
         if (figures.isEmpty()) {
             return figures;
         }
         List<Long> figureIds = new ArrayList<>();
-        for (FigureListResponse figure : figures) {
+        for (FigureResponseVO figure : figures) {
             figureIds.add(figure.getFigureId());
         }
-        Map<Long, List<FigureSeriesInfo>> seriesByFigure = new HashMap<>();
-        for (FigureSeriesInfo series : figureSeriesMapper.selectByFigureIds(userId, figureIds)) {
+        Map<Long, List<SeriesVO>> seriesByFigure = new HashMap<>();
+        for (SeriesVO series : figureSeriesMapper.selectByFigureIds(userId, figureIds)) {
             seriesByFigure.computeIfAbsent(series.getFigureId(), key -> new ArrayList<>()).add(series);
         }
-        Map<Long, List<FigureCharacterInfo>> charactersByFigure = new HashMap<>();
-        for (FigureCharacterInfo character : figureCharacterMapper.selectByFigureIds(userId, figureIds)) {
+        Map<Long, List<GenreCharacterVO>> charactersByFigure = new HashMap<>();
+        for (GenreCharacterVO character : figureCharacterMapper.selectByFigureIds(userId, figureIds)) {
             charactersByFigure.computeIfAbsent(character.getFigureId(), key -> new ArrayList<>()).add(character);
         }
-        for (FigureListResponse figure : figures) {
+        for (FigureResponseVO figure : figures) {
             figure.setSeries(seriesByFigure.getOrDefault(figure.getFigureId(), new ArrayList<>()));
             figure.setCharacters(charactersByFigure.getOrDefault(figure.getFigureId(), new ArrayList<>()));
         }
@@ -72,8 +70,8 @@ public class FigureServiceImpl implements FigureService {
     }
 
     @Override
-    public FigureDetailResponse getDetail(Long userId, Long figureId) {
-        FigureDetailResponse figure = figureMapper.selectDetailById(userId, figureId);
+    public FigureResponseVO getDetail(Long userId, Long figureId) {
+        FigureResponseVO figure = figureMapper.selectDetailById(userId, figureId);
         if (figure == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
@@ -84,8 +82,8 @@ public class FigureServiceImpl implements FigureService {
     }
 
     @Override
-    public FigureListResponse getListItem(Long userId, Long figureId) {
-        FigureListResponse figure = figureMapper.selectListById(userId, figureId);
+    public FigureResponseVO getListItem(Long userId, Long figureId) {
+        FigureResponseVO figure = figureMapper.selectListById(userId, figureId);
         if (figure == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
@@ -97,7 +95,7 @@ public class FigureServiceImpl implements FigureService {
 
     @Override
     @Transactional
-    public FigureListResponse create(Long userId, FigureCreateRequest request) {
+    public FigureResponseVO create(Long userId, FigureSaveRequestVO request) {
         FigureStatus status = request.getStatus() == null ? FigureStatus.CART : request.getStatus();
         if (status != FigureStatus.CART && status != FigureStatus.UNPURCHASED) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "등록 시 상태는 CART 또는 UNPURCHASED만 가능합니다");
@@ -119,7 +117,7 @@ public class FigureServiceImpl implements FigureService {
 
     @Override
     @Transactional
-    public FigureListResponse update(Long userId, Long figureId, FigureUpdateRequest request) {
+    public FigureResponseVO update(Long userId, Long figureId, FigureSaveRequestVO request) {
         if (figureMapper.selectCurrentStatus(userId, figureId) == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }

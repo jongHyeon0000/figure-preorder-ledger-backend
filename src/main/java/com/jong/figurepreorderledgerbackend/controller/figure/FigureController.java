@@ -4,12 +4,9 @@ import com.jong.figurepreorderledgerbackend.common.response.ApiResponse;
 import com.jong.figurepreorderledgerbackend.common.security.CurrentUser;
 import com.jong.figurepreorderledgerbackend.service.figure.FigureService;
 import com.jong.figurepreorderledgerbackend.service.figure.FigureStatusService;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureBulkStatusRequest;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureCreateRequest;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureDetailResponse;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureListResponse;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureStatusRequest;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureUpdateRequest;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureResponseVO;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureSaveRequestVO;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureStatusRequestVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,10 +35,10 @@ public class FigureController {
      * 상품 전체 목록 조회, 설명(HTML) 제외 (예: 넨도로이드 하츠네 미쿠)
      * [GET] 목록 | /api/figure
      *
-     * @return ApiResponse<List<FigureListResponse>> 상품 정보와 형태(figureType), 판매처(shop), 제조사(maker), 시리즈(series), 캐릭터(characters, 장르 포함), 최신 등록순
+     * @return ApiResponse<List<FigureResponseVO>> 상품 정보와 형태(figureType), 판매처(shop), 제조사(maker), 시리즈(series), 캐릭터(characters, 장르 포함), 최신 등록순
      */
     @GetMapping
-    public ApiResponse<List<FigureListResponse>> getList() {
+    public ApiResponse<List<FigureResponseVO>> getList() {
         return ApiResponse.ok(figureService.getList(currentUser.getId()));
     }
 
@@ -51,11 +48,11 @@ public class FigureController {
      *
      * @param figureId 조회할 상품 id (경로)
      *
-     * @return ApiResponse<FigureDetailResponse> 목록 항목의 모든 정보 + description, createdAt, updatedAt
+     * @return ApiResponse<FigureResponseVO> 목록 항목의 모든 정보 + description, createdAt, updatedAt
      * @throws 404 대상 없음
      */
     @GetMapping("/{figureId}")
-    public ApiResponse<FigureDetailResponse> getDetail(@PathVariable Long figureId) {
+    public ApiResponse<FigureResponseVO> getDetail(@PathVariable Long figureId) {
         return ApiResponse.ok(figureService.getDetail(currentUser.getId(), figureId));
     }
 
@@ -67,11 +64,11 @@ public class FigureController {
      *                seriesIds: 시리즈 id 목록(1개 이상), characterIds: 캐릭터 id 목록(1개 이상) (본문, 필수),
      *                status: CART 또는 UNPURCHASED (생략 시 CART), deliveryMonth, reservationDeadline, purchaseLink, thumbnailUrl, description (본문, 선택)
      *
-     * @return ApiResponse<FigureListResponse> 등록된 상품 한 건 (목록 항목 모양)
+     * @return ApiResponse<FigureResponseVO> 등록된 상품 한 건 (목록 항목 모양)
      * @throws 404 분류 id가 없거나 다른 사용자의 것 | 400 허용되지 않는 등록 상태, 입력값 오류
      */
     @PostMapping
-    public ApiResponse<FigureListResponse> create(@Valid @RequestBody FigureCreateRequest request) {
+    public ApiResponse<FigureResponseVO> create(@Valid @RequestBody FigureSaveRequestVO request) {
         return ApiResponse.ok(figureService.create(currentUser.getId(), request));
     }
 
@@ -82,11 +79,11 @@ public class FigureController {
      * @param figureId 수정할 상품 id (경로)
      * @param request  등록과 같은 항목에서 status 제외 (본문)
      *
-     * @return ApiResponse<FigureListResponse> 수정된 상품 한 건 (목록 항목 모양)
+     * @return ApiResponse<FigureResponseVO> 수정된 상품 한 건 (목록 항목 모양)
      * @throws 404 대상 없음, 분류 id가 없거나 다른 사용자의 것 | 400 입력값 오류
      */
     @PutMapping("/{figureId}")
-    public ApiResponse<FigureListResponse> update(@PathVariable Long figureId, @Valid @RequestBody FigureUpdateRequest request) {
+    public ApiResponse<FigureResponseVO> update(@PathVariable Long figureId, @Valid @RequestBody FigureSaveRequestVO request) {
         return ApiResponse.ok(figureService.update(currentUser.getId(), figureId, request));
     }
 
@@ -99,11 +96,11 @@ public class FigureController {
      *                paymentType: 미구매에서 넘길 때만 (RESERVED=DEPOSIT, PURCHASED=FULL),
      *                depositAmount: RESERVED 전이에서 필수, depositPaidAt, balanceDueDate, paidAt, deliveredAt: 생략 시 오늘 날짜 (본문, 선택)
      *
-     * @return ApiResponse<FigureListResponse> 전이된 상품 한 건 (목록 항목 모양)
+     * @return ApiResponse<FigureResponseVO> 전이된 상품 한 건 (목록 항목 모양)
      * @throws 404 대상 없음 | 400 허용되지 않는 전이, 결제 방식 불일치, 예약금 누락, 입력값 오류
      */
     @PatchMapping("/{figureId}/status")
-    public ApiResponse<FigureListResponse> changeStatus(@PathVariable Long figureId, @Valid @RequestBody FigureStatusRequest request) {
+    public ApiResponse<FigureResponseVO> changeStatus(@PathVariable Long figureId, @Valid @RequestBody FigureStatusRequestVO request) {
         return ApiResponse.ok(figureStatusService.change(currentUser.getId(), figureId, request));
     }
 
@@ -117,7 +114,7 @@ public class FigureController {
      * @throws 400 하나라도 전이할 수 없음(없는 id, 다른 사용자의 상품 포함, 메시지에 문제 id), 예약금 결제(RESERVED)는 일괄 불가, 입력값 오류
      */
     @PatchMapping("/status")
-    public ApiResponse<List<Long>> changeStatusAll(@Valid @RequestBody FigureBulkStatusRequest request) {
+    public ApiResponse<List<Long>> changeStatusAll(@Valid @RequestBody FigureStatusRequestVO request) {
         return ApiResponse.ok(figureStatusService.changeAll(currentUser.getId(), request));
     }
 

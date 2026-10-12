@@ -7,11 +7,9 @@ import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.mapper.figure.FigureMapper;
 import com.jong.figurepreorderledgerbackend.service.figure.FigureService;
 import com.jong.figurepreorderledgerbackend.service.figure.FigureStatusService;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureBulkStatusRequest;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureCurrentStatus;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureListResponse;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureStatusRequest;
-import com.jong.figurepreorderledgerbackend.vo.figure.FigureStatusUpdateParam;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureResponseVO;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureStatusRequestVO;
+import com.jong.figurepreorderledgerbackend.vo.figure.FigureVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,12 +31,12 @@ public class FigureStatusServiceImpl implements FigureStatusService {
 
     @Override
     @Transactional
-    public FigureListResponse change(Long userId, Long figureId, FigureStatusRequest request) {
-        FigureCurrentStatus current = figureMapper.selectCurrentStatus(userId, figureId);
+    public FigureResponseVO change(Long userId, Long figureId, FigureStatusRequestVO request) {
+        FigureVO current = figureMapper.selectCurrentStatus(userId, figureId);
         if (current == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
-        FigureStatusUpdateParam param = buildParam(userId, current, request.getStatus(), request.getPaymentType(),
+        FigureVO param = buildParam(userId, current, request.getStatus(), request.getPaymentType(),
                 request.getDepositAmount(), request.getDepositPaidAt(), request.getBalanceDueDate(),
                 request.getPaidAt(), request.getDeliveredAt());
         figureMapper.updateStatus(param);
@@ -47,21 +45,24 @@ public class FigureStatusServiceImpl implements FigureStatusService {
 
     @Override
     @Transactional
-    public List<Long> changeAll(Long userId, FigureBulkStatusRequest request) {
+    public List<Long> changeAll(Long userId, FigureStatusRequestVO request) {
+        if (request.getFigureIds() == null || request.getFigureIds().isEmpty()) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "figureIds: 비어 있을 수 없습니다");
+        }
         if (request.getStatus() == FigureStatus.RESERVED) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "예약금 결제는 일괄 변경할 수 없습니다");
         }
         List<Long> figureIds = new ArrayList<>(new LinkedHashSet<>(request.getFigureIds()));
 
-        Map<Long, FigureCurrentStatus> currentById = new HashMap<>();
-        for (FigureCurrentStatus current : figureMapper.selectCurrentStatusByIds(userId, figureIds)) {
+        Map<Long, FigureVO> currentById = new HashMap<>();
+        for (FigureVO current : figureMapper.selectCurrentStatusByIds(userId, figureIds)) {
             currentById.put(current.getFigureId(), current);
         }
 
-        List<FigureStatusUpdateParam> params = new ArrayList<>();
+        List<FigureVO> params = new ArrayList<>();
         List<Long> problemIds = new ArrayList<>();
         for (Long figureId : figureIds) {
-            FigureCurrentStatus current = currentById.get(figureId);
+            FigureVO current = currentById.get(figureId);
             if (current == null) {
                 problemIds.add(figureId);
                 continue;
@@ -78,7 +79,7 @@ public class FigureStatusServiceImpl implements FigureStatusService {
                     "변경할 수 없는 상품이 있어 아무것도 바꾸지 않았습니다. 문제 figureId: " + problemIds);
         }
 
-        for (FigureStatusUpdateParam param : params) {
+        for (FigureVO param : params) {
             figureMapper.updateStatus(param);
         }
         return figureIds;
@@ -92,7 +93,7 @@ public class FigureStatusServiceImpl implements FigureStatusService {
      *  RESERVED → PURCHASED   : 결제 방식은 이미 정해져 있어 받지 않음
      *  PURCHASED → DELIVERED  : 결제 방식 받지 않음
      */
-    private FigureStatusUpdateParam buildParam(Long userId, FigureCurrentStatus current, FigureStatus next,
+    private FigureVO buildParam(Long userId, FigureVO current, FigureStatus next,
                                                PaymentType paymentType, Integer depositAmount,
                                                LocalDate depositPaidAt, LocalDate balanceDueDate,
                                                LocalDate paidAt, LocalDate deliveredAt) {
@@ -103,7 +104,7 @@ public class FigureStatusServiceImpl implements FigureStatusService {
         }
 
         LocalDate today = LocalDate.now();
-        FigureStatusUpdateParam param = new FigureStatusUpdateParam();
+        FigureVO param = new FigureVO();
         param.setUserId(userId);
         param.setFigureId(current.getFigureId());
         param.setStatus(next);

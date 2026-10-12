@@ -6,7 +6,7 @@ import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.config.properties.UploadProperties;
 import com.jong.figurepreorderledgerbackend.mapper.editor.EditorImageMapper;
 import com.jong.figurepreorderledgerbackend.service.editor.EditorImageService;
-import com.jong.figurepreorderledgerbackend.vo.editor.EditorImageUploadResponse;
+import com.jong.figurepreorderledgerbackend.vo.editor.EditorImageVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -40,7 +40,7 @@ public class EditorImageServiceImpl implements EditorImageService {
 
     @Override
     @Transactional
-    public EditorImageUploadResponse upload(Long userId, MultipartFile file) {
+    public EditorImageVO upload(Long userId, MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "업로드할 파일이 비어 있습니다");
         }
@@ -72,7 +72,13 @@ public class EditorImageServiceImpl implements EditorImageService {
             log.error("이미지 저장 실패: {}", filePath, e);
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);   // 예외로 DB 행도 롤백된다
         }
-        return new EditorImageUploadResponse(editorImageId, UploadConstant.URL_PREFIX + filePath);
+        EditorImageVO result = new EditorImageVO();
+        result.setEditorImageId(editorImageId);
+        result.setFilePath(filePath);
+        result.setOriginalName(originalName);
+        result.setFileSize(file.getSize());
+        result.setUrl(UploadConstant.URL_PREFIX + filePath);
+        return result;
     }
 
     @Override

@@ -3,10 +3,8 @@ package com.jong.figurepreorderledgerbackend.controller.series;
 import com.jong.figurepreorderledgerbackend.common.response.ApiResponse;
 import com.jong.figurepreorderledgerbackend.common.security.CurrentUser;
 import com.jong.figurepreorderledgerbackend.service.series.SeriesService;
-import com.jong.figurepreorderledgerbackend.vo.series.request.SeriesCreateRequest;
-import com.jong.figurepreorderledgerbackend.vo.series.response.SeriesResponse;
-import com.jong.figurepreorderledgerbackend.vo.series.request.SeriesUpdateRequest;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
+import com.jong.figurepreorderledgerbackend.vo.series.SeriesVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,10 +30,10 @@ public class SeriesController {
      * 시리즈 목록 조회 (예: 팝업퍼레이드)
      * [GET] 목록 | /api/series
      *
-     * @return ApiResponse<List<SeriesResponse>> seriesId, seriesGroupId(상위 시리즈 그룹 id), name
+     * @return ApiResponse<List<SeriesVO>> seriesId, seriesGroupId(상위 시리즈 그룹 id), name
      */
     @GetMapping
-    public ApiResponse<List<SeriesResponse>> getAll() {
+    public ApiResponse<List<SeriesVO>> getAll() {
         return ApiResponse.ok(seriesService.getAll(currentUser.getId()));
     }
 
@@ -45,12 +43,12 @@ public class SeriesController {
      *
      * @param request seriesGroupId: 상위 시리즈 그룹 id, name: 시리즈 이름 (본문, 둘 다 필수, 이름은 100자 이하)
      *
-     * @return ApiResponse<SeriesResponse> 생성된 seriesId, seriesGroupId, name
+     * @return ApiResponse<SeriesVO> 생성된 seriesId, seriesGroupId, name
      * @throws 404 상위 시리즈 그룹 없음 | 400 이름 중복, 입력값 오류
      */
     @PostMapping
-    public ApiResponse<SeriesResponse> create(@Valid @RequestBody SeriesCreateRequest request) {
-        return ApiResponse.ok(seriesService.create(currentUser.getId(), request.getSeriesGroupId(), request.getName()));
+    public ApiResponse<SeriesVO> create(@Valid @RequestBody SeriesVO request) {
+        return ApiResponse.ok(seriesService.create(currentUser.getId(), request));
     }
 
     /**
@@ -64,8 +62,8 @@ public class SeriesController {
      * @throws 404 대상 없음 | 400 기타 수정 불가, 이름 중복, 입력값 오류
      */
     @PutMapping("/{seriesId}")
-    public ApiResponse<Void> update(@PathVariable Long seriesId, @Valid @RequestBody SeriesUpdateRequest request) {
-        seriesService.update(currentUser.getId(), seriesId, request.getName());
+    public ApiResponse<Void> update(@PathVariable Long seriesId, @Valid @RequestBody SeriesVO request) {
+        seriesService.update(currentUser.getId(), seriesId, request);
         return ApiResponse.ok();
     }
 

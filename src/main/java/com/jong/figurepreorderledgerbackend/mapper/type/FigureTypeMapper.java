@@ -1,6 +1,6 @@
 package com.jong.figurepreorderledgerbackend.mapper.type;
 
-import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeResponse;
+import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,11 +9,11 @@ import java.util.List;
 @Mapper
 public interface FigureTypeMapper {
 
-    List<FigureTypeResponse> selectAll(@Param("userId") Long userId);
+    List<FigureTypeVO> selectAll(@Param("userId") Long userId);
 
-    FigureTypeResponse selectById(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId);
+    FigureTypeVO selectById(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId);
 
-    FigureTypeResponse selectByParentAndName(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId,
+    FigureTypeVO selectByParentAndName(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId,
                                         @Param("name") String name);
 
     int countByParent(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId);
