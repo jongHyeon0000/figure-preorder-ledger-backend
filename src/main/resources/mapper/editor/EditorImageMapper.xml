@@ -12,4 +12,20 @@
         SELECT LAST_INSERT_ID()
     </select>
 
+    <!-- 정리 대상: 업로드 후 retentionDays일이 지났고 어떤 상품과도 연결되지 않은 이미지 (모든 사용자 대상의 시스템 작업이라 user_id 조건 없음) -->
+    <select id="selectOrphans" resultType="EditorImageVO">
+        SELECT e.editor_image_id, e.user_id, e.file_path
+        FROM editor_image e
+        WHERE e.created_at &lt; NOW() - INTERVAL #{retentionDays} DAY
+          AND NOT EXISTS (SELECT 1 FROM figure_editor_image_map m WHERE m.editor_image_id = e.editor_image_id)
+        ORDER BY e.editor_image_id
+    </select>
+
+    <!-- 조회 이후 상품에 연결됐다면(연결 행이 생겼다면) 지우지 않는다. 지우면 연결 행도 CASCADE로 사라지기 때문 -->
+    <delete id="deleteOrphanById">
+        DELETE FROM editor_image
+        WHERE editor_image_id = #{editorImageId}
+          AND NOT EXISTS (SELECT 1 FROM figure_editor_image_map m WHERE m.editor_image_id = #{editorImageId})
+    </delete>
+
 </mapper>

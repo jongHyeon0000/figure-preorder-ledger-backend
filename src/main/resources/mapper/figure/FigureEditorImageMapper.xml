@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.figure.FigureEditorImageMapper">
+
+    <!-- file_path가 정확히 같은 내 이미지를 찾아 이 상품에 연결한다. 목록이 비어 있으면 호출하지 않는다(서비스가 거른다) -->
+    <insert id="insertAllByFilePaths">
+        INSERT INTO figure_editor_image_map (user_id, figure_id, editor_image_id)
+        SELECT e.user_id, #{figureId}, e.editor_image_id
+        FROM editor_image e
+        WHERE e.user_id = #{userId}
+          AND e.file_path IN
+        <foreach collection="filePaths" item="filePath" open="(" separator="," close=")">
+            #{filePath}
+        </foreach>
+    </insert>
+
+    <delete id="deleteByFigure">
+        DELETE FROM figure_editor_image_map
+        WHERE user_id = #{userId} AND figure_id = #{figureId}
+    </delete>
+
+</mapper>

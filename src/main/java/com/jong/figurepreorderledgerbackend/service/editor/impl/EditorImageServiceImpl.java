@@ -23,7 +23,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -89,6 +93,18 @@ public class EditorImageServiceImpl implements EditorImageService {
                         "설명에 base64 이미지를 넣을 수 없습니다. 이미지는 업로드해서 사용하세요");
             }
         }
+    }
+
+    @Override
+    public List<String> extractFilePaths(String html) {
+        Set<String> filePaths = new LinkedHashSet<>();
+        for (Element img : parse(html).select("img[src]")) {
+            String src = img.attr("src").trim();
+            if (src.startsWith(UploadConstant.URL_PREFIX)) {
+                filePaths.add(src.substring(UploadConstant.URL_PREFIX.length()));
+            }
+        }
+        return new ArrayList<>(filePaths);
     }
 
     private void deleteQuietly(Path target) {

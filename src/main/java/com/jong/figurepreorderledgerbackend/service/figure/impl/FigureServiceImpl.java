@@ -6,6 +6,7 @@ import com.jong.figurepreorderledgerbackend.common.constant.UploadConstant;
 import com.jong.figurepreorderledgerbackend.common.exception.BusinessException;
 import com.jong.figurepreorderledgerbackend.config.properties.UploadProperties;
 import com.jong.figurepreorderledgerbackend.mapper.figure.FigureCharacterMapper;
+import com.jong.figurepreorderledgerbackend.mapper.figure.FigureEditorImageMapper;
 import com.jong.figurepreorderledgerbackend.mapper.figure.FigureMapper;
 import com.jong.figurepreorderledgerbackend.mapper.figure.FigureSeriesMapper;
 import com.jong.figurepreorderledgerbackend.mapper.figure.ThumbnailImageMapper;
@@ -45,6 +46,7 @@ public class FigureServiceImpl implements FigureService {
     private final FigureMapper figureMapper;
     private final FigureSeriesMapper figureSeriesMapper;
     private final FigureCharacterMapper figureCharacterMapper;
+    private final FigureEditorImageMapper figureEditorImageMapper;
     private final FigureTypeMapper figureTypeMapper;
     private final ShopMapper shopMapper;
     private final MakerMapper makerMapper;
@@ -125,6 +127,7 @@ public class FigureServiceImpl implements FigureService {
         Long figureId = figureMapper.selectLastInsertId();
         figureSeriesMapper.insertAll(userId, figureId, seriesIds);
         figureCharacterMapper.insertAll(userId, figureId, characterIds);
+        linkEditorImages(userId, figureId, request.getDescription());
         return getListItem(userId, figureId);
     }
 
@@ -147,6 +150,8 @@ public class FigureServiceImpl implements FigureService {
         figureSeriesMapper.insertAll(userId, figureId, seriesIds);
         figureCharacterMapper.deleteByFigure(userId, figureId);
         figureCharacterMapper.insertAll(userId, figureId, characterIds);
+        figureEditorImageMapper.deleteByFigure(userId, figureId);
+        linkEditorImages(userId, figureId, request.getDescription());
         return getListItem(userId, figureId);
     }
 
@@ -173,6 +178,14 @@ public class FigureServiceImpl implements FigureService {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
         deleteThumbnailFiles(thumbnailPaths);
+    }
+
+    /* 설명 HTML에 쓰인 에디터 이미지를 이 상품에 연결한다. 업로드 경로가 정확히 같은 이미지만 연결하고 외부 주소는 무시한다 */
+    private void linkEditorImages(Long userId, Long figureId, String description) {
+        List<String> filePaths = editorImageService.extractFilePaths(description);
+        if (!filePaths.isEmpty()) {
+            figureEditorImageMapper.insertAllByFilePaths(userId, figureId, filePaths);
+        }
     }
 
     /* DB에는 상대 경로만 있으므로 응답에서 /uploads/ 를 붙인다 */

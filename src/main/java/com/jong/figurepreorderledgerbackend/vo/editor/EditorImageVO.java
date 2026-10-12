@@ -23,9 +23,6 @@ public class EditorImageVO {
     /** 소유 계정 */
     private Long userId;
 
-    /** 연결된 상품 (등록 중에는 NULL) */
-    private Long figureId;
-
     /** 서버 저장 경로 */
     private String filePath;
 
@@ -35,7 +32,7 @@ public class EditorImageVO {
     /** 파일 크기(byte) */
     private Long fileSize;
 
-    /** 업로드일 (연결 안 된 파일 정리 기준) */
+    /** 업로드일 (고아 파일 정리 기준) */
     private LocalDateTime createdAt;
 
     /** [response] 이미지를 내려주는 주소 (/uploads/ + file_path) */

@@ -205,16 +205,23 @@ CREATE TABLE figure_character_map (
 CREATE TABLE editor_image (
   editor_image_id BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
   user_id         BIGINT       NOT NULL COMMENT '소유 계정',
-  figure_id       BIGINT       NULL COMMENT '연결된 상품 (등록 중에는 NULL)',
   file_path       VARCHAR(500) NOT NULL COMMENT '서버 저장 경로',
   original_name   VARCHAR(255) NOT NULL COMMENT '원본 파일명',
   file_size       INT UNSIGNED NOT NULL COMMENT '파일 크기(byte)',
-  created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '업로드일 (연결 안 된 파일 정리 기준)',
+  created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '업로드일 (고아 파일 정리 기준)',
   PRIMARY KEY (editor_image_id),
-  KEY idx_editor_image_user_figure (user_id, figure_id),
-  CONSTRAINT fk_editor_image_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
-  CONSTRAINT fk_editor_image_figure FOREIGN KEY (user_id, figure_id) REFERENCES figure (user_id, figure_id) ON DELETE CASCADE
+  UNIQUE KEY uk_editor_image_user_id (user_id, editor_image_id),
+  CONSTRAINT fk_editor_image_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='에디터 본문 이미지';
+
+CREATE TABLE figure_editor_image_map (
+  user_id         BIGINT NOT NULL COMMENT '소유 계정',
+  figure_id       BIGINT NOT NULL COMMENT '상품',
+  editor_image_id BIGINT NOT NULL COMMENT '상품 설명에 쓰인 에디터 이미지',
+  PRIMARY KEY (figure_id, editor_image_id),
+  CONSTRAINT fk_figure_editor_image_map_figure FOREIGN KEY (user_id, figure_id) REFERENCES figure (user_id, figure_id) ON DELETE CASCADE,
+  CONSTRAINT fk_figure_editor_image_map_editor_image FOREIGN KEY (user_id, editor_image_id) REFERENCES editor_image (user_id, editor_image_id) ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='상품-에디터 이미지 연결(N:M)';
 
 -- ---------------------------------------------------------------- 썸네일 이미지
 CREATE TABLE thumbnail_image (
