@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>전시장 입주 예약 시스템</title>
+<link rel="icon" type="image/png" href="resource/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#100e1a;
+    --surface:#1b1830;
+    --surface-2:#241f3d;
+    --line:#3a3260;
+    --line-soft:#2a2548;
+    --text:#f1eefc;
+    --text-dim:#948db2;
+    --gold:#e8b654;
+    --pink:#ff8fb3;
+    --green:#7fd9a8;
+    --amber:#f0a857;
+    --red:#e8735f;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(232,182,84,0.10), transparent),
+      radial-gradient(ellipse 700px 600px at 90% 10%, rgba(255,143,179,0.08), transparent),
+      var(--bg);
+    color:var(--text);
+    font-family:'Noto Sans KR', sans-serif;
+    min-height:100vh;
+    padding:36px 20px 80px;
+  }
+  .wrap{max-width:1180px; margin:0 auto;}
+
+  /* header */
+  header{margin-bottom:24px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.28em;
+    color:var(--gold);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Do Hyeon', sans-serif;
+    font-size:38px;
+    font-weight:400;
+    letter-spacing:0.01em;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  h1 span.sub{
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:14px;
+    font-weight:500;
+    color:var(--text-dim);
+  }
+  .reupload-btn{
+    flex:0 0 auto;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    color:var(--text-dim);
+    background:var(--surface);
+    border:1px solid var(--line-soft);
+    border-radius:8px;
+    padding:9px 14px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .reupload-btn:hover{color:var(--gold); border-color:var(--gold);}
+
+  /* upload modal */
+  .upload-modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(8,7,14,0.82);
+    backdrop-filter:blur(3px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+    padding:20px;
+  }
+  .upload-modal-overlay.show{display:flex;}
+  .upload-modal{
+    width:100%;
+    max-width:820px;
+    max-height:92vh;
+    overflow-y:auto;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:26px 32px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    position:relative;
+  }
+  .upload-modal-close{
+    position:absolute;
+    top:16px; right:16px;
+    width:30px; height:30px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--surface-2);
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:14px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all .15s ease;
+  }
+  .upload-modal-close:hover{background:var(--red); border-color:var(--red); color:#fff;}
+  .upload-modal-head{margin-bottom:12px;}
+  .upload-entry-row{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .entry-card{
+    width:100%;
+    appearance:none;
+    outline:none;
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    background:var(--surface);
+    padding:11px 18px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    cursor:pointer;
+    text-align:left;
+    font:inherit;
+    color:inherit;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .entry-card:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+  .entry-card:hover{border-color:var(--gold); background:var(--surface-2);}
+  .entry-sub{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--text-dim);
+  }
+
+  /* urgent (임박 알림) modal */
+  .urgent-modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(8,7,14,0.82);
+    backdrop-filter:blur(3px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1100;
+    padding:20px;
+  }
+  .urgent-modal-overlay.show{display:flex;}
+  .urgent-modal{
+    width:100%;
+    max-width:980px;
+    max-height:min(720px, 86vh);
+    background:var(--surface);
+    border:1px solid var(--red);
+    border-radius:16px;
+    padding:32px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.55);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .urgent-modal .upload-modal-eyebrow{color:var(--red);}
+  .urgent-modal .upload-modal-title{font-size:19px;}
+  .urgent-modal #urgent-grid{
+    overflow-y:auto;
+    padding-right:4px;
+    margin-top:6px;
+  }
+  .urgent-dismiss-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:16px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--text-dim);
+    cursor:pointer;
+  }
+  .urgent-dismiss-row input{width:15px; height:15px; accent-color:var(--red); cursor:pointer;}
+
+  /* help (사용 방법) modal */
+  .help-modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(8,7,14,0.82);
+    backdrop-filter:blur(3px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1100;
+    padding:20px;
+  }
+  .help-modal-overlay.show{display:flex;}
+  .help-modal{
+    width:100%;
+    max-width:760px;
+    max-height:min(760px, 88vh);
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:32px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .help-body{
+    overflow-y:auto;
+    padding-right:6px;
+    margin-top:6px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+  }
+  .help-section h3{
+    font-family:'Do Hyeon', sans-serif;
+    font-size:15px;
+    font-weight:400;
+    color:var(--gold);
+    margin-bottom:8px;
+  }
+  .help-section p{
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--text-dim);
+    margin-bottom:6px;
+  }
+  .help-section p:last-child{margin-bottom:0;}
+  .help-section p b{color:var(--text); font-weight:700;}
+  .help-section ul{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .help-section ul li{
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--text-dim);
+    padding-left:14px;
+    position:relative;
+  }
+  .help-section ul li::before{
+    content:'·';
+    position:absolute;
+    left:0;
+    color:var(--gold);
+    font-weight:700;
+  }
+  .help-section ul li b{color:var(--text); font-weight:700;}
+
+  /* toast */
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:28px;
+    transform:translateX(-50%) translateY(20px);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    max-width:calc(100% - 40px);
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:13px 18px;
+    box-shadow:0 12px 32px rgba(0,0,0,0.45);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--text);
+    opacity:0;
+    pointer-events:none;
+    z-index:2000;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+  .toast::before{
+    content:'';
+    flex:0 0 auto;
+    width:8px; height:8px;
+    border-radius:50%;
+  }
+  .toast.ok::before{background:var(--green); box-shadow:0 0 8px var(--green);}
+  .toast.err::before{background:var(--red); box-shadow:0 0 8px var(--red);}
+  .upload-modal-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.24em;
+    color:var(--gold);
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .upload-modal-title{
+    font-family:'Do Hyeon', sans-serif;
+    font-size:22px;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  .upload-modal-desc{
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:13px;
+    color:var(--text-dim);
+    line-height:1.5;
+  }
+  .upload-section{margin-bottom:28px;}
+  .dropzone{
+    border:1.5px dashed var(--line);
+    border-radius:14px;
+    background:var(--surface);
+    padding:16px 18px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .dropzone:hover, .dropzone.dragover{
+    border-color:var(--gold);
+    background:var(--surface-2);
+  }
+  .dz-row{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+  .dz-icon{
+    flex:0 0 auto;
+    width:44px; height:44px;
+    border-radius:10px;
+    background:rgba(232,182,84,0.14);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--gold);
+  }
+  .dz-icon svg{width:22px; height:22px;}
+  .dz-text{flex:1 1 200px; min-width:0;}
+  .dz-title{
+    font-family:'Do Hyeon', sans-serif;
+    font-size:16px;
+    color:var(--text);
+    margin-bottom:3px;
+  }
+  .dz-sub{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    line-height:1.6;
+    color:var(--text-dim);
+    background:rgba(0,0,0,0.22);
+    border:1px solid var(--line-soft);
+    border-radius:8px;
+    padding:12px 14px;
+    white-space:pre;
+    overflow-x:auto;
+    max-width:100%;
+    cursor:auto;
+  }
+  .dz-sub .k{color:var(--pink);}
+  .dz-btn{
+    flex:0 0 auto;
+    font-family:'Noto Sans KR', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--bg);
+    background:var(--gold);
+    border:none;
+    border-radius:8px;
+    padding:10px 18px;
+    cursor:pointer;
+  }
+  .upload-msg{
+    margin-top:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    display:none;
+  }
+  .upload-msg.show{display:block;}
+  .upload-msg.ok{color:var(--green);}
+  .upload-msg.err{color:var(--red);}
+
+  /* tabs */
+  .tabs{
+    display:flex;
+    gap:10px;
+    margin:0 0 22px;
+    border-bottom:1px solid var(--line-soft);
+    padding-bottom:0;
+  }
+  .tab-btn{
+    font-family:'Do Hyeon', sans-serif;
+    font-size:17px;
+    letter-spacing:0.02em;
+    color:var(--text-dim);
+    background:none;
+    border:none;
+    padding:10px 4px 14px;
+    cursor:pointer;
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    transition:color .15s ease;
+  }
+  .tab-btn .count{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    color:var(--text-dim);
+    background:var(--surface-2);
+    border-radius:20px;
+    padding:2px 9px;
+  }
+  .tab-btn::after{
+    content:'';
+    position:absolute;
+    left:0; right:0; bottom:-1px;
+    height:2px;
+    background:transparent;
+    transition:background .15s ease;
+  }
+  .tab-btn.active{color:var(--text);}
+  .tab-btn.active .count{color:#100e1a;}
+  .tab-btn[data-tab="all"].active::after,
+  .tab-btn[data-del-tab="all"].active::after{background:var(--gold);}
+  .tab-btn[data-tab="all"].active .count,
+  .tab-btn[data-del-tab="all"].active .count{background:var(--gold);}
+  .tab-btn[data-tab="bought"].active::after,
+  .tab-btn[data-del-tab="bought"].active::after{background:var(--green);}
+  .tab-btn[data-tab="bought"].active .count,
+  .tab-btn[data-del-tab="bought"].active .count{background:var(--green);}
+  .tab-btn[data-tab="wish"].active::after,
+  .tab-btn[data-del-tab="wish"].active::after{background:var(--amber);}
+  .tab-btn[data-tab="wish"].active .count,
+  .tab-btn[data-del-tab="wish"].active .count{background:var(--amber);}
+
+  /* filter bar */
+  .filters{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:22px 0 26px;
+  }
+  .filters select{
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:13px;
+    font-weight:500;
+    color:var(--text);
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 30px 9px 13px;
+    cursor:pointer;
+    appearance:none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0 L5 6 L10 0' fill='none' stroke='%23948db2' stroke-width='1.4'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    transition:border-color .15s ease;
+  }
+  .filters select:hover{border-color:var(--gold);}
+  .filters select:focus{outline:2px solid var(--gold); outline-offset:1px;}
+  .filter-reset{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--text-dim);
+    background:none;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 14px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .filter-reset:hover{color:var(--gold); border-color:var(--gold);}
+
+  .result-line{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--text-dim);
+    margin-bottom:16px;
+  }
+  .result-line b{color:var(--gold); font-weight:600;}
+
+  /* grid */
+  .grid{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  /* card - 가로로 길쭉한 카드, 세로로는 짧게 */
+  @keyframes cardIn{
+    from{ opacity:0; transform:translateY(18px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line-soft);
+    border-radius:12px;
+    display:flex;
+    align-items:stretch;
+    overflow:hidden;
+    position:relative;
+    transition:transform .15s ease, border-color .15s ease;
+    text-decoration:none;
+    color:inherit;
+    animation:cardIn .75s cubic-bezier(.22,.61,.36,1) both;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card{animation:none;}
+  }
+  .card.linkable{cursor:pointer;}
+  .card:hover{transform:translateX(3px); border-color:var(--gold);}
+
+  .thumb{
+    flex:0 0 128px;
+    width:128px;
+    height:128px;
+    align-self:center;
+    margin:10px 0 10px 10px;
+    border-radius:10px;
+    background:var(--surface-2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+  .thumb.empty{
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    text-align:center;
+    padding:4px;
+  }
+
+  .card-top{
+    padding:12px 18px;
+    flex:1;
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .tag-row{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex:0 0 92px;
+    width:92px;
+  }
+  .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    padding:3px 6px;
+    border-radius:5px;
+    text-align:center;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    width:100%;
+  }
+  .tag.genre{background:rgba(232,182,84,0.14); color:var(--gold);}
+  .tag.style{background:rgba(255,143,179,0.14); color:var(--pink);}
+
+  .name-block{
+    min-width:0;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+  .character{
+    font-family:'Do Hyeon', sans-serif;
+    font-size:16px;
+    line-height:1.3;
+    color:var(--text);
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .figure-name{
+    font-size:12.5px;
+    color:var(--text-dim);
+    line-height:1.4;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .shop-line{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    color:var(--text-dim);
+    opacity:0.75;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .card-stub{
+    flex:0 0 165px;
+    border-left:1px dashed var(--line);
+    padding:14px 18px;
+    background:var(--surface-2);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:flex-start;
+    gap:5px;
+  }
+  .card-stub::before,
+  .card-stub::after{
+    content:'';
+    position:absolute;
+    left:-7px;
+    width:14px; height:14px;
+    background:var(--bg);
+    border-radius:50%;
+  }
+  .card-stub::before{top:-7px;}
+  .card-stub::after{bottom:-7px;}
+  .month{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--text-dim);
+    letter-spacing:0.02em;
+    white-space:nowrap;
+  }
+  .month b{color:var(--text);}
+  .deadline{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--text-dim);
+    letter-spacing:0.02em;
+    white-space:nowrap;
+  }
+  .deadline b{color:var(--pink);}
+  .deadline.passed b{color:var(--red);}
+  @keyframes deadlineBlink{
+    0%, 100%{opacity:1;}
+    50%{opacity:0.25;}
+  }
+  .deadline.blink b{animation:deadlineBlink 1.1s ease-in-out infinite;}
+  @media (prefers-reduced-motion: reduce){
+    .deadline.blink b{animation:none;}
+  }
+  .price{
+    font-family:'JetBrains Mono', monospace;
+    font-size:16px;
+    font-weight:700;
+    color:var(--gold);
+    white-space:nowrap;
+  }
+
+  @media (max-width:560px){
+    .card{flex-direction:column;}
+    .thumb{
+      flex:0 0 auto;
+      width:calc(100% - 20px);
+      height:auto;
+      aspect-ratio:1/1;
+      margin:10px 10px 0;
+    }
+    .card-stub{
+      flex:none;
+      border-left:none;
+      border-top:1px dashed var(--line);
+      flex-direction:row;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .card-stub::before,.card-stub::after{left:auto; top:-7px;}
+    .card-stub::before{left:-7px;}
+    .card-stub::after{right:-7px;}
+  }
+
+  .empty{
+    text-align:center;
+    padding:70px 20px;
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+  }
+
+  @media (max-width:480px){
+    h1{font-size:28px;}
+  }
+
+  /* view nav */
+  .view-nav{
+    display:flex;
+    gap:8px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+  }
+  .view-nav button{
+    font-family:'Noto Sans KR', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--text-dim);
+    background:var(--surface);
+    border:1px solid var(--line-soft);
+    border-radius:9px;
+    padding:9px 16px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .view-nav button:hover{border-color:var(--gold); color:var(--text);}
+  .view-nav button.active{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:var(--bg);
+  }
+  .view-section{display:none;}
+  .view-section.active{display:block;}
+
+  /* edit layout (add / delete) */
+  .edit-layout{
+    display:grid;
+    grid-template-columns:340px 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  @media (max-width:820px){
+    .edit-layout{grid-template-columns:1fr;}
+  }
+  .json-panel{
+    background:var(--surface);
+    border:1px solid var(--line-soft);
+    border-radius:12px;
+    padding:16px;
+    position:sticky;
+    top:20px;
+  }
+  .json-panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .json-panel-title{
+    font-family:'Do Hyeon', sans-serif;
+    font-size:15px;
+    color:var(--text);
+  }
+  .download-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    font-weight:600;
+    color:var(--bg);
+    background:var(--green);
+    border:none;
+    border-radius:7px;
+    padding:7px 12px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .download-btn:hover{opacity:0.88;}
+  .json-preview{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    line-height:1.5;
+    color:var(--text-dim);
+    white-space:pre;
+    overflow:auto;
+    max-height:640px;
+    margin:0;
+  }
+
+  /* add form */
+  .add-form{
+    background:var(--surface);
+    border:1px solid var(--line-soft);
+    border-radius:12px;
+    padding:20px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  @media (max-width:560px){
+    .add-form{grid-template-columns:1fr;}
+  }
+  .field{display:flex; flex-direction:column; gap:6px;}
+  .field.full{grid-column:1/-1;}
+  .field label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:0.03em;
+  }
+  .field input[type="text"],
+  .field input[type="number"],
+  .field input[type="url"],
+  .field input[type="month"],
+  .field input[type="date"]{
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:13px;
+    color:var(--text);
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 12px;
+  }
+  .field input:focus{outline:2px solid var(--gold); outline-offset:1px;}
+  .field input[type="month"],
+  .field input[type="date"]{color-scheme:dark;}
+  .field input:disabled{
+    color:var(--text-dim);
+    background:var(--surface);
+    cursor:not-allowed;
+  }
+  .field-checkbox{
+    flex-direction:row;
+    align-items:center;
+    gap:8px;
+  }
+  .field-checkbox input{width:16px; height:16px; accent-color:var(--gold);}
+  .field-radio label{margin-bottom:0;}
+  .radio-row{display:flex; gap:18px;}
+  .radio-option{
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center;
+    gap:6px;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:13px;
+    color:var(--text);
+    cursor:pointer;
+  }
+  .radio-option input{width:16px; height:16px; accent-color:var(--gold); cursor:pointer;}
+  .add-submit{
+    grid-column:1/-1;
+    font-family:'Do Hyeon', sans-serif;
+    font-size:15px;
+    color:var(--bg);
+    background:var(--gold);
+    border:none;
+    border-radius:9px;
+    padding:12px;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .add-submit:hover{opacity:0.9;}
+  .form-msg{
+    grid-column:1/-1;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    display:none;
+  }
+  .form-msg.show{display:block;}
+  .form-msg.ok{color:var(--green);}
+  .form-msg.err{color:var(--red);}
+
+  /* delete list */
+  .delete-list{display:flex; flex-direction:column; gap:10px;}
+
+  /* 수정모드 (미구매 -> 구매완료 전환) */
+  .mode-bar{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .mode-bar:has(.select-hint.show){margin-bottom:16px;}
+  .help-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--text-dim);
+    background:none;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 14px;
+    cursor:pointer;
+    transition:all .15s ease;
+    margin-left:auto;
+  }
+  .help-btn:hover{color:var(--gold); border-color:var(--gold);}
+  .mode-toggle-btn{
+    font-family:'Do Hyeon', sans-serif;
+    font-size:14px;
+    color:var(--text-dim);
+    background:var(--surface);
+    border:1px solid var(--line-soft);
+    border-radius:9px;
+    padding:9px 16px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .mode-toggle-btn:hover{border-color:var(--gold); color:var(--text);}
+  .mode-toggle-btn.active{
+    background:var(--green);
+    border-color:var(--green);
+    color:var(--bg);
+  }
+  .select-hint{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--text-dim);
+    display:none;
+  }
+  .select-hint.show{display:block;}
+
+  .card.select-mode{cursor:pointer;}
+  .card.selected{border-color:var(--green); background:var(--surface-2);}
+  .select-check{
+    position:absolute;
+    top:8px; left:8px;
+    width:24px; height:24px;
+    border-radius:7px;
+    border:1.5px solid var(--line);
+    background:var(--surface-2);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:2;
+    color:transparent;
+    font-size:14px;
+    font-weight:700;
+    transition:all .15s ease;
+  }
+  .select-mode .select-check{display:flex;}
+  .card.selected .select-check{background:var(--green); border-color:var(--green); color:var(--bg);}
+
+  .bulk-action-bar{
+    position:sticky;
+    bottom:16px;
+    display:none;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-top:18px;
+    padding:14px 18px;
+    background:var(--surface-2);
+    border:1px solid var(--green);
+    border-radius:12px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.35);
+  }
+  .bulk-action-bar.show{display:flex;}
+  .bulk-action-info{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--text);
+  }
+  .bulk-action-info b{color:var(--green);}
+  .bulk-action-btns{display:flex; gap:10px; flex-wrap:wrap;}
+  .bulk-btn{
+    font-family:'Do Hyeon', sans-serif;
+    font-size:14px;
+    border:none;
+    border-radius:8px;
+    padding:9px 16px;
+    cursor:pointer;
+    transition:opacity .15s ease;
+  }
+  .bulk-btn:hover{opacity:0.88;}
+  .bulk-btn:disabled{opacity:0.4; cursor:not-allowed;}
+  .bulk-btn.confirm{background:var(--green); color:var(--bg);}
+  .bulk-btn.clear{background:var(--surface); color:var(--text-dim); border:1px solid var(--line);}
+  .bulk-btn.danger{background:none; color:var(--red); border:1px solid var(--red);}
+
+  /* result (저장/삭제 완료) modal */
+  .result-modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(8,7,14,0.82);
+    backdrop-filter:blur(3px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1200;
+    padding:20px;
+  }
+  .result-modal-overlay.show{display:flex;}
+  .result-modal{
+    width:100%;
+    max-width:460px;
+    background:var(--surface);
+    border:1px solid var(--green);
+    border-radius:16px;
+    padding:28px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.55);
+    position:relative;
+  }
+  .result-modal .upload-modal-eyebrow{color:var(--green);}
+  .result-warning{
+    margin-top:14px;
+    padding:12px 14px;
+    background:rgba(232,115,95,0.12);
+    border:1px solid var(--red);
+    border-radius:10px;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--text);
+  }
+  .result-modal-btns{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+  }
+  .result-download-btn{
+    flex:1;
+    font-size:14px;
+    padding:12px;
+  }
+  .result-leave-btn{
+    flex:0 0 auto;
+    font-family:'Do Hyeon', sans-serif;
+    font-size:14px;
+    color:var(--red);
+    background:none;
+    border:1px solid var(--red);
+    border-radius:9px;
+    padding:12px 18px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .result-leave-btn:hover{background:var(--red); color:#fff;}
+
+  /* confirm (다운로드 없이 나가기) modal */
+  .confirm-modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(8,7,14,0.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1300;
+    padding:20px;
+  }
+  .confirm-modal-overlay.show{display:flex;}
+  .confirm-modal{
+    width:100%;
+    max-width:380px;
+    background:var(--surface-2);
+    border:1px solid var(--red);
+    border-radius:14px;
+    padding:22px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.55);
+  }
+  .confirm-modal .upload-modal-title{font-size:16px; margin-bottom:6px;}
+  .confirm-modal .upload-modal-desc{margin-bottom:16px;}
+  .confirm-modal-btns{display:flex; flex-direction:column; gap:8px;}
+  .confirm-modal-btns .bulk-btn{width:100%;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">FIGURE PRE-ORDER LEDGER</div>
+      <h1>전시장 입주 예약 시스템 <span class="sub">예약구매 · 구매예정 관리</span></h1>
+    </div>
+    <button type="button" class="reupload-btn" id="reupload-btn">⟲ 데이터 교체</button>
+  </header>
+
+  <div class="view-nav">
+    <button class="active" data-view="browse">전체 보기</button>
+    <button data-view="add">데이터 추가</button>
+    <button data-view="delete">데이터 삭제</button>
+  </div>
+
+  <div class="view-section active" id="view-browse">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="all">전체 <span class="count" id="count-all">0</span></button>
+      <button class="tab-btn" data-tab="bought">구매완료 <span class="count" id="count-bought">0</span></button>
+      <button class="tab-btn" data-tab="wish">미구매 <span class="count" id="count-wish">0</span></button>
+    </div>
+
+    <div class="filters">
+      <select id="f-genre"><option value="">장르 전체</option></select>
+      <select id="f-style"><option value="">스타일 전체</option></select>
+      <select id="f-month"><option value="">배송월 전체</option></select>
+      <select id="f-sort">
+        <option value="default">예약 빠른순</option>
+        <option value="price-asc">가격 낮은순</option>
+        <option value="price-desc">가격 높은순</option>
+        <option value="month-asc">배송 빠른순</option>
+      </select>
+      <button class="filter-reset" id="reset-btn">필터 초기화</button>
+      <button type="button" class="help-btn" id="help-btn">사용 방법</button>
+      <button type="button" class="mode-toggle-btn" id="edit-mode-btn" style="display:none;">✎ 구매완료 처리 모드</button>
+    </div>
+
+    <div class="mode-bar">
+      <span class="select-hint" id="select-hint">카드를 눌러 여러 개를 선택하세요. 다시 누르면 선택이 풀려요.</span>
+    </div>
+
+    <div class="result-line" id="result-line"></div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="bulk-action-bar" id="bulk-action-bar">
+      <div class="bulk-action-info"><b id="bulk-selected-count">0</b>개 선택됨</div>
+      <div class="bulk-action-btns">
+        <button type="button" class="bulk-btn clear" id="bulk-clear-btn">선택 해제</button>
+        <button type="button" class="bulk-btn confirm" id="bulk-confirm-btn" disabled>선택 항목 구매완료 처리 + JSON 다운로드</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="view-section" id="view-add">
+    <div class="edit-layout">
+      <div class="json-panel">
+        <div class="json-panel-head">
+          <span class="json-panel-title">현재 JSON</span>
+          <button class="download-btn" id="download-add">JSON 다운로드</button>
+        </div>
+        <pre class="json-preview" id="json-preview-add"></pre>
+      </div>
+      <form class="add-form" id="add-form">
+        <div class="field"><label>ID (자동 부여)</label><input type="text" id="add-id-display" disabled></div>
+        <div class="field"><label>장르</label><input type="text" name="genre" placeholder="예: 보컬로이드"></div>
+        <div class="field"><label>캐릭터명</label><input type="text" name="character" placeholder="예: 하츠네 미쿠"></div>
+        <div class="field"><label>스타일</label><input type="text" name="style" placeholder="예: 넨도로이드"></div>
+        <div class="field full"><label>상품명</label><input type="text" name="name" placeholder="예: 넨도로이드 데코미쿠 (라이트니스)"></div>
+        <div class="field">
+          <label>배송예정월</label>
+          <input type="month" id="add-month-picker">
+          <input type="hidden" name="month">
+        </div>
+        <div class="field">
+          <label>예약마감일</label>
+          <input type="date" name="deadline" id="add-deadline-picker">
+        </div>
+        <div class="field"><label>가격</label><input type="number" name="price" placeholder="예: 76200"></div>
+        <div class="field"><label>제작사</label><input type="text" name="maker" placeholder="예: 굿스마일"></div>
+        <div class="field"><label>구매처</label><input type="text" name="shop" placeholder="예: 네이버스토어"></div>
+        <div class="field full"><label>구매 링크</label><input type="url" name="link" placeholder="https://..."></div>
+        <div class="field full"><label>이미지 썸네일 URL</label><input type="url" name="image" placeholder="https://..."></div>
+        <div class="field field-radio full">
+          <label style="margin-bottom:2px;">구매 상태</label>
+          <div class="radio-row">
+            <label class="radio-option"><input type="radio" name="boughtStatus" value="bought"> 구매완료</label>
+            <label class="radio-option"><input type="radio" name="boughtStatus" value="wish" checked> 구매예정(미구매)</label>
+          </div>
+        </div>
+        <div class="form-msg" id="add-msg"></div>
+        <button type="submit" class="add-submit">+ 데이터 추가</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="view-section" id="view-delete">
+    <div class="tabs">
+      <button class="tab-btn active" data-del-tab="all">전체 <span class="count" id="del-count-all">0</span></button>
+      <button class="tab-btn" data-del-tab="bought">구매완료 <span class="count" id="del-count-bought">0</span></button>
+      <button class="tab-btn" data-del-tab="wish">미구매 <span class="count" id="del-count-wish">0</span></button>
+    </div>
+    <div class="mode-bar">
+      <span class="select-hint show">삭제할 카드를 눌러 선택하세요. 다시 누르면 선택이 풀려요.</span>
+    </div>
+    <div class="edit-layout">
+      <div class="json-panel">
+        <div class="json-panel-head">
+          <span class="json-panel-title">현재 JSON</span>
+          <button class="download-btn" id="download-delete">JSON 다운로드</button>
+        </div>
+        <pre class="json-preview" id="json-preview-delete"></pre>
+      </div>
+      <div class="delete-list" id="delete-list"></div>
+    </div>
+    <div class="bulk-action-bar" id="delete-bulk-action-bar">
+      <div class="bulk-action-info"><b id="delete-bulk-selected-count">0</b>개 선택됨</div>
+      <div class="bulk-action-btns">
+        <button type="button" class="bulk-btn clear" id="delete-bulk-clear-btn">선택 해제</button>
+        <button type="button" class="bulk-btn danger" id="delete-bulk-confirm-btn" disabled>선택 항목 삭제하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="upload-modal-overlay" id="upload-modal-overlay">
+  <div class="upload-modal">
+    <button type="button" class="upload-modal-close" id="upload-modal-close" title="닫기" style="display:none;">✕</button>
+    <div class="upload-modal-head">
+      <div class="upload-modal-eyebrow">FIGURE PRE-ORDER LEDGER</div>
+      <div class="upload-modal-title" id="upload-modal-title">시작하려면 JSON을 업로드하세요</div>
+      <div class="upload-modal-desc" id="upload-modal-desc">전시장 입주 예약 시스템을 이용하려면 먼저 굿 데이터 JSON 파일이 필요해요.<br>업로드 전까지는 다른 화면을 볼 수 없어요.</div>
+    </div>
+    <div class="upload-entry-row" id="upload-entry-row">
+      <button type="button" class="entry-card" id="entry-about-btn">
+        <div class="dz-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="12" cy="7.5" r="1.2" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="dz-text">
+          <div class="dz-title">이 사이트는 뭔가요?</div>
+          <div class="entry-sub">기획 의도와 전체 사용법을 안내해요</div>
+        </div>
+      </button>
+      <button type="button" class="entry-card" id="entry-sample-btn">
+        <div class="dz-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M4 7.5L12 12M12 12L20 7.5M12 12V21" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="dz-text">
+          <div class="dz-title">샘플 데이터 사용</div>
+          <div class="entry-sub">미리 준비된 예시 데이터로 바로 둘러봐요</div>
+        </div>
+      </button>
+    </div>
+    <div class="upload-section">
+      <div class="dropzone" id="dropzone">
+        <div class="dz-row">
+          <div class="dz-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15V3M12 3L7 8M12 3L17 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 15V17C3 18.6569 4.34315 20 6 20H18C19.6569 20 21 18.6569 21 17V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="dz-text">
+            <div class="dz-title">기존 JSON 파일을 드래그하거나 클릭해서 업로드</div>
+          </div>
+          <button type="button" class="dz-btn" id="dz-btn">파일 선택</button>
+          <input type="file" id="file-input" accept=".json,application/json" style="display:none;">
+        </div>
+        <pre class="dz-sub">[
+  {
+    <span class="k">"id"</span>: "001",
+    <span class="k">"genre"</span>: "보컬로이드",
+    <span class="k">"character"</span>: "하츠네 미쿠",
+    <span class="k">"style"</span>: "넨도로이드",
+    <span class="k">"name"</span>: "넨도로이드 데코미쿠 (라이트니스)",
+    <span class="k">"month"</span>: "26.10",
+    <span class="k">"deadline"</span>: "2026-09-30",
+    <span class="k">"price"</span>: 76200,
+    <span class="k">"bought"</span>: false,
+    <span class="k">"maker"</span>: "굿스마일",
+    <span class="k">"shop"</span>: "네이버스토어",
+    <span class="k">"link"</span>: "https://...",
+    <span class="k">"image"</span>: "https://..."
+  }
+]</pre>
+      </div>
+      <div class="upload-msg" id="upload-msg"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="urgent-modal-overlay" id="urgent-modal-overlay">
+  <div class="urgent-modal">
+    <button type="button" class="upload-modal-close" id="urgent-modal-close" title="닫기">✕</button>
+    <div class="upload-modal-head">
+      <div class="upload-modal-eyebrow">STOCK ALERT</div>
+      <div class="upload-modal-title">⚠ 곧 품절될 가능성이 높은 제품이 있어요!</div>
+      <div class="upload-modal-desc">예약마감일이 얼마 남지 않은 미구매 항목이에요. 서둘러 확인해보세요.</div>
+    </div>
+    <div class="grid" id="urgent-grid"></div>
+    <label class="urgent-dismiss-row">
+      <input type="checkbox" id="urgent-dismiss-checkbox">
+      새로고침 전까지 다시 보지 않기
+    </label>
+  </div>
+</div>
+
+<div class="help-modal-overlay" id="help-modal-overlay">
+  <div class="help-modal">
+    <button type="button" class="upload-modal-close" id="help-modal-close" title="닫기">✕</button>
+    <div class="upload-modal-head">
+      <div class="upload-modal-eyebrow">HOW TO USE</div>
+      <div class="upload-modal-title">사용 방법</div>
+    </div>
+    <div class="help-body">
+      <section class="help-section">
+        <h3>1. 이 사이트는 뭔가요?</h3>
+        <p>이 시스템은 <b>예약구매 · 배송 일정 관리</b> 전용입니다. 상시 판매 중인 상품을 재고처럼 정리하는 용도가 아닙니다.</p>
+        <p>기획 의도는 두 가지입니다.</p>
+        <ul>
+          <li><b>"이번 달엔 뭐가 오지?"를 한눈에 파악하기</b> — 예약 상품을 여러 개 구매하다 보면 "9월엔 몇 개가 오지? 10월엔?"처럼 배송월별로 헷갈리기 쉬운데, 배송예정월 기준으로 모아보고 필터링해서 한눈에 확인할 수 있게 합니다.</li>
+          <li><b>예약마감일을 놓치지 않기</b> — 마감일이 다가오는 항목은 깜빡임과 임박 알림 모달로 미리 알려줘서, 결제 · 예약 타이밍을 놓쳐 품절되는 걸 방지합니다.</li>
+        </ul>
+      </section>
+      <section class="help-section">
+        <h3>2. 시작하기 — JSON 업로드</h3>
+        <p>처음 진입하면 JSON 업로드 모달이 강제로 뜹니다. 파일을 올리기 전까지는 다른 화면으로 넘어갈 수 없습니다.</p>
+        <p>헤더의 <b>"⟲ 데이터 교체"</b> 버튼으로 언제든 다른 JSON으로 바꿔치기할 수 있습니다 (✕ 버튼 · 배경 클릭 · ESC로 취소 가능).</p>
+      </section>
+      <section class="help-section">
+        <h3>3. 전체 보기 탭</h3>
+        <p>전체 / 구매완료 / 미구매 탭으로 구분해서 봅니다.</p>
+        <p>장르 · 스타일 · 배송월 필터와 정렬(기본은 <b>"예약 빠른순"</b> = 예약마감일이 가까운 순)을 쓸 수 있습니다.</p>
+        <p>카드에는 예약마감일 · 배송예정월 · 가격이 표시되고, 카드를 클릭하면 구매 링크로 이동합니다.</p>
+      </section>
+      <section class="help-section">
+        <h3>4. 미구매 탭 전용 기능</h3>
+        <ul>
+          <li><b>깜빡임</b> — 예약마감일이 2개월 미만 남으면 카드의 마감일 숫자가 깜빡입니다.</li>
+          <li><b>임박 알림 모달</b> — 예약마감일이 1개월 미만 남은 항목이 있으면, 미구매 탭에 들어갈 때마다 "곧 품절될 가능성이 높은 제품이 있어요!" 모달이 자동으로 뜹니다. "새로고침 전까지 다시 보지 않기" 체크박스로 세션 동안만 끌 수 있습니다.</li>
+          <li><b>구매완료 처리 모드</b> — 버튼을 눌러 켜면 카드에 체크 선택이 생깁니다. 여러 개를 골라 하단 액션바에서 "선택 항목 구매완료 처리 + JSON 다운로드"를 누르면 한 번에 구매완료로 바뀌고 새 JSON이 저장됩니다.</li>
+        </ul>
+      </section>
+      <section class="help-section">
+        <h3>5. 데이터 추가 탭</h3>
+        <p>폼으로 새 굿즈 정보를 입력합니다. ID는 자동 부여됩니다.</p>
+        <p>배송예정월을 고르면 예약마감일(한 달 전 말일)이 자동으로 채워지며, 수동으로 수정할 수도 있습니다.</p>
+        <p>우측 JSON 패널에서 현재 데이터를 실시간으로 확인 · 다운로드할 수 있습니다.</p>
+      </section>
+      <section class="help-section">
+        <h3>6. 데이터 삭제 탭</h3>
+        <p>전체 / 구매완료 / 미구매로 필터링해서 원하는 항목만 찾아 ✕ 버튼으로 삭제합니다.</p>
+      </section>
+      <section class="help-section">
+        <h3>7. 저장 방식 주의사항</h3>
+        <p>이 앱은 서버 없이 브라우저 메모리에서만 동작합니다. 추가 · 삭제 · 구매완료 처리는 화면에 즉시 반영되지만, <b>새로고침하면 사라집니다.</b></p>
+        <p>변경사항을 남기려면 반드시 <b>"JSON 다운로드"</b>로 파일을 받아서, 다음에 그 파일을 다시 업로드해야 합니다.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="result-modal-overlay" id="result-modal-overlay">
+  <div class="result-modal">
+    <div class="upload-modal-head">
+      <div class="upload-modal-eyebrow" id="result-modal-eyebrow">SAVED</div>
+      <div class="upload-modal-title" id="result-modal-title">정상적으로 저장되었어요</div>
+    </div>
+    <div class="result-warning">
+      지금 JSON을 다운로드하지 않으면 이번 변경사항은 새로고침 시 사라지고 나중에 다시 확인할 수 없어요.
+    </div>
+    <div class="result-modal-btns">
+      <button type="button" class="download-btn result-download-btn" id="result-download-btn">JSON 다운로드</button>
+      <button type="button" class="result-leave-btn" id="result-leave-direct-btn">그냥 나가기</button>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-modal-overlay" id="confirm-modal-overlay">
+  <div class="confirm-modal">
+    <div class="upload-modal-title">다운로드하지 않고 나가시겠어요?</div>
+    <div class="upload-modal-desc">지금 나가면 이번 변경사항은 저장되지 않고, 새로고침 시 사라져요.</div>
+    <div class="confirm-modal-btns">
+      <button type="button" class="bulk-btn clear" id="confirm-stay-btn">계속 다운로드하기</button>
+      <button type="button" class="bulk-btn danger" id="confirm-leave-btn">그냥 나가기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SAMPLE_DATA = [{"id": "001", "genre": "보컬로이드", "character": "카가미네 린", "style": "넨도로이드", "name": "[예약] 넨도로이드 돌 카가미네 린 열등상등 버전 l 보컬로이드 26.08", "month": "26.09", "deadline": "2026-08-31", "price": 98920, "bought": true, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_bh/products/12831613313?NaPm=ct%3Dmrac9oph%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3De54006331961bc7eb34158ff680be2c6a79d153e", "image": "https://shop-phinf.pstatic.net/20251216_201/176584839342953PxX_PNG/34964275514783809_640308963.png?type=o1000"}, {"id": "002", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "넨도로이드", "name": "[예약] 넨도로이드 데코미쿠 (라이트니스) l 하츠네 미쿠 26.08", "month": "26.09", "deadline": "2026-08-31", "price": 68580, "bought": true, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_bh/products/13125479028?NaPm=ct%3Dmracckcj%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3D66a4e0235eccb07c22c803887569ce7c778b11be", "image": "https://shop-phinf.pstatic.net/20260216_194/1771250179863Q1ELA_JPEG/2951895742893118_1341875794.jpg?type=o1000"}, {"id": "003", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "넨도로이드", "name": "[예약] 넨도로이드 데코미쿠 (다크니스) l 하츠네 미쿠 26.08", "month": "26.09", "deadline": "2026-08-31", "price": 68580, "bought": true, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_bh/products/13125491262?NaPm=ct%3Dmracd18r%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3D4de68abb39b558827242d87416f5f12dfd360298", "image": "https://shop-phinf.pstatic.net/20260216_10/1771250492988djDWj_JPEG/2952208863971179_1841250513.jpg?type=o1000"}, {"id": "004", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "스케일", "name": "[예약] 타이토 T most 하츠네 미쿠 l 보컬로이드", "month": "26.08", "deadline": "2026-07-31", "price": 28000, "bought": true, "maker": "타이토", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/13472961933?NaPm=ct%3Dmrace1cc%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3D3331aef044cd7a73b8641bd64926bd79b999f30c", "image": "https://shop-phinf.pstatic.net/20260430_75/1777545059534UBhru_JPEG/7545512601311505_1701632808.jpg?type=o1000"}, {"id": "005", "genre": "바키", "character": "레츠 카이오", "style": "스케일", "name": "[26년10-11월입고] 바키도 세가 Luminasta 피규어 레츠 카이오", "month": "26.11", "deadline": "2026-10-31", "price": 24300, "bought": true, "maker": "세가", "shop": "네이버스토어", "link": "https://smartstore.naver.com/figurefarm/products/13375860506?NaPm=ct%3Dmracgmu2%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3D1513b989906b4fa64354c96d8b8768113def92cb", "image": "https://shop-phinf.pstatic.net/20260409_159/1775711412670qCyt9_JPEG/38702872781669148_1861641515.jpg?type=o1000"}, {"id": "006", "genre": "바키", "character": "미야모토 무사시", "style": "스케일", "name": "[예약상품][27년 1월 출고] 세가 바키도 Luminasta 피규어 미야모토 무사시", "month": "27.01", "deadline": "2026-12-31", "price": 22950, "bought": true, "maker": "세가", "shop": "네이버스토어", "link": "https://smartstore.naver.com/daesong000/products/13381302887?NaPm=ct%3Dmrachx55%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3D446f38a4ffdfd601e316fc7a4334d29c4b356620", "image": "https://shop-phinf.pstatic.net/20260410_75/1775801195946JUcnK_JPEG/16947925652818539_2014428603.jpg?type=o1000"}, {"id": "007", "genre": "바키", "character": "비스켓 올리버", "style": "스케일", "name": "[26년9월]반프레스토 바키 피규어 비스켓 올리버 이거 구체", "month": "26.09", "deadline": "2026-08-31", "price": 20000, "bought": true, "maker": "반프레스토", "shop": "네이버스토어", "link": "https://smartstore.naver.com/kyouma/products/13436412302?NaPm=ct%3Dmrachfbg%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3D4b9951e80797b57ea6bf2764825c624b01cde260", "image": "https://shop-phinf.pstatic.net/20260422_241/1776832006388Iqtw1_JPEG/31349998760254905_722623193.jpg?type=o1000"}, {"id": "008", "genre": "동방프로젝트", "character": "후지와라노 모코우", "style": "스케일", "name": "후류 동방 프로젝트 후지와라노 모코우 누들 스토퍼 피규어", "month": "26.07", "deadline": "2026-06-30", "price": 25000, "bought": true, "maker": "후류", "shop": "네이버스토어", "link": "https://smartstore.naver.com/androidcontinental/products/12198105008?NaPm=ct%3Dmracj6n5%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3Da7ffdedb4d626466f4f7a711c512d49f7ef09a3c", "image": "https://shop-phinf.pstatic.net/20250804_270/1754246239861b09SY_JPEG/29746472933310591_126302831.jpg?type=o1000"}, {"id": "009", "genre": "동방프로젝트", "character": "레이무, 마리사", "style": "스케일", "name": "[예약상품 26년 12월 출고] 2종 세트 후류 동방 프로젝트 뮤츄트 피규어 -하쿠레이 레이무--키리사메마리사-", "month": "26.12", "deadline": "2026-11-30", "price": 54000, "bought": true, "maker": "후류", "shop": "네이버스토어", "link": "https://smartstore.naver.com/daesong000/products/13640140093?NaPm=ct%3Dmracii3q%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3Dd6e7336c5e29da5646ffb299b79837dd34e93556", "image": "https://shop-phinf.pstatic.net/20260622_262/1782110362471WItzp_JPEG/116243157438955381_2133903786.jpg?type=o1000"}, {"id": "010", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "넨도로이드", "name": "[특전] 넨도로이드 3068 하츠네 미쿠 메스머라이저Ver. / 보컬로이드", "month": "26.10", "deadline": "2026-09-30", "price": 76200, "bought": true, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://brand.naver.com/goodsmilekr/products/13622734159?NaPm=ct%3Dmracktus%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3D1d9088564c5680f38a2bb9671b7862469bcd635b", "image": "https://shop-phinf.pstatic.net/20260604_2/1780565379682MDgWq_PNG/5533196328431832_2011797845.png?type=o1000"}, {"id": "011", "genre": "보컬로이드", "character": "카사네 테토", "style": "넨도로이드", "name": "[특전] 넨도로이드 3069 카사네 테토 메스머라이저Ver. / 보컬로이드", "month": "26.10", "deadline": "2026-09-30", "price": 76200, "bought": true, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://brand.naver.com/goodsmilekr/products/13622736368?NaPm=ct%3Dmrackg1j%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3D75f527ee289fa20d4b651d68a59c9b049c017960", "image": "https://shop-phinf.pstatic.net/20260604_139/1780565506968bn44I_PNG/113973716959045297_1537295920.png?type=o1000"}, {"id": "012", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "넨도로이드", "name": "[예약] 하츠네미쿠x시나모롤 데포르메 피규어 l 보컬로이드", "month": "26.08", "deadline": "2026-07-31", "price": 41130, "bought": true, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/12773797636?NaPm=ct%3Dmracm1n5%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3Dc38607215caef6439fa430bb8622d2d759e52202", "image": "https://shop-phinf.pstatic.net/20251204_234/1764810588354kXtb9_JPEG/19500444309710705_736809564.jpg?type=o1000"}, {"id": "013", "genre": "니케", "character": "도로", "style": "넨도로이드", "name": "[예약] 굿스마일아츠상하이 DORO 도로시 신데렐라 도로롱 l 승리의 여신 니케 (재판)", "month": "26.10", "deadline": "2026-09-30", "price": 28500, "bought": true, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/13374835072?NaPm=ct%3Dmraclj8i%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3Dde5ff83fd635c0bd34af14240ba1097d920fe2a7", "image": "https://shop-phinf.pstatic.net/20250404_155/1743737804131CYFJR_JPEG/77870654256602759_751606988.jpg?type=o1000"}, {"id": "014", "genre": "보컬로이드", "character": "카사네 테토", "style": "스케일", "name": "[예약] 후류 누들스토퍼 카사네 테토 킹 버전 l 보컬로이드", "month": "26.08", "deadline": "2026-07-31", "price": 32390, "bought": true, "maker": "후류", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/13130975394?NaPm=ct%3Dmracmlmk%7Cci%3Dcheckout%7Ctr%3Dppc%7Ctrx%3Dnull%7Chk%3D1d72522511a86dde90d1cb1b5e44f6f437e457fe", "image": "https://shop-phinf.pstatic.net/20260218_215/1771378427993lOWnv_JPEG/105511241249589191_924764625.jpg?type=o1000"}, {"id": "015", "genre": "동방프로젝트", "character": "코메이지 사토리", "style": "스케일", "name": "마기아츠(MAGI ARTS) 1/6스케일 피규어 동방 프로젝트 코메이지 사토리 (호화판)", "month": "26.07", "deadline": "2026-06-30", "price": 350000, "bought": true, "maker": "마기아츠", "shop": "코믹스아트", "link": "https://comics-art.co.kr/product/%EB%A7%88%EA%B8%B0%EC%95%84%EC%B8%A0magi-arts-16%EC%8A%A4%EC%BC%80%EC%9D%BC-%ED%94%BC%EA%B7%9C%EC%96%B4-%EB%8F%99%EB%B0%A9-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%BD%94%EB%A9%94%EC%9D%B4%EC%A7%80-%EC%82%AC%ED%86%A0%EB%A6%AC-%ED%98%B8%ED%99%94%ED%8C%90/152924/category/1815/", "image": "https://cafe24img.poxo.com/comics11/web/product/medium/202601/2ae5d77b05c3cdfff032d194417c5ba3.jpg"}, {"id": "016", "genre": "동방프로젝트", "character": "플랑드르 스칼렛", "style": "스케일", "name": "(공식 파트너샵) 리버스 스튜디오 1/6스케일 피규어 동방 프로젝트 - 플랑드르 스칼렛 무구한 시간 Ver", "month": "26.09", "deadline": "2026-08-31", "price": 142000, "bought": true, "maker": "리버스 스튜디오", "shop": "코믹스아트", "link": "https://comics-art.co.kr/product/%EA%B3%B5%EC%8B%9D-%ED%8C%8C%ED%8A%B8%EB%84%88%EC%83%B5-%EB%A6%AC%EB%B2%84%EC%8A%A4-%EC%8A%A4%ED%8A%9C%EB%94%94%EC%98%A4-16%EC%8A%A4%EC%BC%80%EC%9D%BC-%ED%94%BC%EA%B7%9C%EC%96%B4-%EB%8F%99%EB%B0%A9-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%94%8C%EB%9E%91%EB%93%9C%EB%A5%B4-%EC%8A%A4%EC%B9%BC%EB%A0%9B-%EB%AC%B4%EA%B5%AC%ED%95%9C-%EC%8B%9C%EA%B0%84-ver/169744/category/1815/", "image": "https://cafe24img.poxo.com/comics11/web/product/medium/202506/3bc42322387405eaeea98c1faf7f4abe.jpg"}, {"id": "017", "genre": "동방프로젝트", "character": "레밀리아 스칼렛", "style": "스케일", "name": "(공식 파트너샵) 노벨 스텔라(Novel Stella) 1/7스케일 피규어 동방 프로젝트 레밀리아 스칼렛", "month": "27.01", "deadline": "2026-12-31", "price": 235000, "bought": true, "maker": "노벨 스텔라", "shop": "코믹스아트", "link": "https://comics-art.co.kr/product/%EA%B3%B5%EC%8B%9D-%ED%8C%8C%ED%8A%B8%EB%84%88%EC%83%B5-%EB%85%B8%EB%B2%A8-%EC%8A%A4%ED%85%94%EB%9D%BCnovel-stella-17%EC%8A%A4%EC%BC%80%EC%9D%BC-%ED%94%BC%EA%B7%9C%EC%96%B4-%EB%8F%99%EB%B0%A9-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EB%A0%88%EB%B0%80%EB%A6%AC%EC%95%84-%EC%8A%A4%EC%B9%BC%EB%A0%9B/239546/category/1815/", "image": "https://cafe24img.poxo.com/comics11/web/product/medium/202605/81997d33d75c937c6ac39ddfa16e2109.jpg"}, {"id": "018", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "스케일", "name": "[예약] 후류 Muchute 하츠네 미쿠 테마파크 데이트 버전 l 보컬로이드", "month": "26.12", "deadline": "2026-11-30", "price": 40000, "bought": false, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/13645886424?nl-au=482c8b44292c41bab9310a1f2c11cc1b&NaPm=ct%3Dmracprir%7Cci%3Dcheckout%7Ctr%3Dnslsl_myc%7Ctrx%3Dnull%7Chk%3D81e6f73b0c063b754e7b0a4b2f1de8769b59db2b", "image": "https://shop-phinf.pstatic.net/20260629_13/1782693983460sLTK2_JPEG/22712767253928705_1463498139.jpg?type=o1000"}, {"id": "019", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "넨도로이드", "name": "[예약] 넨도로이드 하츠네 미쿠 매지컬 큐어 러브 샷 버전 l 보컬로이드", "month": "27.01", "deadline": "2026-12-31", "price": 79600, "bought": false, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/13654344048?nl-au=288cc411ec3f4967a9abaa9f51acbd0b&NaPm=ct%3Dmracptak%7Cci%3Dcheckout%7Ctr%3Dnslsl_myc%7Ctrx%3Dnull%7Chk%3Df436d8ed1215d4538ee3c161a7a149e466c86ba9", "image": "https://shop-phinf.pstatic.net/20260707_252/1783403682439BPivS_JPEG/53911719573356752_628859603.jpg?type=o1000"}, {"id": "020", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "넨도로이드", "name": "[예약] 넨도로이드 하츠네 미쿠 HMO 버전 l 보컬로이드", "month": "26.12", "deadline": "2026-11-30", "price": 95700, "bought": false, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/13587143739?nl-au=5a70b9b9900e4ad1951b476c5b181400&NaPm=ct%3Dmracpv4q%7Cci%3Dcheckout%7Ctr%3Dmyc%7Ctrx%3Dnull%7Chk%3D681710398ad6b695ce55b934da1d9f9e371597ab", "image": "https://shop-phinf.pstatic.net/20260528_151/1779961138021GoAJA_JPEG/126594921238379226_206621016.jpg?type=o1000"}, {"id": "021", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "넨도로이드", "name": "[예약] 넨도로이드 하츠네 미쿠 심포니 10주년 버전 l 보컬로이드", "month": "26.12", "deadline": "2026-11-30", "price": 95700, "bought": false, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/13623240132?nl-au=a8ff23b578764c67902b32791e337a9d&NaPm=ct%3Dmracpwb0%7Cci%3Dcheckout%7Ctr%3Dmyc%7Ctrx%3Dnull%7Chk%3D7d78f1a04866f601fc87fe2bc8096d548a8a1864", "image": "https://shop-phinf.pstatic.net/20260605_147/1780621450081yHJsR_JPEG/35829621185725551_1178667334.jpg?type=o1000"}, {"id": "022", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "스케일", "name": "[예약] 타이토 T most 하츠네 미쿠 NT버전 l 보컬로이드", "month": "26.10", "deadline": "2026-09-30", "price": 29000, "bought": false, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/13626090586?nl-au=817ca11bf23b42e5b9b2bd9980536f48&NaPm=ct%3Dmracpxkz%7Cci%3Dcheckout%7Ctr%3Dmyc%7Ctrx%3Dnull%7Chk%3D4b52195632174b01f2856a08953c7d37f3b4ae89", "image": "https://shop-phinf.pstatic.net/20260608_251/1780880256320ER2fv_JPEG/61079870203580037_1075383293.jpg?type=o1000"}, {"id": "023", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "스케일", "name": "[예약] 팝업퍼레이드 하츠네 미쿠 래빗홀 버전 L 사이즈 l 보컬로이드", "month": "26.10", "deadline": "2026-09-30", "price": 86000, "bought": false, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/13380183739?nl-au=6d317d0020324f99abb40bbccc922ab1&NaPm=ct%3Dmracpyk3%7Cci%3Dcheckout%7Ctr%3Dmyc%7Ctrx%3Dnull%7Chk%3Da63accca6d241c74a018c371ded2bb03dd5ae9cc", "image": "https://shop-phinf.pstatic.net/20260506_36/1778031227102TMKEU_JPEG/10187570215633615_569493622.jpg?type=o1000"}, {"id": "024", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "넨도로이드", "name": "넨도로이드 하츠네미쿠 3.0 l 보컬로이드", "month": "26.09", "deadline": "2026-08-31", "price": 65300, "bought": false, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/12314342796", "image": "https://shop-phinf.pstatic.net/20250828_46/1756348149729Atc44_JPEG/81736514420759136_229962712.jpg?type=o1000"}, {"id": "025", "genre": "보컬로이드", "character": "하츠네 미쿠", "style": "넨도로이드", "name": "넨도로이드 하츠네미쿠 심해소녀버전 l 보컬로이드", "month": "26.08", "deadline": "2026-07-31", "price": 75800, "bought": false, "maker": "굿스마일", "shop": "네이버스토어", "link": "https://smartstore.naver.com/gsc_korea_dt_pw/products/12779555577", "image": "https://shop-phinf.pstatic.net/20251205_76/1764897614173cC2uh_JPEG/19587470128079048_507214412.jpg?type=o1000"}];
+let DATA = [];
+let state = { tab:"all", genre:"", style:"", month:"", sort:"default" };
+let deleteTab = "all";
+let editMode = false;
+let selectedIds = new Set();
+let deleteSelectedIds = new Set();
+
+function fmtPrice(n){ return Number(n||0).toLocaleString("ko-KR") + "원"; }
+
+function currentTabData(){
+  if(state.tab === "all") return DATA;
+  return DATA.filter(d => state.tab === "bought" ? d.bought : !d.bought);
+}
+
+function populateFilterOptions(){
+  const tabData = currentTabData();
+
+  const genres = [...new Set(tabData.map(d=>d.genre).filter(Boolean))];
+  const styles = [...new Set(tabData.map(d=>d.style).filter(Boolean))];
+  const months = [...new Set(tabData.map(d=>d.month).filter(Boolean))].sort();
+
+  fillSelect("f-genre", genres, "장르 전체", state.genre);
+  fillSelect("f-style", styles, "스타일 전체", state.style);
+  fillSelect("f-month", months, "배송월 전체", state.month);
+}
+
+function fillSelect(id, values, allLabel, current){
+  const sel = document.getElementById(id);
+  const prev = current;
+  sel.innerHTML = `<option value="">${allLabel}</option>` +
+    values.map(v => `<option value="${v}">${v}</option>`).join("");
+  if(values.includes(prev)) sel.value = prev;
+  else {
+    if(id==="f-genre") state.genre = "";
+    if(id==="f-style") state.style = "";
+    if(id==="f-month") state.month = "";
+  }
+}
+
+function escapeHtml(str){
+  return String(str ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[c]));
+}
+
+function todayStr(){
+  const now = new Date();
+  return now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0") + "-" + String(now.getDate()).padStart(2,"0");
+}
+
+function fmtDeadline(dateStr){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr || "");
+  if(!m) return "";
+  return `${m[1].slice(2)}.${m[2]}.${m[3]}`;
+}
+
+function monthsUntil(dateStr){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr || "");
+  if(!m) return null;
+  const deadline = new Date(Number(m[1]), Number(m[2])-1, Number(m[3]));
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = (deadline - today) / 86400000;
+  return diffDays / 30;
+}
+
+function isDeadlineUnder(d, months){
+  if(!d.deadline || d.bought) return false;
+  const diff = monthsUntil(d.deadline);
+  return diff !== null && diff < months;
+}
+
+function cardInnerHtml(d){
+  const shopLine = [d.maker, d.shop].filter(Boolean).join(" · ");
+  const thumb = d.image
+    ? `<div class="thumb"><img src="${escapeHtml(d.image)}" alt="${escapeHtml(d.character)}" loading="lazy" onerror="this.parentElement.classList.add('empty'); this.remove();"></div>`
+    : `<div class="thumb empty">이미지<br>없음</div>`;
+  let deadlineHtml = "";
+  if(d.deadline){
+    const passed = !d.bought && d.deadline < todayStr();
+    const blink = state.tab === "wish" && isDeadlineUnder(d, 2);
+    deadlineHtml = `<span class="deadline ${passed ? "passed" : ""} ${blink ? "blink" : ""}">예약마감일 <b>${escapeHtml(fmtDeadline(d.deadline))}</b></span>`;
+  }
+  return `
+    ${thumb}
+    <div class="card-top">
+      <div class="tag-row">
+        <span class="tag genre">${escapeHtml(d.genre)}</span>
+        <span class="tag style">${escapeHtml(d.style)}</span>
+      </div>
+      <div class="name-block">
+        <div class="character">${escapeHtml(d.name)}</div>
+        <div class="figure-name">${escapeHtml(d.character)}</div>
+        ${shopLine ? `<div class="shop-line">${escapeHtml(shopLine)}</div>` : ""}
+      </div>
+    </div>
+    <div class="card-stub">
+      ${deadlineHtml}
+      <span class="month">배송예정월 <b>${escapeHtml(d.month)}</b></span>
+      <span class="price">${fmtPrice(d.price)}</span>
+    </div>
+  `;
+}
+
+function updateEditModeUI(){
+  const editBtn = document.getElementById("edit-mode-btn");
+  const hint = document.getElementById("select-hint");
+  const bar = document.getElementById("bulk-action-bar");
+
+  editBtn.style.display = state.tab === "wish" ? "" : "none";
+  if(state.tab !== "wish" && editMode){
+    editMode = false;
+    selectedIds.clear();
+  }
+  editBtn.classList.toggle("active", editMode);
+  editBtn.textContent = editMode ? "✕ 수정모드 종료" : "✎ 구매완료 처리 모드";
+  hint.classList.toggle("show", editMode);
+  bar.classList.toggle("show", editMode);
+  document.getElementById("bulk-selected-count").textContent = selectedIds.size;
+  document.getElementById("bulk-confirm-btn").disabled = selectedIds.size === 0;
+}
+
+function render(){
+  populateFilterOptions();
+
+  let items = currentTabData();
+  if(state.genre) items = items.filter(d=>d.genre===state.genre);
+  if(state.style) items = items.filter(d=>d.style===state.style);
+  if(state.month) items = items.filter(d=>d.month===state.month);
+
+  if(state.sort === "price-asc") items = [...items].sort((a,b)=>a.price-b.price);
+  else if(state.sort === "price-desc") items = [...items].sort((a,b)=>b.price-a.price);
+  else if(state.sort === "month-asc") items = [...items].sort((a,b)=>String(a.month).localeCompare(String(b.month)));
+  else items = [...items].sort((a,b)=>String(a.deadline||"9999-99-99").localeCompare(String(b.deadline||"9999-99-99")));
+
+  document.getElementById("count-all").textContent = DATA.length;
+  document.getElementById("count-bought").textContent = DATA.filter(d=>d.bought).length;
+  document.getElementById("count-wish").textContent = DATA.filter(d=>!d.bought).length;
+
+  updateEditModeUI();
+
+  const grid = document.getElementById("grid");
+  const resultLine = document.getElementById("result-line");
+  resultLine.innerHTML = `총 <b>${items.length}</b>개 표시 중 · 합계 <b>${fmtPrice(items.reduce((sum,d)=>sum+(d.price||0),0))}</b>`;
+
+  if(DATA.length === 0){
+    grid.innerHTML = `<div class="empty">아직 업로드된 데이터가 없어요.<br>위에서 JSON 파일을 올려주세요.</div>`;
+    return;
+  }
+  if(items.length === 0){
+    grid.innerHTML = `<div class="empty">조건에 맞는 굿즈가 없어요.<br>필터를 조정해보세요.</div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map((d, i) => {
+    const delay = Math.min(i * 70, 700);
+    const selected = editMode && selectedIds.has(d.id);
+    if(editMode){
+      return `<div class="card select-mode ${selected ? "selected" : ""}" data-id="${escapeHtml(d.id)}" style="animation-delay:${delay}ms">
+        <span class="select-check">✓</span>
+        ${cardInnerHtml(d)}
+      </div>`;
+    }
+    const tag = d.link ? "a" : "div";
+    const linkAttrs = d.link ? `href="${escapeHtml(d.link)}" target="_blank" rel="noopener noreferrer"` : "";
+    return `<${tag} class="card ${d.link ? "linkable" : ""}" style="animation-delay:${delay}ms" ${linkAttrs}>${cardInnerHtml(d)}</${tag}>`;
+  }).join("");
+
+  if(editMode){
+    grid.querySelectorAll(".card.select-mode").forEach(card=>{
+      card.addEventListener("click", ()=>{
+        const id = card.dataset.id;
+        if(selectedIds.has(id)) selectedIds.delete(id);
+        else selectedIds.add(id);
+        render();
+      });
+    });
+  }
+}
+
+/* ---- 데이터 편집(추가/삭제) 공통 ---- */
+function updateJsonPreview(){
+  const text = JSON.stringify(DATA, null, 2);
+  document.getElementById("json-preview-add").textContent = text;
+  document.getElementById("json-preview-delete").textContent = text;
+}
+
+function updateDeleteBulkBar(){
+  const bar = document.getElementById("delete-bulk-action-bar");
+  const count = deleteSelectedIds.size;
+  bar.classList.toggle("show", count > 0);
+  document.getElementById("delete-bulk-selected-count").textContent = count;
+  document.getElementById("delete-bulk-confirm-btn").disabled = count === 0;
+}
+
+function renderDeleteList(){
+  document.getElementById("del-count-all").textContent = DATA.length;
+  document.getElementById("del-count-bought").textContent = DATA.filter(d=>d.bought).length;
+  document.getElementById("del-count-wish").textContent = DATA.filter(d=>!d.bought).length;
+
+  const list = document.getElementById("delete-list");
+  const validIds = new Set(DATA.map(d=>d.id));
+  deleteSelectedIds.forEach(id => { if(!validIds.has(id)) deleteSelectedIds.delete(id); });
+
+  if(DATA.length === 0){
+    list.innerHTML = `<div class="empty">삭제할 데이터가 없어요.</div>`;
+    updateDeleteBulkBar();
+    return;
+  }
+
+  const items = DATA.filter(d => deleteTab === "all" ? true : deleteTab === "bought" ? d.bought : !d.bought);
+
+  if(items.length === 0){
+    list.innerHTML = `<div class="empty">해당 조건의 데이터가 없어요.</div>`;
+    updateDeleteBulkBar();
+    return;
+  }
+
+  list.innerHTML = items.map((d, i) => {
+    const selected = deleteSelectedIds.has(d.id);
+    return `<div class="card select-mode ${selected ? "selected" : ""}" data-id="${escapeHtml(d.id)}" style="animation-delay:${Math.min(i * 60, 700)}ms">
+      <span class="select-check">✓</span>
+      ${cardInnerHtml(d)}
+    </div>`;
+  }).join("");
+
+  list.querySelectorAll(".card.select-mode").forEach(card=>{
+    card.addEventListener("click", ()=>{
+      const id = card.dataset.id;
+      if(deleteSelectedIds.has(id)) deleteSelectedIds.delete(id);
+      else deleteSelectedIds.add(id);
+      renderDeleteList();
+    });
+  });
+
+  updateDeleteBulkBar();
+}
+
+function downloadJson(){
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const now = new Date();
+  const pad = (n)=>String(n).padStart(2,"0");
+  const stamp = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `figures-data-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* ---- 저장/삭제 결과 확인 모달 ---- */
+const resultModalOverlay = document.getElementById("result-modal-overlay");
+const resultModalEyebrow = document.getElementById("result-modal-eyebrow");
+const resultModalTitle = document.getElementById("result-modal-title");
+const resultDownloadBtn = document.getElementById("result-download-btn");
+const resultLeaveDirectBtn = document.getElementById("result-leave-direct-btn");
+const confirmModalOverlay = document.getElementById("confirm-modal-overlay");
+const confirmStayBtn = document.getElementById("confirm-stay-btn");
+const confirmLeaveBtn = document.getElementById("confirm-leave-btn");
+let resultDownloaded = false;
+
+function showResultModal({kind, title}){
+  resultDownloaded = false;
+  resultModalEyebrow.textContent = kind === "delete" ? "DELETED" : "SAVED";
+  resultModalTitle.textContent = title;
+  resultModalOverlay.classList.add("show");
+}
+function hideResultModal(){
+  resultModalOverlay.classList.remove("show");
+}
+function requestCloseResultModal(){
+  if(resultDownloaded){ hideResultModal(); return; }
+  confirmModalOverlay.classList.add("show");
+}
+resultLeaveDirectBtn.addEventListener("click", requestCloseResultModal);
+resultDownloadBtn.addEventListener("click", ()=>{
+  downloadJson();
+  resultDownloaded = true;
+  hideResultModal();
+});
+confirmStayBtn.addEventListener("click", ()=>{
+  confirmModalOverlay.classList.remove("show");
+});
+confirmLeaveBtn.addEventListener("click", ()=>{
+  confirmModalOverlay.classList.remove("show");
+  hideResultModal();
+});
+
+function padId(n){
+  return String(n).padStart(3, "0");
+}
+
+function renumberIds(){
+  DATA.forEach((d, i) => { d.id = padId(i + 1); });
+}
+
+function updateNextIdDisplay(){
+  const el = document.getElementById("add-id-display");
+  if(el) el.value = padId(DATA.length + 1);
+}
+
+function refreshAll(){
+  renumberIds();
+  render();
+  updateJsonPreview();
+  renderDeleteList();
+  updateNextIdDisplay();
+}
+
+/* ---- 뷰 전환 ---- */
+document.querySelectorAll(".view-nav button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".view-nav button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll(".view-section").forEach(s=>s.classList.remove("active"));
+    document.getElementById("view-" + btn.dataset.view).classList.add("active");
+    if(btn.dataset.view === "add" || btn.dataset.view === "delete") updateJsonPreview();
+    if(btn.dataset.view === "delete") renderDeleteList();
+  });
+});
+
+/* ---- 배송예정월 picker (YYYY-MM -> YY.MM 저장) ---- */
+const monthPicker = document.getElementById("add-month-picker");
+const monthHidden = document.querySelector('#add-form input[name="month"]');
+const deadlinePicker = document.getElementById("add-deadline-picker");
+
+function deadlineForMonthValue(val){
+  const m = /^(\d{4})-(\d{2})$/.exec(val || "");
+  if(!m) return "";
+  let year = Number(m[1]);
+  let mon = Number(m[2]) - 1;
+  if(mon === 0){ mon = 12; year -= 1; }
+  const lastDay = new Date(year, mon, 0).getDate();
+  return `${year}-${String(mon).padStart(2,"0")}-${String(lastDay).padStart(2,"0")}`;
+}
+
+monthPicker.addEventListener("change", ()=>{
+  const val = monthPicker.value;
+  monthHidden.value = val ? val.slice(2).replace("-", ".") : "";
+  if(val && !deadlinePicker.value){
+    deadlinePicker.value = deadlineForMonthValue(val);
+  }
+});
+
+/* ---- 데이터 추가 폼 ---- */
+document.getElementById("add-form").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  const form = e.target;
+  const fd = new FormData(form);
+  const character = (fd.get("character") || "").trim();
+  const name = (fd.get("name") || "").trim();
+  const msgEl = document.getElementById("add-msg");
+
+  if(!character || !name){
+    msgEl.textContent = "캐릭터명과 상품명은 필수예요.";
+    msgEl.className = "form-msg show err";
+    return;
+  }
+
+  const priceVal = fd.get("price");
+  const newItem = {
+    id: padId(DATA.length + 1),
+    genre: (fd.get("genre") || "").trim(),
+    character,
+    style: (fd.get("style") || "").trim(),
+    name,
+    month: (fd.get("month") || "").trim(),
+    deadline: (fd.get("deadline") || "").trim(),
+    price: priceVal ? Number(priceVal) : 0,
+    bought: fd.get("boughtStatus") === "bought",
+    maker: (fd.get("maker") || "").trim(),
+    shop: (fd.get("shop") || "").trim(),
+    link: (fd.get("link") || "").trim(),
+    image: (fd.get("image") || "").trim(),
+  };
+
+  DATA.push(newItem);
+  form.reset();
+  monthHidden.value = "";
+  msgEl.textContent = "";
+  msgEl.className = "form-msg";
+  refreshAll();
+  showResultModal({
+    kind: "save",
+    title: "정상적으로 저장되었어요"
+  });
+});
+
+document.getElementById("download-add").addEventListener("click", downloadJson);
+document.getElementById("download-delete").addEventListener("click", downloadJson);
+
+/* ---- 삭제 탭: 전체/구매완료/미구매 필터 ---- */
+document.querySelectorAll("#view-delete .tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("#view-delete .tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    deleteTab = btn.dataset.delTab;
+    deleteSelectedIds.clear();
+    renderDeleteList();
+  });
+});
+
+document.getElementById("delete-bulk-clear-btn").addEventListener("click", ()=>{
+  deleteSelectedIds.clear();
+  renderDeleteList();
+});
+
+document.getElementById("delete-bulk-confirm-btn").addEventListener("click", ()=>{
+  if(deleteSelectedIds.size === 0) return;
+  DATA = DATA.filter(d => !deleteSelectedIds.has(d.id));
+  deleteSelectedIds.clear();
+  refreshAll();
+  showResultModal({
+    kind: "delete",
+    title: "정상적으로 삭제되었어요"
+  });
+});
+
+/* ---- 미구매 탭: 구매완료 처리 수정모드 ---- */
+document.getElementById("edit-mode-btn").addEventListener("click", ()=>{
+  editMode = !editMode;
+  if(!editMode) selectedIds.clear();
+  render();
+});
+
+document.getElementById("bulk-clear-btn").addEventListener("click", ()=>{
+  selectedIds.clear();
+  render();
+});
+
+document.getElementById("bulk-confirm-btn").addEventListener("click", ()=>{
+  if(selectedIds.size === 0) return;
+  DATA.forEach(d=>{
+    if(selectedIds.has(d.id)) d.bought = true;
+  });
+  selectedIds.clear();
+  editMode = false;
+  refreshAll();
+  showResultModal({
+    kind: "save",
+    title: "정상적으로 저장되었어요"
+  });
+});
+
+/* ---- 임박 재고 알림 모달 (미구매 탭 전용) ---- */
+const urgentModalOverlay = document.getElementById("urgent-modal-overlay");
+const urgentModalClose = document.getElementById("urgent-modal-close");
+const urgentGrid = document.getElementById("urgent-grid");
+const urgentDismissCheckbox = document.getElementById("urgent-dismiss-checkbox");
+let urgentDismissedThisSession = false;
+
+function hideUrgentModal(){
+  urgentModalOverlay.classList.remove("show");
+}
+function maybeShowUrgentModal(){
+  if(urgentDismissedThisSession) return;
+  const urgentItems = DATA.filter(d => isDeadlineUnder(d, 1));
+  if(urgentItems.length === 0) return;
+  urgentGrid.innerHTML = urgentItems.map((d, i) => {
+    const tag = d.link ? "a" : "div";
+    const linkAttrs = d.link ? `href="${escapeHtml(d.link)}" target="_blank" rel="noopener noreferrer"` : "";
+    const delay = Math.min(i * 70, 700);
+    return `<${tag} class="card ${d.link ? "linkable" : ""}" style="animation-delay:${delay}ms" ${linkAttrs}>${cardInnerHtml(d)}</${tag}>`;
+  }).join("");
+  urgentDismissCheckbox.checked = false;
+  urgentModalOverlay.classList.add("show");
+}
+urgentModalClose.addEventListener("click", ()=>{
+  if(urgentDismissCheckbox.checked) urgentDismissedThisSession = true;
+  hideUrgentModal();
+});
+urgentModalOverlay.addEventListener("click", (e)=>{
+  if(e.target !== urgentModalOverlay) return;
+  if(urgentDismissCheckbox.checked) urgentDismissedThisSession = true;
+  hideUrgentModal();
+});
+document.addEventListener("keydown", (e)=>{
+  if(e.key !== "Escape") return;
+  if(!urgentModalOverlay.classList.contains("show")) return;
+  if(urgentDismissCheckbox.checked) urgentDismissedThisSession = true;
+  hideUrgentModal();
+});
+
+/* ---- 사용 방법 모달 ---- */
+const helpBtn = document.getElementById("help-btn");
+const helpModalOverlay = document.getElementById("help-modal-overlay");
+const helpModalClose = document.getElementById("help-modal-close");
+
+function showHelpModal(){ helpModalOverlay.classList.add("show"); }
+function hideHelpModal(){ helpModalOverlay.classList.remove("show"); }
+
+helpBtn.addEventListener("click", showHelpModal);
+helpModalClose.addEventListener("click", hideHelpModal);
+helpModalOverlay.addEventListener("click", (e)=>{
+  if(e.target === helpModalOverlay) hideHelpModal();
+});
+document.addEventListener("keydown", (e)=>{
+  if(e.key !== "Escape") return;
+  if(!helpModalOverlay.classList.contains("show")) return;
+  hideHelpModal();
+});
+
+/* ---- 탭/필터 이벤트 ---- */
+document.querySelectorAll("#view-browse .tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("#view-browse .tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    state.tab = btn.dataset.tab;
+    state.genre = ""; state.style = ""; state.month = "";
+    editMode = false;
+    selectedIds.clear();
+    render();
+    if(state.tab === "wish") maybeShowUrgentModal();
+  });
+});
+
+document.getElementById("f-genre").addEventListener("change", e=>{ state.genre = e.target.value; render(); });
+document.getElementById("f-style").addEventListener("change", e=>{ state.style = e.target.value; render(); });
+document.getElementById("f-month").addEventListener("change", e=>{ state.month = e.target.value; render(); });
+document.getElementById("f-sort").addEventListener("change", e=>{ state.sort = e.target.value; render(); });
+document.getElementById("reset-btn").addEventListener("click", ()=>{
+  state.genre=""; state.style=""; state.month=""; state.sort="default";
+  document.getElementById("f-sort").value = "default";
+  render();
+});
+
+/* ---- 업로드(드래그앤드롭 / 클릭) ---- */
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("file-input");
+const dzBtn = document.getElementById("dz-btn");
+const uploadMsg = document.getElementById("upload-msg");
+const uploadModalOverlay = document.getElementById("upload-modal-overlay");
+const uploadModalClose = document.getElementById("upload-modal-close");
+const uploadModalTitle = document.getElementById("upload-modal-title");
+const uploadModalDesc = document.getElementById("upload-modal-desc");
+const reuploadBtn = document.getElementById("reupload-btn");
+const uploadEntryRow = document.getElementById("upload-entry-row");
+const entryAboutBtn = document.getElementById("entry-about-btn");
+const entrySampleBtn = document.getElementById("entry-sample-btn");
+let uploadModalDismissible = false;
+
+function openUploadModal(dismissible){
+  uploadModalDismissible = dismissible;
+  uploadModalClose.style.display = dismissible ? "" : "none";
+  uploadModalTitle.textContent = dismissible ? "JSON 데이터 교체" : "시작하려면 JSON을 업로드하세요";
+  uploadModalDesc.innerHTML = dismissible
+    ? "새 JSON 파일을 업로드하면 현재 데이터가 모두 교체돼요."
+    : "전시장 입주 예약 시스템을 이용하려면 먼저 피규어 데이터 JSON 파일이 필요해요.<br>업로드 전까지는 다른 화면을 볼 수 없어요.";
+  uploadEntryRow.style.display = dismissible ? "none" : "";
+  uploadModalOverlay.classList.add("show");
+}
+function hideUploadModal(){
+  uploadModalOverlay.classList.remove("show");
+}
+function dismissUploadModal(){
+  if(!uploadModalDismissible) return;
+  hideUploadModal();
+}
+reuploadBtn.addEventListener("click", ()=>{
+  uploadMsg.className = "upload-msg";
+  uploadMsg.textContent = "";
+  openUploadModal(true);
+});
+entryAboutBtn.addEventListener("click", showHelpModal);
+entrySampleBtn.addEventListener("click", loadSampleData);
+uploadModalClose.addEventListener("click", dismissUploadModal);
+uploadModalOverlay.addEventListener("click", (e)=>{
+  if(e.target === uploadModalOverlay) dismissUploadModal();
+});
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape") dismissUploadModal();
+});
+
+function showUploadMsg(text, ok){
+  uploadMsg.textContent = text;
+  uploadMsg.className = "upload-msg show " + (ok ? "ok" : "err");
+}
+
+const toastEl = document.getElementById("toast");
+let toastTimer = null;
+function showToast(text, ok){
+  clearTimeout(toastTimer);
+  toastEl.textContent = text;
+  toastEl.className = "toast show " + (ok ? "ok" : "err");
+  toastTimer = setTimeout(()=>{ toastEl.classList.remove("show"); }, 3200);
+}
+
+function applyLoadedData(parsed, sourceLabel){
+  if(!Array.isArray(parsed)) throw new Error("배열 형식이 아니에요.");
+  DATA = parsed;
+  state = { tab:"all", genre:"", style:"", month:"", sort:"default" };
+  deleteTab = "all";
+  editMode = false;
+  selectedIds.clear();
+  document.querySelectorAll("#view-browse .tab-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelector('#view-browse .tab-btn[data-tab="all"]').classList.add("active");
+  document.querySelectorAll("#view-delete .tab-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelector('#view-delete .tab-btn[data-del-tab="all"]').classList.add("active");
+  document.getElementById("f-sort").value = "default";
+  refreshAll();
+  showUploadMsg(`${sourceLabel} 불러오기 완료 · ${DATA.length}개 항목`, true);
+  hideUploadModal();
+  showToast(`${sourceLabel} 불러오기 완료 · ${DATA.length}개 항목`, true);
+}
+
+function loadJsonFile(file){
+  if(!file) return;
+  if(!file.name.toLowerCase().endsWith(".json") && file.type !== "application/json"){
+    showUploadMsg("JSON 파일만 업로드할 수 있어요.", false);
+    showToast("JSON 파일만 업로드할 수 있어요.", false);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try{
+      const parsed = JSON.parse(e.target.result);
+      applyLoadedData(parsed, file.name);
+    }catch(err){
+      showUploadMsg("JSON을 읽는 데 실패했어요: " + err.message, false);
+      showToast("JSON을 읽는 데 실패했어요: " + err.message, false);
+    }
+  };
+  reader.onerror = () => {
+    showUploadMsg("파일을 읽는 데 실패했어요.", false);
+    showToast("파일을 읽는 데 실패했어요.", false);
+  };
+  reader.readAsText(file, "utf-8");
+}
+
+function loadSampleData(){
+  try{
+    applyLoadedData(JSON.parse(JSON.stringify(SAMPLE_DATA)), "샘플 데이터");
+  }catch(err){
+    showUploadMsg("샘플 데이터를 불러오는 데 실패했어요: " + err.message, false);
+    showToast("샘플 데이터를 불러오는 데 실패했어요: " + err.message, false);
+  }
+}
+
+function openFilePicker(){
+  fileInput.value = "";
+  fileInput.click();
+}
+dzBtn.addEventListener("click", (e)=>{ e.stopPropagation(); openFilePicker(); });
+dropzone.addEventListener("click", openFilePicker);
+fileInput.addEventListener("change", (e)=> loadJsonFile(e.target.files[0]));
+
+["dragenter","dragover"].forEach(evt=>{
+  dropzone.addEventListener(evt, (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    dropzone.classList.add("dragover");
+  });
+});
+["dragleave","drop"].forEach(evt=>{
+  dropzone.addEventListener(evt, (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    dropzone.classList.remove("dragover");
+  });
+});
+dropzone.addEventListener("drop", (e)=>{
+  const file = e.dataTransfer.files[0];
+  loadJsonFile(file);
+});
+
+refreshAll();
+if(DATA.length === 0) openUploadModal(false);
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.editor.EditorImageMapper">
+
+    <insert id="insert">
+        INSERT INTO editor_image (user_id, file_path, original_name, file_size)
+        VALUES (#{userId}, #{filePath}, #{originalName}, #{fileSize})
+    </insert>
+
+    <!-- 같은 트랜잭션(같은 커넥션)에서 방금 넣은 행의 id -->
+    <select id="selectLastInsertId" resultType="long">
+        SELECT LAST_INSERT_ID()
+    </select>
+
+</mapper>

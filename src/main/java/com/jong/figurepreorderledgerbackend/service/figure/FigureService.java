@@ -11,6 +11,7 @@ import com.jong.figurepreorderledgerbackend.mapper.maker.MakerMapper;
 import com.jong.figurepreorderledgerbackend.mapper.series.SeriesMapper;
 import com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper;
 import com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeMapper;
+import com.jong.figurepreorderledgerbackend.service.editor.EditorImageService;
 import com.jong.figurepreorderledgerbackend.vo.figure.FigureCharacterInfo;
 import com.jong.figurepreorderledgerbackend.vo.figure.FigureCreateRequest;
 import com.jong.figurepreorderledgerbackend.vo.figure.FigureDetailResponse;
@@ -42,6 +43,7 @@ public class FigureService {
     private final MakerMapper makerMapper;
     private final SeriesMapper seriesMapper;
     private final GenreCharacterMapper genreCharacterMapper;
+    private final EditorImageService editorImageService;
 
     public List<FigureListResponse> getList(Long userId) {
         List<FigureListResponse> figures = figureMapper.selectList(userId);
@@ -100,6 +102,7 @@ public class FigureService {
         List<Long> characterIds = distinct(request.getCharacterIds());
         checkCategories(userId, request.getFigureTypeId(), request.getShopId(), request.getMakerId(),
                 seriesIds, characterIds);
+        editorImageService.checkNoBase64(request.getDescription());
 
         request.setName(request.getName().trim());
         request.setDeliveryMonth(firstDayOfMonth(request.getDeliveryMonth()));
@@ -120,6 +123,7 @@ public class FigureService {
         List<Long> characterIds = distinct(request.getCharacterIds());
         checkCategories(userId, request.getFigureTypeId(), request.getShopId(), request.getMakerId(),
                 seriesIds, characterIds);
+        editorImageService.checkNoBase64(request.getDescription());
 
         request.setName(request.getName().trim());
         request.setDeliveryMonth(firstDayOfMonth(request.getDeliveryMonth()));
