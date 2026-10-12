@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterGroupMapper">
+
+    <select id="selectAll" resultType="GenreCharacterGroupResponse">
+        SELECT genre_character_group_id, name
+        FROM genre_character_group
+        WHERE user_id = #{userId}
+        ORDER BY genre_character_group_id
+    </select>
+
+    <select id="selectById" resultType="GenreCharacterGroupResponse">
+        SELECT genre_character_group_id, name
+        FROM genre_character_group
+        WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId}
+    </select>
+
+    <select id="selectByName" resultType="GenreCharacterGroupResponse">
+        SELECT genre_character_group_id, name
+        FROM genre_character_group
+        WHERE user_id = #{userId} AND name = #{name}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO genre_character_group (user_id, name)
+        VALUES (#{userId}, #{name})
+    </insert>
+
+    <update id="updateName">
+        UPDATE genre_character_group SET name = #{name}
+        WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId}
+    </update>
+
+    <!-- 하위(genre_character)는 FK의 ON DELETE CASCADE로 함께 지워진다 -->
+    <delete id="delete">
+        DELETE FROM genre_character_group
+        WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId}
+    </delete>
+
+    <!-- 상품을 옮겨 갈 기본 항목: 이름이 기타인 상위 아래의 기타 하위 -->
+    <select id="selectDefaultChildId" resultType="long">
+        SELECT c.genre_character_id
+        FROM genre_character c
+        JOIN genre_character_group p ON p.genre_character_group_id = c.genre_character_group_id AND p.user_id = c.user_id
+        WHERE c.user_id = #{userId} AND p.name = #{defaultName} AND c.name = #{defaultName}
+    </select>
+
+    <!-- 이 상위에 속한 하위 중 하나라도 쓰는 상품의 수 -->
+    <select id="countUsage" resultType="int">
+        SELECT COUNT(DISTINCT figure_id)
+        FROM figure_character_map
+        WHERE user_id = #{userId}
+          AND genre_character_id IN (SELECT genre_character_id FROM genre_character WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId})
+    </select>
+
+    <!-- 1단계: 이 상위의 하위만 가지고 있던 상품에 기본 항목을 연결한다. 다른 항목이 남은 상품에는 추가하지 않는다 -->
+    <insert id="moveInsertFallback">
+        INSERT INTO figure_character_map (user_id, figure_id, genre_character_id)
+        SELECT DISTINCT l.user_id, l.figure_id, #{fallbackId}
+        FROM figure_character_map l
+        WHERE l.user_id = #{userId}
+          AND l.genre_character_id IN (SELECT genre_character_id FROM genre_character WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId})
+          AND NOT EXISTS (
+              SELECT 1 FROM figure_character_map o
+              WHERE o.user_id = l.user_id AND o.figure_id = l.figure_id
+                AND o.genre_character_id NOT IN (SELECT genre_character_id FROM genre_character WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId})
+          )
+    </insert>
+
+    <!-- 2단계: 이 상위의 하위에 대한 연결을 지운다 -->
+    <delete id="moveDeleteLinks">
+        DELETE FROM figure_character_map
+        WHERE user_id = #{userId}
+          AND genre_character_id IN (SELECT genre_character_id FROM genre_character WHERE user_id = #{userId} AND genre_character_group_id = #{genreCharacterGroupId})
+    </delete>
+
+</mapper>
