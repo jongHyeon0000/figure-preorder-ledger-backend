@@ -17,6 +17,9 @@ app:
   upload:
     max-size: 5MB
     allowed-extensions: [jpg, jpeg, png, gif, webp]
+  jwt:
+    # 로그인 토큰 유효 시간(시간 단위). 서명 키(app.jwt.secret)는 프로파일별 파일에서 받는다
+    expiration-hours: 24
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml

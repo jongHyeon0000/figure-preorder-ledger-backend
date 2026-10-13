@@ -11,3 +11,6 @@ app:
     dir: ${PROD_UPLOAD_DIR:/data/figure-ledger/uploads}
   cors:
     allowed-origins: ${PROD_CORS_ORIGINS}
+  jwt:
+    # 환경변수 PROD_JWT_SECRET(32자 이상, 예: openssl rand -base64 48)이 없으면 기동에 실패한다
+    secret: ${PROD_JWT_SECRET}

@@ -152,6 +152,11 @@
         </foreach>
     </delete>
 
+    <delete id="deleteAllByUser">
+        DELETE FROM figure
+        WHERE user_id = #{userId}
+    </delete>
+
     <select id="selectCurrentStatus" resultType="FigureVO">
         SELECT figure_id, status, payment_type
         FROM figure

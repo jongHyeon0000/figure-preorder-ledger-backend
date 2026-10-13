@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.user.UserMapper">
+
+    <select id="selectByLoginId" resultType="UserVO">
+        SELECT user_id, login_id, email, name, password_hash, created_at, updated_at
+        FROM users
+        WHERE login_id = #{loginId}
+    </select>
+
+    <select id="selectByEmail" resultType="UserVO">
+        SELECT user_id, login_id, email, name, created_at, updated_at
+        FROM users
+        WHERE email = #{email}
+    </select>
+
+    <select id="selectById" resultType="UserVO">
+        SELECT user_id, login_id, email, name, created_at, updated_at
+        FROM users
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO users (login_id, email, name, password_hash)
+        VALUES (#{loginId}, #{email}, #{name}, #{passwordHash})
+    </insert>
+
+    <select id="selectLastInsertId" resultType="long">
+        SELECT LAST_INSERT_ID()
+    </select>
+
+    <delete id="delete">
+        DELETE FROM users
+        WHERE user_id = #{userId}
+    </delete>
+
+</mapper>

@@ -29,6 +29,8 @@ public interface FigureMapper {
 
     int deleteByIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);
 
+    int deleteAllByUser(@Param("userId") Long userId);
+
     FigureVO selectCurrentStatus(@Param("userId") Long userId, @Param("figureId") Long figureId);
 
     List<FigureVO> selectCurrentStatusByIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);

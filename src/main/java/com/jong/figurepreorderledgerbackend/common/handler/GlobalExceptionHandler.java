@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -69,10 +71,19 @@ public class GlobalExceptionHandler {
         return build(GlobalExceptionCode.BAD_REQUEST, "업로드 가능한 크기를 초과했습니다");
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthentication(AuthenticationException e) {
+        return build(GlobalExceptionCode.UNAUTHORIZED, GlobalExceptionCode.UNAUTHORIZED.getDefaultMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException e) {
+        return build(GlobalExceptionCode.FORBIDDEN, GlobalExceptionCode.FORBIDDEN.getDefaultMessage());
+    }
+
     /*
      * 위에서 잡지 못한 예외의 마지막 처리.
      * 스프링이 던지는 404, 405, 415 등(ErrorResponse)은 상태에 맞는 코드로, 나머지는 500으로 응답한다.
-     * 인증을 붙일 때는 AccessDeniedException, AuthenticationException이 여기서 500으로 바뀌지 않도록 따로 처리해야 한다.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {

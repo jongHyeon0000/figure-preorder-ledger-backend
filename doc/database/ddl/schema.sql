@@ -14,8 +14,9 @@
 -- ---------------------------------------------------------------- 계정
 CREATE TABLE users (
   user_id       BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  login_id      VARCHAR(30)  NOT NULL COMMENT '로그인 아이디',
+  login_id      VARCHAR(30)  CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '로그인 아이디(대소문자 구분)',
   email         VARCHAR(100) NOT NULL COMMENT '이메일',
+  name          VARCHAR(20)  NOT NULL COMMENT '닉네임(한글 포함 20자 이하)',
   password_hash VARCHAR(100) NOT NULL COMMENT '비밀번호 해시(BCrypt)',
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '가입일',
   updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',

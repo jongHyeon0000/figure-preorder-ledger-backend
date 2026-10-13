@@ -14,7 +14,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
  * 업로드 이미지 파일의 검증, 저장, 삭제를 한 곳에서 처리한다 (에디터 이미지, 썸네일, 고아 이미지 정리가 같이 쓴다).
@@ -100,6 +104,30 @@ public class ImageFileStore {
             return true;
         } catch (IOException e) {
             log.warn("이미지 파일 삭제 실패: {}", target, e);
+            return false;
+        }
+    }
+
+    /* 업로드 폴더 아래 폴더 하나를 통째로 지운다(탈퇴 때 {userId}). 업로드 폴더 밖이거나 실패하면 false(예외 없음) */
+    public boolean deleteDirectory(String dirPath) {
+        Path target = resolve(dirPath);
+        Path root = uploadProperties.getDir().toAbsolutePath().normalize();
+        if (target == null || target.equals(root)) {
+            log.warn("업로드 폴더 밖이거나 업로드 폴더 자체라 지우지 않음: {}", dirPath);
+            return false;
+        }
+        if (!Files.exists(target)) {
+            return true;
+        }
+        try (Stream<Path> paths = Files.walk(target)) {
+            // 깊은 경로부터 지운다
+            List<Path> deleteOrder = paths.sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+            for (Path path : deleteOrder) {
+                Files.deleteIfExists(path);
+            }
+            return true;
+        } catch (IOException e) {
+            log.warn("업로드 폴더 삭제 실패: {}", target, e);
             return false;
         }
     }

@@ -10,5 +10,6 @@ app:
     dir: ${user.home}/dev-tools/dev-resource/figure-preorder-ledger/uploads
   cors:
     allowed-origins: [http://localhost:5173]
-  dev:
-    user-id: 1
+  jwt:
+    # 로컬 개발 전용 더미 키(32자 이상). 공개 저장소에 올라가므로 운영에서는 절대 쓰지 않는다
+    secret: local-dev-only-jwt-secret-key-do-not-use-in-prod-0123456789
