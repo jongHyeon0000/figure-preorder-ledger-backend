@@ -38,7 +38,7 @@ public class GenreCharacterController {
             description = "응답: genreCharacterId, genreCharacterGroupId(상위 장르 id), name, description, thumbnailUrl")
     @GetMapping
     public ApiResponse<List<GenreCharacterVO>> getAll() {
-        return ApiResponse.ok(genreCharacterService.getAll(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", genreCharacterService.getAll(currentUser.getId()));
     }
 
     @Operation(
@@ -56,7 +56,7 @@ public class GenreCharacterController {
     })
     @PostMapping
     public ApiResponse<GenreCharacterVO> create(@Valid @RequestBody GenreCharacterVO request) {
-        return ApiResponse.ok(genreCharacterService.create(currentUser.getId(), request));
+        return ApiResponse.ok("저장이 완료되었습니다.", genreCharacterService.create(currentUser.getId(), request));
     }
 
     @Operation(
@@ -77,7 +77,7 @@ public class GenreCharacterController {
             @Parameter(description = "수정할 캐릭터 id", example = "1") @PathVariable Long genreCharacterId,
             @Valid @RequestBody GenreCharacterVO request) {
         genreCharacterService.update(currentUser.getId(), genreCharacterId, request);
-        return ApiResponse.ok();
+        return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
     @Operation(
@@ -92,7 +92,7 @@ public class GenreCharacterController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 캐릭터 id", example = "1") @PathVariable Long genreCharacterId) {
         genreCharacterService.delete(currentUser.getId(), genreCharacterId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
     @Operation(
@@ -105,6 +105,6 @@ public class GenreCharacterController {
     @GetMapping("/{genreCharacterId}/usage")
     public ApiResponse<UsageResponse> getUsage(
             @Parameter(description = "조회할 캐릭터 id", example = "1") @PathVariable Long genreCharacterId) {
-        return ApiResponse.ok(genreCharacterService.getUsage(currentUser.getId(), genreCharacterId));
+        return ApiResponse.ok("조회가 완료되었습니다.", genreCharacterService.getUsage(currentUser.getId(), genreCharacterId));
     }
 }

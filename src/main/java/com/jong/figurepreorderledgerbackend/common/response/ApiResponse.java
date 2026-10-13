@@ -12,7 +12,7 @@ public class ApiResponse<T> {
     @Schema(description = "결과 코드. 성공은 OK, 실패는 에러 코드", example = "OK")
     private final String code;
 
-    @Schema(description = "실패 시 사용자에게 보여 줄 메시지. 성공이면 없음", nullable = true)
+    @Schema(description = "사용자에게 그대로 보여 줄 메시지. 성공, 실패 모두 항상 채워진다", example = "저장이 완료되었습니다.")
     private final String message;
 
     @Schema(description = "응답 본문. 실패하거나 돌려줄 값이 없으면 null", nullable = true)
@@ -24,12 +24,12 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
-    public static <T> ApiResponse<T> ok(T data) {
-        return new ApiResponse<>(OK, null, data);
+    public static <T> ApiResponse<T> ok(String message, T data) {
+        return new ApiResponse<>(OK, message, data);
     }
 
-    public static ApiResponse<Void> ok() {
-        return new ApiResponse<>(OK, null, null);
+    public static ApiResponse<Void> ok(String message) {
+        return new ApiResponse<>(OK, message, null);
     }
 
     public static ApiResponse<Void> error(String code, String message) {

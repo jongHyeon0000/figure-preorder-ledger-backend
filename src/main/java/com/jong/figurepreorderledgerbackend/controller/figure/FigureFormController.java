@@ -32,6 +32,6 @@ public class FigureFormController {
                     + "| `makers` | 제조사 (상하위 없이 평면) |")
     @GetMapping
     public ApiResponse<FigureFormOptionsResponse> getOptions() {
-        return ApiResponse.ok(figureFormService.getOptions(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", figureFormService.getOptions(currentUser.getId()));
     }
 }

@@ -38,7 +38,7 @@ public class FigureTypeGroupController {
             description = "응답: figureTypeGroupId, name, description, thumbnailUrl, children(형태 하위 목록: figureTypeId, figureTypeGroupId, name, description, thumbnailUrl)")
     @GetMapping
     public ApiResponse<List<FigureTypeGroupVO>> getTree() {
-        return ApiResponse.ok(figureTypeGroupService.getTree(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", figureTypeGroupService.getTree(currentUser.getId()));
     }
 
     @Operation(
@@ -55,7 +55,7 @@ public class FigureTypeGroupController {
     })
     @PostMapping
     public ApiResponse<FigureTypeGroupVO> create(@Valid @RequestBody FigureTypeGroupVO request) {
-        return ApiResponse.ok(figureTypeGroupService.create(currentUser.getId(), request));
+        return ApiResponse.ok("저장이 완료되었습니다.", figureTypeGroupService.create(currentUser.getId(), request));
     }
 
     @Operation(
@@ -76,7 +76,7 @@ public class FigureTypeGroupController {
             @Parameter(description = "수정할 형태 id", example = "1") @PathVariable Long figureTypeGroupId,
             @Valid @RequestBody FigureTypeGroupVO request) {
         figureTypeGroupService.update(currentUser.getId(), figureTypeGroupId, request);
-        return ApiResponse.ok();
+        return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
     @Operation(
@@ -91,7 +91,7 @@ public class FigureTypeGroupController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 형태 id", example = "1") @PathVariable Long figureTypeGroupId) {
         figureTypeGroupService.delete(currentUser.getId(), figureTypeGroupId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
     @Operation(
@@ -104,6 +104,6 @@ public class FigureTypeGroupController {
     @GetMapping("/{figureTypeGroupId}/usage")
     public ApiResponse<UsageResponse> getUsage(
             @Parameter(description = "조회할 형태 id", example = "1") @PathVariable Long figureTypeGroupId) {
-        return ApiResponse.ok(figureTypeGroupService.getUsage(currentUser.getId(), figureTypeGroupId));
+        return ApiResponse.ok("조회가 완료되었습니다.", figureTypeGroupService.getUsage(currentUser.getId(), figureTypeGroupId));
     }
 }

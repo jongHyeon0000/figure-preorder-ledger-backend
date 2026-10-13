@@ -38,7 +38,7 @@ public class MakerController {
             description = "응답: makerId, name, description, thumbnailUrl")
     @GetMapping
     public ApiResponse<List<MakerVO>> getAll() {
-        return ApiResponse.ok(makerService.getAll(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", makerService.getAll(currentUser.getId()));
     }
 
     @Operation(
@@ -55,7 +55,7 @@ public class MakerController {
     })
     @PostMapping
     public ApiResponse<MakerVO> create(@Valid @RequestBody MakerVO request) {
-        return ApiResponse.ok(makerService.create(currentUser.getId(), request));
+        return ApiResponse.ok("저장이 완료되었습니다.", makerService.create(currentUser.getId(), request));
     }
 
     @Operation(
@@ -76,7 +76,7 @@ public class MakerController {
             @Parameter(description = "수정할 제조사 id", example = "1") @PathVariable Long makerId,
             @Valid @RequestBody MakerVO request) {
         makerService.update(currentUser.getId(), makerId, request);
-        return ApiResponse.ok();
+        return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
     @Operation(
@@ -91,7 +91,7 @@ public class MakerController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 제조사 id", example = "1") @PathVariable Long makerId) {
         makerService.delete(currentUser.getId(), makerId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
     @Operation(
@@ -104,6 +104,6 @@ public class MakerController {
     @GetMapping("/{makerId}/usage")
     public ApiResponse<UsageResponse> getUsage(
             @Parameter(description = "조회할 제조사 id", example = "1") @PathVariable Long makerId) {
-        return ApiResponse.ok(makerService.getUsage(currentUser.getId(), makerId));
+        return ApiResponse.ok("조회가 완료되었습니다.", makerService.getUsage(currentUser.getId(), makerId));
     }
 }

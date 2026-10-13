@@ -38,7 +38,7 @@ public class ShopController {
             description = "응답: shopId, shopGroupId(상위 판매처 채널 id), name, description, thumbnailUrl")
     @GetMapping
     public ApiResponse<List<ShopVO>> getAll() {
-        return ApiResponse.ok(shopService.getAll(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", shopService.getAll(currentUser.getId()));
     }
 
     @Operation(
@@ -56,7 +56,7 @@ public class ShopController {
     })
     @PostMapping
     public ApiResponse<ShopVO> create(@Valid @RequestBody ShopVO request) {
-        return ApiResponse.ok(shopService.create(currentUser.getId(), request));
+        return ApiResponse.ok("저장이 완료되었습니다.", shopService.create(currentUser.getId(), request));
     }
 
     @Operation(
@@ -77,7 +77,7 @@ public class ShopController {
             @Parameter(description = "수정할 판매처 스토어 id", example = "1") @PathVariable Long shopId,
             @Valid @RequestBody ShopVO request) {
         shopService.update(currentUser.getId(), shopId, request);
-        return ApiResponse.ok();
+        return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
     @Operation(
@@ -92,7 +92,7 @@ public class ShopController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 판매처 스토어 id", example = "1") @PathVariable Long shopId) {
         shopService.delete(currentUser.getId(), shopId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
     @Operation(
@@ -105,6 +105,6 @@ public class ShopController {
     @GetMapping("/{shopId}/usage")
     public ApiResponse<UsageResponse> getUsage(
             @Parameter(description = "조회할 판매처 스토어 id", example = "1") @PathVariable Long shopId) {
-        return ApiResponse.ok(shopService.getUsage(currentUser.getId(), shopId));
+        return ApiResponse.ok("조회가 완료되었습니다.", shopService.getUsage(currentUser.getId(), shopId));
     }
 }

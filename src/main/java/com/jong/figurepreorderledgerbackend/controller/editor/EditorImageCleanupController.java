@@ -26,6 +26,6 @@ public class EditorImageCleanupController {
             description = "응답: scannedCount: 정리 대상 수, deletedCount: 삭제 수, failedCount: 실패 수")
     @PostMapping
     public ApiResponse<EditorImageCleanupResponse> cleanup() {
-        return ApiResponse.ok(editorImageCleanupService.cleanup());
+        return ApiResponse.ok("정리가 완료되었습니다.", editorImageCleanupService.cleanup());
     }
 }

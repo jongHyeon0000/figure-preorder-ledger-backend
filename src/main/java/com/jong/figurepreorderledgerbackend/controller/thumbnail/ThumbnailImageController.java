@@ -42,7 +42,7 @@ public class ThumbnailImageController {
             @Parameter(description = "대상 id", example = "1") @PathVariable Long targetId,
             @Parameter(description = "업로드할 이미지 파일 (본문 multipart, 필드명 file, 필수, jpg/jpeg/png/gif/webp, 최대 5MB)") @RequestParam("file") MultipartFile file) {
         ThumbnailTarget target = ThumbnailTarget.fromUrlValue(targetType);
-        return ApiResponse.ok(thumbnailImageService.upload(currentUser.getId(), target, targetId, file));
+        return ApiResponse.ok("업로드가 완료되었습니다.", thumbnailImageService.upload(currentUser.getId(), target, targetId, file));
     }
 
     @Operation(
@@ -58,6 +58,6 @@ public class ThumbnailImageController {
             @Parameter(description = "썸네일을 지울 대상 종류", example = "figure") @PathVariable String targetType,
             @Parameter(description = "대상 id", example = "1") @PathVariable Long targetId) {
         thumbnailImageService.delete(currentUser.getId(), ThumbnailTarget.fromUrlValue(targetType), targetId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 }

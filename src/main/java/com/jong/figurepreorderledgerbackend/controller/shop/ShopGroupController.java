@@ -38,7 +38,7 @@ public class ShopGroupController {
             description = "응답: shopGroupId, name, description, thumbnailUrl, children(판매처 스토어 목록: shopId, shopGroupId, name, description, thumbnailUrl)")
     @GetMapping
     public ApiResponse<List<ShopGroupVO>> getTree() {
-        return ApiResponse.ok(shopGroupService.getTree(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", shopGroupService.getTree(currentUser.getId()));
     }
 
     @Operation(
@@ -55,7 +55,7 @@ public class ShopGroupController {
     })
     @PostMapping
     public ApiResponse<ShopGroupVO> create(@Valid @RequestBody ShopGroupVO request) {
-        return ApiResponse.ok(shopGroupService.create(currentUser.getId(), request));
+        return ApiResponse.ok("저장이 완료되었습니다.", shopGroupService.create(currentUser.getId(), request));
     }
 
     @Operation(
@@ -76,7 +76,7 @@ public class ShopGroupController {
             @Parameter(description = "수정할 판매처 채널 id", example = "1") @PathVariable Long shopGroupId,
             @Valid @RequestBody ShopGroupVO request) {
         shopGroupService.update(currentUser.getId(), shopGroupId, request);
-        return ApiResponse.ok();
+        return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
     @Operation(
@@ -91,7 +91,7 @@ public class ShopGroupController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 판매처 채널 id", example = "1") @PathVariable Long shopGroupId) {
         shopGroupService.delete(currentUser.getId(), shopGroupId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
     @Operation(
@@ -104,6 +104,6 @@ public class ShopGroupController {
     @GetMapping("/{shopGroupId}/usage")
     public ApiResponse<UsageResponse> getUsage(
             @Parameter(description = "조회할 판매처 채널 id", example = "1") @PathVariable Long shopGroupId) {
-        return ApiResponse.ok(shopGroupService.getUsage(currentUser.getId(), shopGroupId));
+        return ApiResponse.ok("조회가 완료되었습니다.", shopGroupService.getUsage(currentUser.getId(), shopGroupId));
     }
 }

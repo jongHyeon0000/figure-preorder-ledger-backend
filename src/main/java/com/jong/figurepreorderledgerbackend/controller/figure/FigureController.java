@@ -45,7 +45,7 @@ public class FigureController {
                     + "캐릭터(`characters`, 상위 장르 포함)가 들어 있다. 상세 설명(`description`)은 제외한다.")
     @GetMapping
     public ApiResponse<List<FigureResponseVO>> getList() {
-        return ApiResponse.ok(figureService.getList(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", figureService.getList(currentUser.getId()));
     }
 
     @Operation(
@@ -58,7 +58,7 @@ public class FigureController {
     @GetMapping("/{figureId}")
     public ApiResponse<FigureResponseVO> getDetail(
             @Parameter(description = "조회할 상품 id", example = "12") @PathVariable Long figureId) {
-        return ApiResponse.ok(figureService.getDetail(currentUser.getId(), figureId));
+        return ApiResponse.ok("조회가 완료되었습니다.", figureService.getDetail(currentUser.getId(), figureId));
     }
 
     @Operation(
@@ -82,7 +82,7 @@ public class FigureController {
     })
     @PostMapping
     public ApiResponse<FigureResponseVO> create(@Valid @RequestBody FigureSaveRequestVO request) {
-        return ApiResponse.ok(figureService.create(currentUser.getId(), request));
+        return ApiResponse.ok("저장이 완료되었습니다.", figureService.create(currentUser.getId(), request));
     }
 
     @Operation(
@@ -98,7 +98,7 @@ public class FigureController {
     public ApiResponse<FigureResponseVO> update(
             @Parameter(description = "수정할 상품 id", example = "12") @PathVariable Long figureId,
             @Valid @RequestBody FigureSaveRequestVO request) {
-        return ApiResponse.ok(figureService.update(currentUser.getId(), figureId, request));
+        return ApiResponse.ok("수정이 완료되었습니다.", figureService.update(currentUser.getId(), figureId, request));
     }
 
     @Operation(
@@ -134,7 +134,7 @@ public class FigureController {
     public ApiResponse<FigureResponseVO> changeStatus(
             @Parameter(description = "전이할 상품 id", example = "12") @PathVariable Long figureId,
             @Valid @RequestBody FigureStatusRequestVO request) {
-        return ApiResponse.ok(figureStatusService.change(currentUser.getId(), figureId, request));
+        return ApiResponse.ok("상태 변경이 완료되었습니다.", figureStatusService.change(currentUser.getId(), figureId, request));
     }
 
     @Operation(
@@ -153,7 +153,7 @@ public class FigureController {
     })
     @PatchMapping("/status")
     public ApiResponse<List<Long>> changeStatusAll(@Valid @RequestBody FigureStatusRequestVO request) {
-        return ApiResponse.ok(figureStatusService.changeAll(currentUser.getId(), request));
+        return ApiResponse.ok("상태 변경이 완료되었습니다.", figureStatusService.changeAll(currentUser.getId(), request));
     }
 
     @Operation(
@@ -167,7 +167,7 @@ public class FigureController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 상품 id", example = "12") @PathVariable Long figureId) {
         figureService.delete(currentUser.getId(), figureId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
     @Operation(
@@ -183,6 +183,6 @@ public class FigureController {
             @Parameter(description = "삭제할 상품 id 목록 (쉼표로 구분)", example = "1,2,3", required = true)
             @RequestParam List<Long> figureIds) {
         figureService.deleteAll(currentUser.getId(), figureIds);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 }

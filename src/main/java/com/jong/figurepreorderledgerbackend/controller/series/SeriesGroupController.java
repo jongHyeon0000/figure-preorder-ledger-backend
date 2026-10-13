@@ -38,7 +38,7 @@ public class SeriesGroupController {
             description = "응답: seriesGroupId, name, description, thumbnailUrl, children(시리즈 목록: seriesId, seriesGroupId, name, description, thumbnailUrl)")
     @GetMapping
     public ApiResponse<List<SeriesGroupVO>> getTree() {
-        return ApiResponse.ok(seriesGroupService.getTree(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", seriesGroupService.getTree(currentUser.getId()));
     }
 
     @Operation(
@@ -55,7 +55,7 @@ public class SeriesGroupController {
     })
     @PostMapping
     public ApiResponse<SeriesGroupVO> create(@Valid @RequestBody SeriesGroupVO request) {
-        return ApiResponse.ok(seriesGroupService.create(currentUser.getId(), request));
+        return ApiResponse.ok("저장이 완료되었습니다.", seriesGroupService.create(currentUser.getId(), request));
     }
 
     @Operation(
@@ -76,7 +76,7 @@ public class SeriesGroupController {
             @Parameter(description = "수정할 시리즈 그룹 id", example = "1") @PathVariable Long seriesGroupId,
             @Valid @RequestBody SeriesGroupVO request) {
         seriesGroupService.update(currentUser.getId(), seriesGroupId, request);
-        return ApiResponse.ok();
+        return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
     @Operation(
@@ -91,7 +91,7 @@ public class SeriesGroupController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 시리즈 그룹 id", example = "1") @PathVariable Long seriesGroupId) {
         seriesGroupService.delete(currentUser.getId(), seriesGroupId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
     @Operation(
@@ -104,6 +104,6 @@ public class SeriesGroupController {
     @GetMapping("/{seriesGroupId}/usage")
     public ApiResponse<UsageResponse> getUsage(
             @Parameter(description = "조회할 시리즈 그룹 id", example = "1") @PathVariable Long seriesGroupId) {
-        return ApiResponse.ok(seriesGroupService.getUsage(currentUser.getId(), seriesGroupId));
+        return ApiResponse.ok("조회가 완료되었습니다.", seriesGroupService.getUsage(currentUser.getId(), seriesGroupId));
     }
 }

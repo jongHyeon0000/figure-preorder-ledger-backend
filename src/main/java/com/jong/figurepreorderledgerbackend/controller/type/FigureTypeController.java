@@ -38,7 +38,7 @@ public class FigureTypeController {
             description = "응답: figureTypeId, figureTypeGroupId(상위 형태 id), name, description, thumbnailUrl")
     @GetMapping
     public ApiResponse<List<FigureTypeVO>> getAll() {
-        return ApiResponse.ok(figureTypeService.getAll(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", figureTypeService.getAll(currentUser.getId()));
     }
 
     @Operation(
@@ -56,7 +56,7 @@ public class FigureTypeController {
     })
     @PostMapping
     public ApiResponse<FigureTypeVO> create(@Valid @RequestBody FigureTypeVO request) {
-        return ApiResponse.ok(figureTypeService.create(currentUser.getId(), request));
+        return ApiResponse.ok("저장이 완료되었습니다.", figureTypeService.create(currentUser.getId(), request));
     }
 
     @Operation(
@@ -77,7 +77,7 @@ public class FigureTypeController {
             @Parameter(description = "수정할 형태 하위 id", example = "1") @PathVariable Long figureTypeId,
             @Valid @RequestBody FigureTypeVO request) {
         figureTypeService.update(currentUser.getId(), figureTypeId, request);
-        return ApiResponse.ok();
+        return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
     @Operation(
@@ -92,7 +92,7 @@ public class FigureTypeController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 형태 하위 id", example = "1") @PathVariable Long figureTypeId) {
         figureTypeService.delete(currentUser.getId(), figureTypeId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
     @Operation(
@@ -105,6 +105,6 @@ public class FigureTypeController {
     @GetMapping("/{figureTypeId}/usage")
     public ApiResponse<UsageResponse> getUsage(
             @Parameter(description = "조회할 형태 하위 id", example = "1") @PathVariable Long figureTypeId) {
-        return ApiResponse.ok(figureTypeService.getUsage(currentUser.getId(), figureTypeId));
+        return ApiResponse.ok("조회가 완료되었습니다.", figureTypeService.getUsage(currentUser.getId(), figureTypeId));
     }
 }

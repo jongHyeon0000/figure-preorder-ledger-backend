@@ -35,6 +35,6 @@ public class EditorImageController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<EditorImageVO> upload(
             @Parameter(description = "업로드할 이미지 파일 (본문 multipart, 필드명 file, 필수, jpg/jpeg/png/gif/webp, 최대 5MB)") @RequestParam("file") MultipartFile file) {
-        return ApiResponse.ok(editorImageService.upload(currentUser.getId(), file));
+        return ApiResponse.ok("이미지 업로드가 완료되었습니다.", editorImageService.upload(currentUser.getId(), file));
     }
 }

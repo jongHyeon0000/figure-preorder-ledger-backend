@@ -38,7 +38,7 @@ public class GenreCharacterGroupController {
             description = "응답: genreCharacterGroupId, name, description, thumbnailUrl, children(캐릭터 목록: genreCharacterId, genreCharacterGroupId, name, description, thumbnailUrl)")
     @GetMapping
     public ApiResponse<List<GenreCharacterGroupVO>> getTree() {
-        return ApiResponse.ok(genreCharacterGroupService.getTree(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", genreCharacterGroupService.getTree(currentUser.getId()));
     }
 
     @Operation(
@@ -55,7 +55,7 @@ public class GenreCharacterGroupController {
     })
     @PostMapping
     public ApiResponse<GenreCharacterGroupVO> create(@Valid @RequestBody GenreCharacterGroupVO request) {
-        return ApiResponse.ok(genreCharacterGroupService.create(currentUser.getId(), request));
+        return ApiResponse.ok("저장이 완료되었습니다.", genreCharacterGroupService.create(currentUser.getId(), request));
     }
 
     @Operation(
@@ -76,7 +76,7 @@ public class GenreCharacterGroupController {
             @Parameter(description = "수정할 장르 id", example = "1") @PathVariable Long genreCharacterGroupId,
             @Valid @RequestBody GenreCharacterGroupVO request) {
         genreCharacterGroupService.update(currentUser.getId(), genreCharacterGroupId, request);
-        return ApiResponse.ok();
+        return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
     @Operation(
@@ -91,7 +91,7 @@ public class GenreCharacterGroupController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 장르 id", example = "1") @PathVariable Long genreCharacterGroupId) {
         genreCharacterGroupService.delete(currentUser.getId(), genreCharacterGroupId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
     @Operation(
@@ -104,6 +104,6 @@ public class GenreCharacterGroupController {
     @GetMapping("/{genreCharacterGroupId}/usage")
     public ApiResponse<UsageResponse> getUsage(
             @Parameter(description = "조회할 장르 id", example = "1") @PathVariable Long genreCharacterGroupId) {
-        return ApiResponse.ok(genreCharacterGroupService.getUsage(currentUser.getId(), genreCharacterGroupId));
+        return ApiResponse.ok("조회가 완료되었습니다.", genreCharacterGroupService.getUsage(currentUser.getId(), genreCharacterGroupId));
     }
 }

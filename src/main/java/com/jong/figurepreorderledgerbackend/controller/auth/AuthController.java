@@ -47,7 +47,7 @@ public class AuthController {
     })
     @PostMapping("/signup")
     public ApiResponse<UserVO> signup(@Valid @RequestBody UserVO request) {
-        return ApiResponse.ok(authService.signup(request));
+        return ApiResponse.ok("가입이 완료되었습니다.", authService.signup(request));
     }
 
     @Operation(
@@ -67,7 +67,7 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequestVO request) {
-        return ApiResponse.ok(authService.login(request));
+        return ApiResponse.ok("로그인되었습니다.", authService.login(request));
     }
 
     @Operation(
@@ -79,7 +79,7 @@ public class AuthController {
     })
     @GetMapping("/me")
     public ApiResponse<UserVO> getMe() {
-        return ApiResponse.ok(authService.getMe(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", authService.getMe(currentUser.getId()));
     }
 
     @Operation(
@@ -98,6 +98,6 @@ public class AuthController {
     @DeleteMapping("/me")
     public ApiResponse<Void> withdraw(@Valid @RequestBody WithdrawRequestVO request) {
         authService.withdraw(currentUser.getId(), request.getPassword());
-        return ApiResponse.ok();
+        return ApiResponse.ok("탈퇴가 완료되었습니다.");
     }
 }

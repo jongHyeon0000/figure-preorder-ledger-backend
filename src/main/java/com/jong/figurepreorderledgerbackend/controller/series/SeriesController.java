@@ -38,7 +38,7 @@ public class SeriesController {
             description = "응답: seriesId, seriesGroupId(상위 시리즈 그룹 id), name, description, thumbnailUrl")
     @GetMapping
     public ApiResponse<List<SeriesVO>> getAll() {
-        return ApiResponse.ok(seriesService.getAll(currentUser.getId()));
+        return ApiResponse.ok("조회가 완료되었습니다.", seriesService.getAll(currentUser.getId()));
     }
 
     @Operation(
@@ -56,7 +56,7 @@ public class SeriesController {
     })
     @PostMapping
     public ApiResponse<SeriesVO> create(@Valid @RequestBody SeriesVO request) {
-        return ApiResponse.ok(seriesService.create(currentUser.getId(), request));
+        return ApiResponse.ok("저장이 완료되었습니다.", seriesService.create(currentUser.getId(), request));
     }
 
     @Operation(
@@ -77,7 +77,7 @@ public class SeriesController {
             @Parameter(description = "수정할 시리즈 id", example = "1") @PathVariable Long seriesId,
             @Valid @RequestBody SeriesVO request) {
         seriesService.update(currentUser.getId(), seriesId, request);
-        return ApiResponse.ok();
+        return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
     @Operation(
@@ -92,7 +92,7 @@ public class SeriesController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 시리즈 id", example = "1") @PathVariable Long seriesId) {
         seriesService.delete(currentUser.getId(), seriesId);
-        return ApiResponse.ok();
+        return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
     @Operation(
@@ -105,6 +105,6 @@ public class SeriesController {
     @GetMapping("/{seriesId}/usage")
     public ApiResponse<UsageResponse> getUsage(
             @Parameter(description = "조회할 시리즈 id", example = "1") @PathVariable Long seriesId) {
-        return ApiResponse.ok(seriesService.getUsage(currentUser.getId(), seriesId));
+        return ApiResponse.ok("조회가 완료되었습니다.", seriesService.getUsage(currentUser.getId(), seriesId));
     }
 }
