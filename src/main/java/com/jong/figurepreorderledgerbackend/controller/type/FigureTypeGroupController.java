@@ -5,6 +5,12 @@ import com.jong.figurepreorderledgerbackend.common.security.CurrentUser;
 import com.jong.figurepreorderledgerbackend.service.type.FigureTypeGroupService;
 import com.jong.figurepreorderledgerbackend.vo.common.UsageResponse;
 import com.jong.figurepreorderledgerbackend.vo.type.FigureTypeGroupVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "형태", description = "형태 상위 분류(예: 스케일, 넨도로이드). 추가하면 기본 하위 '기타'가 함께 만들어진다.")
 @RestController
 @RequestMapping("/api/figure-type-group")
 @RequiredArgsConstructor
@@ -26,73 +33,77 @@ public class FigureTypeGroupController {
     private final FigureTypeGroupService figureTypeGroupService;
     private final CurrentUser currentUser;
 
-    /**
-     * 형태 목록 조회, 하위 형태 하위 중첩 (예: 스케일, 넨도로이드)
-     * [GET] 목록 | /api/figure-type-group
-     *
-     * @return ApiResponse<List<FigureTypeGroupVO>> figureTypeGroupId, name, description, thumbnailUrl, children(형태 하위 목록: figureTypeId, figureTypeGroupId, name, description, thumbnailUrl)
-     */
+    @Operation(
+            summary = "형태 목록 조회, 하위 형태 하위 중첩 (예: 스케일, 넨도로이드)",
+            description = "응답: figureTypeGroupId, name, description, thumbnailUrl, children(형태 하위 목록: figureTypeId, figureTypeGroupId, name, description, thumbnailUrl)")
     @GetMapping
     public ApiResponse<List<FigureTypeGroupVO>> getTree() {
         return ApiResponse.ok(figureTypeGroupService.getTree(currentUser.getId()));
     }
 
-    /**
-     * 형태 추가, 기본 하위 '기타' 자동 생성 (예: 스케일, 넨도로이드)
-     * [POST] 단일 | /api/figure-type-group
-     *
-     * @param request name: 형태 이름 (본문, 필수, 100자 이하), description: 설명 (본문, 선택, 1000자 이하)
-     *
-     * @return ApiResponse<FigureTypeGroupVO> 생성된 figureTypeGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)
-     * @throws 400 이름 중복, 입력값 오류
-     */
+    @Operation(
+            summary = "형태 추가, 기본 하위 '기타' 자동 생성 (예: 스케일, 넨도로이드)",
+            description = "요청 본문: name: 형태 이름 (본문, 필수, 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
+                    + "응답: 생성된 figureTypeGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "추가 예",
+                    value = "{\"name\":\"스케일\",\"description\":\"설명(선택)\"}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 figureTypeGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "이름 중복, 입력값 오류")
+    })
     @PostMapping
     public ApiResponse<FigureTypeGroupVO> create(@Valid @RequestBody FigureTypeGroupVO request) {
         return ApiResponse.ok(figureTypeGroupService.create(currentUser.getId(), request));
     }
 
-    /**
-     * 형태 이름과 설명 수정 (예: 스케일, 넨도로이드)
-     * [PUT] 단일 | /api/figure-type-group/{figureTypeGroupId}
-     *
-     * @param figureTypeGroupId 수정할 형태 id (경로)
-     * @param request           name: 새 이름 (본문, 필수, 100자 이하), description: 새 설명 (본문, 선택, 1000자 이하, 생략하면 설명 삭제)
-     *
-     * @return ApiResponse<Void> 성공 시 data 없음
-     * @throws 404 대상 없음 | 400 기타 이름 변경 불가, 이름 중복, 입력값 오류
-     */
+    @Operation(
+            summary = "형태 이름과 설명 수정 (예: 스케일, 넨도로이드)",
+            description = "요청 본문: name: 새 이름 (본문, 필수, 100자 이하), description: 새 설명 (본문, 선택, 1000자 이하, 생략하면 설명 삭제)\n\n"
+                    + "응답: 성공 시 data 없음")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "수정 예",
+                    value = "{\"name\":\"새 이름\",\"description\":\"새 설명(생략하면 설명 삭제)\"}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "기타 이름 변경 불가, 이름 중복, 입력값 오류"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "대상 없음")
+    })
     @PutMapping("/{figureTypeGroupId}")
-    public ApiResponse<Void> update(@PathVariable Long figureTypeGroupId, @Valid @RequestBody FigureTypeGroupVO request) {
+    public ApiResponse<Void> update(
+            @Parameter(description = "수정할 형태 id", example = "1") @PathVariable Long figureTypeGroupId,
+            @Valid @RequestBody FigureTypeGroupVO request) {
         figureTypeGroupService.update(currentUser.getId(), figureTypeGroupId, request);
         return ApiResponse.ok();
     }
 
-    /**
-     * 형태 삭제, 하위와 쓰던 상품은 '기타'로 이동 (예: 스케일, 넨도로이드)
-     * [DELETE] 없음 | /api/figure-type-group/{figureTypeGroupId}
-     *
-     * @param figureTypeGroupId 삭제할 형태 id (경로)
-     *
-     * @return ApiResponse<Void> 성공 시 data 없음
-     * @throws 404 대상 없음 | 400 기타 삭제 불가
-     */
+    @Operation(
+            summary = "형태 삭제, 하위와 쓰던 상품은 '기타'로 이동 (예: 스케일, 넨도로이드)",
+            description = "응답: 성공 시 data 없음")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "기타 삭제 불가"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "대상 없음")
+    })
     @DeleteMapping("/{figureTypeGroupId}")
-    public ApiResponse<Void> delete(@PathVariable Long figureTypeGroupId) {
+    public ApiResponse<Void> delete(
+            @Parameter(description = "삭제할 형태 id", example = "1") @PathVariable Long figureTypeGroupId) {
         figureTypeGroupService.delete(currentUser.getId(), figureTypeGroupId);
         return ApiResponse.ok();
     }
 
-    /**
-     * 형태 삭제 전 영향 상품 수 조회 (예: 스케일, 넨도로이드)
-     * [GET] 단일 | /api/figure-type-group/{figureTypeGroupId}/usage
-     *
-     * @param figureTypeGroupId 조회할 형태 id (경로)
-     *
-     * @return ApiResponse<UsageResponse> count: 이 형태의 하위를 쓰는 상품 수
-     * @throws 404 대상 없음
-     */
+    @Operation(
+            summary = "형태 삭제 전 영향 상품 수 조회 (예: 스케일, 넨도로이드)",
+            description = "응답: count: 이 형태의 하위를 쓰는 상품 수")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "count: 이 형태의 하위를 쓰는 상품 수"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "대상 없음")
+    })
     @GetMapping("/{figureTypeGroupId}/usage")
-    public ApiResponse<UsageResponse> getUsage(@PathVariable Long figureTypeGroupId) {
+    public ApiResponse<UsageResponse> getUsage(
+            @Parameter(description = "조회할 형태 id", example = "1") @PathVariable Long figureTypeGroupId) {
         return ApiResponse.ok(figureTypeGroupService.getUsage(currentUser.getId(), figureTypeGroupId));
     }
 }

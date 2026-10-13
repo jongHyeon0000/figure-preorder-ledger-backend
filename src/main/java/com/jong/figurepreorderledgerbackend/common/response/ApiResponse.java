@@ -1,14 +1,21 @@
 package com.jong.figurepreorderledgerbackend.common.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
+@Schema(description = "모든 응답의 공통 래퍼 {code, message, data}")
 public class ApiResponse<T> {
 
     private static final String OK = "OK";
 
+    @Schema(description = "결과 코드. 성공은 OK, 실패는 에러 코드", example = "OK")
     private final String code;
+
+    @Schema(description = "실패 시 사용자에게 보여 줄 메시지. 성공이면 없음", nullable = true)
     private final String message;
+
+    @Schema(description = "응답 본문. 실패하거나 돌려줄 값이 없으면 null", nullable = true)
     private final T data;
 
     private ApiResponse(String code, String message, T data) {
