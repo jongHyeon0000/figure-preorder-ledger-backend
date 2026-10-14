@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -29,7 +30,10 @@ public class SeriesServiceImpl implements SeriesService {
 
     @Override
     public List<SeriesVO> getAll(Long userId) {
-        return seriesMapper.selectAll(userId);
+        List<SeriesVO> list = seriesMapper.selectAll(userId);
+        // 아무 카테고리에도 해당되지 않는 미분류(기타)는 항상 맨 뒤로 보낸다(안정 정렬이라 나머지는 생성 순 유지)
+        list.sort(Comparator.comparing(v -> CategoryConstant.DEFAULT_NAME.equals(v.getName())));
+        return list;
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -33,6 +34,9 @@ public class FigureTypeGroupServiceImpl implements FigureTypeGroupService {
     public List<FigureTypeGroupVO> getTree(Long userId) {
         List<FigureTypeGroupVO> parents = figureTypeGroupMapper.selectAll(userId);
         List<FigureTypeVO> children = figureTypeMapper.selectAll(userId);
+        // 아무 카테고리에도 해당되지 않는 미분류(기타)는 항상 맨 뒤로 보낸다(안정 정렬이라 나머지는 생성 순 유지)
+        parents.sort(Comparator.comparing(p -> CategoryConstant.DEFAULT_NAME.equals(p.getName())));
+        children.sort(Comparator.comparing(c -> CategoryConstant.DEFAULT_NAME.equals(c.getName())));
         for (FigureTypeGroupVO parent : parents) {
             List<FigureTypeVO> own = new ArrayList<>();
             for (FigureTypeVO child : children) {
