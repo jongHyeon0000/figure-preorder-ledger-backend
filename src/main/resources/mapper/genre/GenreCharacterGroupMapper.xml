@@ -3,7 +3,7 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.genre.GenreCharacterGroupMapper">
 
     <select id="selectAll" resultType="GenreCharacterGroupVO">
-        SELECT e.genre_character_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.genre_character_group_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM genre_character_group e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'GENRE_CHARACTER_GROUP' AND t.target_id = e.genre_character_group_id
@@ -12,7 +12,7 @@
     </select>
 
     <select id="selectById" resultType="GenreCharacterGroupVO">
-        SELECT e.genre_character_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.genre_character_group_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM genre_character_group e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'GENRE_CHARACTER_GROUP' AND t.target_id = e.genre_character_group_id
@@ -20,7 +20,7 @@
     </select>
 
     <select id="selectByName" resultType="GenreCharacterGroupVO">
-        SELECT e.genre_character_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.genre_character_group_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM genre_character_group e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'GENRE_CHARACTER_GROUP' AND t.target_id = e.genre_character_group_id

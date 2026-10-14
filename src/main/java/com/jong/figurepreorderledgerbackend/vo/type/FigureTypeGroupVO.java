@@ -22,9 +22,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FigureTypeGroupVO {
 
-    /** PK */
+    /** PK (쿼리에서 figure_type_group_id AS id) */
     @Schema(description = "형태 id", example = "1")
-    private Long figureTypeGroupId;
+    private Long id;
 
     /** 소유 계정 */
     @Schema(description = "소유 계정 id. 요청 본문에 보내도 읽지 않는다", example = "1")

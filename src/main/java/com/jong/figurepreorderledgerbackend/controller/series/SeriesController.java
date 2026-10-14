@@ -35,7 +35,7 @@ public class SeriesController {
 
     @Operation(
             summary = "시리즈 목록 조회 (예: 팝업퍼레이드)",
-            description = "응답: seriesId, seriesGroupId(상위 시리즈 그룹 id), name, description, thumbnailUrl")
+            description = "응답: id, groupId(상위 시리즈 그룹 id), name, description, thumbnailUrl")
     @GetMapping
     public ApiResponse<List<SeriesVO>> getAll() {
         return ApiResponse.ok("조회가 완료되었습니다.", seriesService.getAll(currentUser.getId()));
@@ -43,14 +43,14 @@ public class SeriesController {
 
     @Operation(
             summary = "시리즈 추가 (예: 팝업퍼레이드)",
-            description = "요청 본문: seriesGroupId: 상위 시리즈 그룹 id, name: 시리즈 이름 (본문, 둘 다 필수, 이름은 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
-                    + "응답: 생성된 seriesId, seriesGroupId, name, description, thumbnailUrl")
+            description = "요청 본문: groupId: 상위 시리즈 그룹 id, name: 시리즈 이름 (본문, 둘 다 필수, 이름은 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
+                    + "응답: 생성된 id, groupId, name, description, thumbnailUrl")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "추가 예",
-                    value = "{\"seriesGroupId\":1,\"name\":\"팝업퍼레이드\",\"description\":\"설명(선택)\"}")
+                    value = "{\"groupId\":1,\"name\":\"팝업퍼레이드\",\"description\":\"설명(선택)\"}")
     }))
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 seriesId, seriesGroupId, name, description, thumbnailUrl"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 id, groupId, name, description, thumbnailUrl"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "이름 중복, 입력값 오류"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "상위 시리즈 그룹 없음")
     })

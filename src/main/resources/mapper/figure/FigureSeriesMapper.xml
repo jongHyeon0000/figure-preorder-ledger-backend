@@ -4,7 +4,7 @@
 
     <!-- 여러 상품의 시리즈를 한 번에 조회 (figure_id로 상품별로 묶는 것은 서비스) -->
     <select id="selectByFigureIds" resultType="SeriesVO">
-        SELECT fs.figure_id, s.series_id, s.name, g.series_group_id, g.name AS series_group_name
+        SELECT fs.figure_id, s.series_id AS id, s.name, g.series_group_id AS group_id, g.name AS group_name
         FROM figure_series_map fs
         JOIN series s ON s.user_id = fs.user_id AND s.series_id = fs.series_id
         JOIN series_group g ON g.user_id = s.user_id AND g.series_group_id = s.series_group_id

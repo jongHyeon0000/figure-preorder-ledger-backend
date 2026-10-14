@@ -40,7 +40,7 @@ public class ShopGroupServiceImpl implements ShopGroupService {
         for (ShopGroupVO parent : parents) {
             List<ShopVO> own = new ArrayList<>();
             for (ShopVO child : children) {
-                if (parent.getShopGroupId().equals(child.getShopGroupId())) {
+                if (parent.getId().equals(child.getGroupId())) {
                     own.add(child);
                 }
             }
@@ -60,9 +60,9 @@ public class ShopGroupServiceImpl implements ShopGroupService {
         }
         ShopGroupVO parent = shopGroupMapper.selectByName(userId, trimmed);
 
-        shopMapper.insert(userId, parent.getShopGroupId(), CategoryConstant.DEFAULT_NAME, null);
+        shopMapper.insert(userId, parent.getId(), CategoryConstant.DEFAULT_NAME, null);
         List<ShopVO> children = new ArrayList<>();
-        children.add(shopMapper.selectByParentAndName(userId, parent.getShopGroupId(), CategoryConstant.DEFAULT_NAME));
+        children.add(shopMapper.selectByParentAndName(userId, parent.getId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
         return parent;
     }

@@ -35,7 +35,7 @@ public class MakerController {
 
     @Operation(
             summary = "제조사 목록 조회 (예: 세가, 후류)",
-            description = "응답: makerId, name, description, thumbnailUrl")
+            description = "응답: id, name, description, thumbnailUrl")
     @GetMapping
     public ApiResponse<List<MakerVO>> getAll() {
         return ApiResponse.ok("조회가 완료되었습니다.", makerService.getAll(currentUser.getId()));
@@ -44,13 +44,13 @@ public class MakerController {
     @Operation(
             summary = "제조사 추가 (예: 세가, 후류)",
             description = "요청 본문: name: 제조사 이름 (본문, 필수, 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
-                    + "응답: 생성된 makerId, name, description, thumbnailUrl")
+                    + "응답: 생성된 id, name, description, thumbnailUrl")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "추가 예",
                     value = "{\"name\":\"세가\",\"description\":\"설명(선택)\"}")
     }))
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 makerId, name, description, thumbnailUrl"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 id, name, description, thumbnailUrl"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "이름 중복, 입력값 오류")
     })
     @PostMapping

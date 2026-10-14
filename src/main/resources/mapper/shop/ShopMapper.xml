@@ -3,7 +3,7 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper">
 
     <select id="selectAll" resultType="ShopVO">
-        SELECT e.shop_id, e.user_id, e.shop_group_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.shop_id AS id, e.user_id, e.shop_group_id AS group_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM shop e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SHOP' AND t.target_id = e.shop_id
@@ -12,7 +12,7 @@
     </select>
 
     <select id="selectById" resultType="ShopVO">
-        SELECT e.shop_id, e.user_id, e.shop_group_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.shop_id AS id, e.user_id, e.shop_group_id AS group_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM shop e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SHOP' AND t.target_id = e.shop_id
@@ -20,7 +20,7 @@
     </select>
 
     <select id="selectByParentAndName" resultType="ShopVO">
-        SELECT e.shop_id, e.user_id, e.shop_group_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.shop_id AS id, e.user_id, e.shop_group_id AS group_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM shop e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SHOP' AND t.target_id = e.shop_id

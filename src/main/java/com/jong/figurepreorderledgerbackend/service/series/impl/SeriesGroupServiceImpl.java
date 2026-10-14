@@ -40,7 +40,7 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
         for (SeriesGroupVO parent : parents) {
             List<SeriesVO> own = new ArrayList<>();
             for (SeriesVO child : children) {
-                if (parent.getSeriesGroupId().equals(child.getSeriesGroupId())) {
+                if (parent.getId().equals(child.getGroupId())) {
                     own.add(child);
                 }
             }
@@ -60,9 +60,9 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
         }
         SeriesGroupVO parent = seriesGroupMapper.selectByName(userId, trimmed);
 
-        seriesMapper.insert(userId, parent.getSeriesGroupId(), CategoryConstant.DEFAULT_NAME, null);
+        seriesMapper.insert(userId, parent.getId(), CategoryConstant.DEFAULT_NAME, null);
         List<SeriesVO> children = new ArrayList<>();
-        children.add(seriesMapper.selectByParentAndName(userId, parent.getSeriesGroupId(), CategoryConstant.DEFAULT_NAME));
+        children.add(seriesMapper.selectByParentAndName(userId, parent.getId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
         return parent;
     }

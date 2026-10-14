@@ -3,7 +3,7 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.series.SeriesGroupMapper">
 
     <select id="selectAll" resultType="SeriesGroupVO">
-        SELECT e.series_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.series_group_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM series_group e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SERIES_GROUP' AND t.target_id = e.series_group_id
@@ -12,7 +12,7 @@
     </select>
 
     <select id="selectById" resultType="SeriesGroupVO">
-        SELECT e.series_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.series_group_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM series_group e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SERIES_GROUP' AND t.target_id = e.series_group_id
@@ -20,7 +20,7 @@
     </select>
 
     <select id="selectByName" resultType="SeriesGroupVO">
-        SELECT e.series_group_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.series_group_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM series_group e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'SERIES_GROUP' AND t.target_id = e.series_group_id

@@ -21,17 +21,17 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FigureTypeVO {
 
-    /** PK */
+    /** PK (쿼리에서 figure_type_id AS id) */
     @Schema(description = "형태 하위 id", example = "1")
-    private Long figureTypeId;
+    private Long id;
 
     /** 소유 계정 */
     @Schema(description = "소유 계정 id. 요청 본문에 보내도 읽지 않는다", example = "1")
     private Long userId;
 
-    /** 상위 형태 */
+    /** 상위 형태 (figure_type_group_id AS group_id) */
     @Schema(description = "상위 형태", example = "1")
-    private Long figureTypeGroupId;
+    private Long groupId;
 
     /** 형태 하위명 (푸치, 기타 등) */
     @Schema(description = "형태 하위명 (푸치, 기타 등)", example = "푸치", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -54,7 +54,7 @@ public class FigureTypeVO {
 
     /** [figure_type_group joined] 상위 형태명 */
     @Schema(description = "상위 형태명 (조회 응답에서만 나온다)")
-    private String figureTypeGroupName;
+    private String groupName;
 
     /** [thumbnail_image joined] 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) */
     @Schema(description = "썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) (조회 응답에서만 나온다)")

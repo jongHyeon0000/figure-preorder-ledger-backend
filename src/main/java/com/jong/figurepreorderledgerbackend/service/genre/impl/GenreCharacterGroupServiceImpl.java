@@ -40,7 +40,7 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
         for (GenreCharacterGroupVO parent : parents) {
             List<GenreCharacterVO> own = new ArrayList<>();
             for (GenreCharacterVO child : children) {
-                if (parent.getGenreCharacterGroupId().equals(child.getGenreCharacterGroupId())) {
+                if (parent.getId().equals(child.getGroupId())) {
                     own.add(child);
                 }
             }
@@ -60,9 +60,9 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
         }
         GenreCharacterGroupVO parent = genreCharacterGroupMapper.selectByName(userId, trimmed);
 
-        genreCharacterMapper.insert(userId, parent.getGenreCharacterGroupId(), CategoryConstant.DEFAULT_NAME, null);
+        genreCharacterMapper.insert(userId, parent.getId(), CategoryConstant.DEFAULT_NAME, null);
         List<GenreCharacterVO> children = new ArrayList<>();
-        children.add(genreCharacterMapper.selectByParentAndName(userId, parent.getGenreCharacterGroupId(), CategoryConstant.DEFAULT_NAME));
+        children.add(genreCharacterMapper.selectByParentAndName(userId, parent.getId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
         return parent;
     }

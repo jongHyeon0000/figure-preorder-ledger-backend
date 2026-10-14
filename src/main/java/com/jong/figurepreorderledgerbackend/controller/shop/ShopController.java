@@ -35,7 +35,7 @@ public class ShopController {
 
     @Operation(
             summary = "판매처 스토어 목록 조회 (예: 굿스마일 pw)",
-            description = "응답: shopId, shopGroupId(상위 판매처 채널 id), name, description, thumbnailUrl")
+            description = "응답: id, groupId(상위 판매처 채널 id), name, description, thumbnailUrl")
     @GetMapping
     public ApiResponse<List<ShopVO>> getAll() {
         return ApiResponse.ok("조회가 완료되었습니다.", shopService.getAll(currentUser.getId()));
@@ -43,14 +43,14 @@ public class ShopController {
 
     @Operation(
             summary = "판매처 스토어 추가 (예: 굿스마일 pw)",
-            description = "요청 본문: shopGroupId: 상위 판매처 채널 id, name: 판매처 스토어 이름 (본문, 둘 다 필수, 이름은 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
-                    + "응답: 생성된 shopId, shopGroupId, name, description, thumbnailUrl")
+            description = "요청 본문: groupId: 상위 판매처 채널 id, name: 판매처 스토어 이름 (본문, 둘 다 필수, 이름은 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
+                    + "응답: 생성된 id, groupId, name, description, thumbnailUrl")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "추가 예",
-                    value = "{\"shopGroupId\":1,\"name\":\"굿스마일 pw\",\"description\":\"설명(선택)\"}")
+                    value = "{\"groupId\":1,\"name\":\"굿스마일 pw\",\"description\":\"설명(선택)\"}")
     }))
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 shopId, shopGroupId, name, description, thumbnailUrl"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 id, groupId, name, description, thumbnailUrl"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "이름 중복, 입력값 오류"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "상위 판매처 채널 없음")
     })

@@ -39,7 +39,7 @@ public class SeriesServiceImpl implements SeriesService {
     @Override
     @Transactional
     public SeriesVO create(Long userId, SeriesVO vo) {
-        Long seriesGroupId = vo.getSeriesGroupId();
+        Long seriesGroupId = vo.getGroupId();
         if (seriesGroupId == null) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "seriesGroupId: 필수 값입니다");
         }
@@ -77,7 +77,7 @@ public class SeriesServiceImpl implements SeriesService {
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
-        if (seriesMapper.countByParent(userId, child.getSeriesGroupId()) <= 1) {
+        if (seriesMapper.countByParent(userId, child.getGroupId()) <= 1) {
             throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
         }
         Long fallbackId = seriesMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);

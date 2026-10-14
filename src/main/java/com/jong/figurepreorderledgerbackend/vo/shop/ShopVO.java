@@ -21,17 +21,17 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ShopVO {
 
-    /** PK */
+    /** PK (쿼리에서 shop_id AS id) */
     @Schema(description = "판매처 스토어 id", example = "1")
-    private Long shopId;
+    private Long id;
 
     /** 소유 계정 */
     @Schema(description = "소유 계정 id. 요청 본문에 보내도 읽지 않는다", example = "1")
     private Long userId;
 
-    /** 상위 채널 */
+    /** 상위 채널 (shop_group_id AS group_id) */
     @Schema(description = "상위 채널", example = "1")
-    private Long shopGroupId;
+    private Long groupId;
 
     /** 스토어명 (굿스마일 pw, 코믹스아트 등) */
     @Schema(description = "스토어명 (굿스마일 pw, 코믹스아트 등)", example = "굿스마일 pw", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -54,7 +54,7 @@ public class ShopVO {
 
     /** [shop_group joined] 상위 채널명 */
     @Schema(description = "상위 채널명 (조회 응답에서만 나온다)")
-    private String shopGroupName;
+    private String groupName;
 
     /** [thumbnail_image joined] 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) */
     @Schema(description = "썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) (조회 응답에서만 나온다)")

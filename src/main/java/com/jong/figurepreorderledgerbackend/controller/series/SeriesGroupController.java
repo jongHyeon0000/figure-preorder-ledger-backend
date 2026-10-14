@@ -35,7 +35,7 @@ public class SeriesGroupController {
 
     @Operation(
             summary = "시리즈 그룹 목록 조회, 하위 시리즈 중첩 (예: 굿스마일 라인업)",
-            description = "응답: seriesGroupId, name, description, thumbnailUrl, children(시리즈 목록: seriesId, seriesGroupId, name, description, thumbnailUrl)")
+            description = "응답: id, name, description, thumbnailUrl, children(시리즈 목록: id, groupId, name, description, thumbnailUrl)")
     @GetMapping
     public ApiResponse<List<SeriesGroupVO>> getTree() {
         return ApiResponse.ok("조회가 완료되었습니다.", seriesGroupService.getTree(currentUser.getId()));
@@ -44,13 +44,13 @@ public class SeriesGroupController {
     @Operation(
             summary = "시리즈 그룹 추가, 기본 하위 '기타' 자동 생성 (예: 굿스마일 라인업)",
             description = "요청 본문: name: 시리즈 그룹 이름 (본문, 필수, 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
-                    + "응답: 생성된 seriesGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)")
+                    + "응답: 생성된 id, name, description, thumbnailUrl, children(기본 '기타' 하나)")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "추가 예",
                     value = "{\"name\":\"굿스마일 라인업\",\"description\":\"설명(선택)\"}")
     }))
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 seriesGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 id, name, description, thumbnailUrl, children(기본 '기타' 하나)"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "이름 중복, 입력값 오류")
     })
     @PostMapping

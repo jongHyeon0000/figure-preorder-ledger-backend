@@ -3,7 +3,7 @@
 <mapper namespace="com.jong.figurepreorderledgerbackend.mapper.maker.MakerMapper">
 
     <select id="selectAll" resultType="MakerVO">
-        SELECT e.maker_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.maker_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM maker e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'MAKER' AND t.target_id = e.maker_id
@@ -12,7 +12,7 @@
     </select>
 
     <select id="selectById" resultType="MakerVO">
-        SELECT e.maker_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.maker_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM maker e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'MAKER' AND t.target_id = e.maker_id
@@ -20,7 +20,7 @@
     </select>
 
     <select id="selectByName" resultType="MakerVO">
-        SELECT e.maker_id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+        SELECT e.maker_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM maker e
         LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'MAKER' AND t.target_id = e.maker_id

@@ -39,7 +39,7 @@ public class ShopServiceImpl implements ShopService {
     @Override
     @Transactional
     public ShopVO create(Long userId, ShopVO vo) {
-        Long shopGroupId = vo.getShopGroupId();
+        Long shopGroupId = vo.getGroupId();
         if (shopGroupId == null) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "shopGroupId: 필수 값입니다");
         }
@@ -77,7 +77,7 @@ public class ShopServiceImpl implements ShopService {
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
-        if (shopMapper.countByParent(userId, child.getShopGroupId()) <= 1) {
+        if (shopMapper.countByParent(userId, child.getGroupId()) <= 1) {
             throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
         }
         Long fallbackId = shopMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);

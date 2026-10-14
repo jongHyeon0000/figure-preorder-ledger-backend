@@ -21,9 +21,9 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MakerVO {
 
-    /** PK */
+    /** PK (쿼리에서 maker_id AS id) */
     @Schema(description = "제조사 id", example = "1")
-    private Long makerId;
+    private Long id;
 
     /** 소유 계정 */
     @Schema(description = "소유 계정 id. 요청 본문에 보내도 읽지 않는다", example = "1")

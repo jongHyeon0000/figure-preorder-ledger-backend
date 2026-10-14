@@ -35,7 +35,7 @@ public class FigureTypeGroupController {
 
     @Operation(
             summary = "형태 목록 조회, 하위 형태 하위 중첩 (예: 스케일, 넨도로이드)",
-            description = "응답: figureTypeGroupId, name, description, thumbnailUrl, children(형태 하위 목록: figureTypeId, figureTypeGroupId, name, description, thumbnailUrl)")
+            description = "응답: id, name, description, thumbnailUrl, children(형태 하위 목록: id, groupId, name, description, thumbnailUrl)")
     @GetMapping
     public ApiResponse<List<FigureTypeGroupVO>> getTree() {
         return ApiResponse.ok("조회가 완료되었습니다.", figureTypeGroupService.getTree(currentUser.getId()));
@@ -44,13 +44,13 @@ public class FigureTypeGroupController {
     @Operation(
             summary = "형태 추가, 기본 하위 '기타' 자동 생성 (예: 스케일, 넨도로이드)",
             description = "요청 본문: name: 형태 이름 (본문, 필수, 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
-                    + "응답: 생성된 figureTypeGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)")
+                    + "응답: 생성된 id, name, description, thumbnailUrl, children(기본 '기타' 하나)")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "추가 예",
                     value = "{\"name\":\"스케일\",\"description\":\"설명(선택)\"}")
     }))
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 figureTypeGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 id, name, description, thumbnailUrl, children(기본 '기타' 하나)"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "이름 중복, 입력값 오류")
     })
     @PostMapping

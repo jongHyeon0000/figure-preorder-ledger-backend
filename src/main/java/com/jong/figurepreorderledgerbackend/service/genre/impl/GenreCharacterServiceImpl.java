@@ -39,7 +39,7 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
     @Override
     @Transactional
     public GenreCharacterVO create(Long userId, GenreCharacterVO vo) {
-        Long genreCharacterGroupId = vo.getGenreCharacterGroupId();
+        Long genreCharacterGroupId = vo.getGroupId();
         if (genreCharacterGroupId == null) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "genreCharacterGroupId: 필수 값입니다");
         }
@@ -77,7 +77,7 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
-        if (genreCharacterMapper.countByParent(userId, child.getGenreCharacterGroupId()) <= 1) {
+        if (genreCharacterMapper.countByParent(userId, child.getGroupId()) <= 1) {
             throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
         }
         Long fallbackId = genreCharacterMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);

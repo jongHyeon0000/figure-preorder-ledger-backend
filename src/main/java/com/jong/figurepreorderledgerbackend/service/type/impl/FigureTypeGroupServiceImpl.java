@@ -40,7 +40,7 @@ public class FigureTypeGroupServiceImpl implements FigureTypeGroupService {
         for (FigureTypeGroupVO parent : parents) {
             List<FigureTypeVO> own = new ArrayList<>();
             for (FigureTypeVO child : children) {
-                if (parent.getFigureTypeGroupId().equals(child.getFigureTypeGroupId())) {
+                if (parent.getId().equals(child.getGroupId())) {
                     own.add(child);
                 }
             }
@@ -60,9 +60,9 @@ public class FigureTypeGroupServiceImpl implements FigureTypeGroupService {
         }
         FigureTypeGroupVO parent = figureTypeGroupMapper.selectByName(userId, trimmed);
 
-        figureTypeMapper.insert(userId, parent.getFigureTypeGroupId(), CategoryConstant.DEFAULT_NAME, null);
+        figureTypeMapper.insert(userId, parent.getId(), CategoryConstant.DEFAULT_NAME, null);
         List<FigureTypeVO> children = new ArrayList<>();
-        children.add(figureTypeMapper.selectByParentAndName(userId, parent.getFigureTypeGroupId(), CategoryConstant.DEFAULT_NAME));
+        children.add(figureTypeMapper.selectByParentAndName(userId, parent.getId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
         return parent;
     }

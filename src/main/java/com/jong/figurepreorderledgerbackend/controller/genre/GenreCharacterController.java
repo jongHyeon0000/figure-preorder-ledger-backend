@@ -35,7 +35,7 @@ public class GenreCharacterController {
 
     @Operation(
             summary = "캐릭터 목록 조회 (예: 하츠네 미쿠)",
-            description = "응답: genreCharacterId, genreCharacterGroupId(상위 장르 id), name, description, thumbnailUrl")
+            description = "응답: id, groupId(상위 장르 id), name, description, thumbnailUrl")
     @GetMapping
     public ApiResponse<List<GenreCharacterVO>> getAll() {
         return ApiResponse.ok("조회가 완료되었습니다.", genreCharacterService.getAll(currentUser.getId()));
@@ -43,14 +43,14 @@ public class GenreCharacterController {
 
     @Operation(
             summary = "캐릭터 추가 (예: 하츠네 미쿠)",
-            description = "요청 본문: genreCharacterGroupId: 상위 장르 id, name: 캐릭터 이름 (본문, 둘 다 필수, 이름은 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
-                    + "응답: 생성된 genreCharacterId, genreCharacterGroupId, name, description, thumbnailUrl")
+            description = "요청 본문: groupId: 상위 장르 id, name: 캐릭터 이름 (본문, 둘 다 필수, 이름은 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
+                    + "응답: 생성된 id, groupId, name, description, thumbnailUrl")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "추가 예",
-                    value = "{\"genreCharacterGroupId\":1,\"name\":\"하츠네 미쿠\",\"description\":\"설명(선택)\"}")
+                    value = "{\"groupId\":1,\"name\":\"하츠네 미쿠\",\"description\":\"설명(선택)\"}")
     }))
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 genreCharacterId, genreCharacterGroupId, name, description, thumbnailUrl"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 id, groupId, name, description, thumbnailUrl"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "이름 중복, 입력값 오류"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "상위 장르 없음")
     })

@@ -35,7 +35,7 @@ public class ShopGroupController {
 
     @Operation(
             summary = "판매처 채널 목록 조회, 하위 판매처 스토어 중첩 (예: 네이버 스토어)",
-            description = "응답: shopGroupId, name, description, thumbnailUrl, children(판매처 스토어 목록: shopId, shopGroupId, name, description, thumbnailUrl)")
+            description = "응답: id, name, description, thumbnailUrl, children(판매처 스토어 목록: id, groupId, name, description, thumbnailUrl)")
     @GetMapping
     public ApiResponse<List<ShopGroupVO>> getTree() {
         return ApiResponse.ok("조회가 완료되었습니다.", shopGroupService.getTree(currentUser.getId()));
@@ -44,13 +44,13 @@ public class ShopGroupController {
     @Operation(
             summary = "판매처 채널 추가, 기본 하위 '기타' 자동 생성 (예: 네이버 스토어)",
             description = "요청 본문: name: 판매처 채널 이름 (본문, 필수, 100자 이하), description: 설명 (본문, 선택, 1000자 이하)\n\n"
-                    + "응답: 생성된 shopGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)")
+                    + "응답: 생성된 id, name, description, thumbnailUrl, children(기본 '기타' 하나)")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "추가 예",
                     value = "{\"name\":\"네이버 스토어\",\"description\":\"설명(선택)\"}")
     }))
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 shopGroupId, name, description, thumbnailUrl, children(기본 '기타' 하나)"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성된 id, name, description, thumbnailUrl, children(기본 '기타' 하나)"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "이름 중복, 입력값 오류")
     })
     @PostMapping

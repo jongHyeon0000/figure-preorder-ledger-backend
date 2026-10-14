@@ -22,17 +22,17 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GenreCharacterVO {
 
-    /** PK */
+    /** PK (쿼리에서 genre_character_id AS id) */
     @Schema(description = "캐릭터 id", example = "1")
-    private Long genreCharacterId;
+    private Long id;
 
     /** 소유 계정 */
     @Schema(description = "소유 계정 id. 요청 본문에 보내도 읽지 않는다", example = "1")
     private Long userId;
 
-    /** 소속 장르 */
+    /** 소속 장르 (genre_character_group_id AS group_id) */
     @Schema(description = "소속 장르", example = "1")
-    private Long genreCharacterGroupId;
+    private Long groupId;
 
     /** 캐릭터명 (하츠네 미쿠 등) */
     @Schema(description = "캐릭터명 (하츠네 미쿠 등)", example = "하츠네 미쿠", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -55,7 +55,7 @@ public class GenreCharacterVO {
 
     /** [genre_character_group joined] 소속 장르명 */
     @Schema(description = "소속 장르명 (조회 응답에서만 나온다)")
-    private String genreCharacterGroupName;
+    private String groupName;
 
     /** [figure_character_map joined] 이 캐릭터가 연결된 상품 (figure_id). 상품별로 묶을 때만 쓰고 응답에는 내보내지 않는다 */
     @JsonIgnore

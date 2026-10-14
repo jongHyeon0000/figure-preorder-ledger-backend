@@ -7,19 +7,19 @@
     <resultMap id="listMap" type="FigureResponseVO" autoMapping="true">
         <id property="figureId" column="figure_id"/>
         <association property="figureType" javaType="FigureTypeVO">
-            <id property="figureTypeId" column="figure_type_id"/>
+            <id property="id" column="figure_type_id"/>
             <result property="name" column="figure_type_name"/>
-            <result property="figureTypeGroupId" column="figure_type_group_id"/>
-            <result property="figureTypeGroupName" column="figure_type_group_name"/>
+            <result property="groupId" column="figure_type_group_id"/>
+            <result property="groupName" column="figure_type_group_name"/>
         </association>
         <association property="shop" javaType="ShopVO">
-            <id property="shopId" column="shop_id"/>
+            <id property="id" column="shop_id"/>
             <result property="name" column="shop_name"/>
-            <result property="shopGroupId" column="shop_group_id"/>
-            <result property="shopGroupName" column="shop_group_name"/>
+            <result property="groupId" column="shop_group_id"/>
+            <result property="groupName" column="shop_group_name"/>
         </association>
         <association property="maker" javaType="MakerVO">
-            <id property="makerId" column="maker_id"/>
+            <id property="id" column="maker_id"/>
             <result property="name" column="maker_name"/>
         </association>
     </resultMap>
@@ -28,19 +28,19 @@
     <resultMap id="detailMap" type="FigureResponseVO" autoMapping="true">
         <id property="figureId" column="figure_id"/>
         <association property="figureType" javaType="FigureTypeVO">
-            <id property="figureTypeId" column="figure_type_id"/>
+            <id property="id" column="figure_type_id"/>
             <result property="name" column="figure_type_name"/>
-            <result property="figureTypeGroupId" column="figure_type_group_id"/>
-            <result property="figureTypeGroupName" column="figure_type_group_name"/>
+            <result property="groupId" column="figure_type_group_id"/>
+            <result property="groupName" column="figure_type_group_name"/>
         </association>
         <association property="shop" javaType="ShopVO">
-            <id property="shopId" column="shop_id"/>
+            <id property="id" column="shop_id"/>
             <result property="name" column="shop_name"/>
-            <result property="shopGroupId" column="shop_group_id"/>
-            <result property="shopGroupName" column="shop_group_name"/>
+            <result property="groupId" column="shop_group_id"/>
+            <result property="groupName" column="shop_group_name"/>
         </association>
         <association property="maker" javaType="MakerVO">
-            <id property="makerId" column="maker_id"/>
+            <id property="id" column="maker_id"/>
             <result property="name" column="maker_name"/>
         </association>
     </resultMap>

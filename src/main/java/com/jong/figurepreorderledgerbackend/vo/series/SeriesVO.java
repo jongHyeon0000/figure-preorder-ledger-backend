@@ -22,17 +22,17 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SeriesVO {
 
-    /** PK */
+    /** PK (쿼리에서 series_id AS id) */
     @Schema(description = "시리즈 id", example = "1")
-    private Long seriesId;
+    private Long id;
 
     /** 소유 계정 */
     @Schema(description = "소유 계정 id. 요청 본문에 보내도 읽지 않는다", example = "1")
     private Long userId;
 
-    /** 상위 시리즈 */
+    /** 상위 시리즈 (series_group_id AS group_id) */
     @Schema(description = "상위 시리즈", example = "1")
-    private Long seriesGroupId;
+    private Long groupId;
 
     /** 시리즈 하위명 (팝업퍼레이드, 매지컬미라이 등) */
     @Schema(description = "시리즈 하위명 (팝업퍼레이드, 매지컬미라이 등)", example = "팝업퍼레이드", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -55,7 +55,7 @@ public class SeriesVO {
 
     /** [series_group joined] 상위 시리즈명 */
     @Schema(description = "상위 시리즈명 (조회 응답에서만 나온다)")
-    private String seriesGroupName;
+    private String groupName;
 
     /** [figure_series_map joined] 이 시리즈가 연결된 상품 (figure_id). 상품별로 묶을 때만 쓰고 응답에는 내보내지 않는다 */
     @JsonIgnore

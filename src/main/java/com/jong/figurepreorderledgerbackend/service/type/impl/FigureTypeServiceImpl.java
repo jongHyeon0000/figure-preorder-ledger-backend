@@ -39,7 +39,7 @@ public class FigureTypeServiceImpl implements FigureTypeService {
     @Override
     @Transactional
     public FigureTypeVO create(Long userId, FigureTypeVO vo) {
-        Long figureTypeGroupId = vo.getFigureTypeGroupId();
+        Long figureTypeGroupId = vo.getGroupId();
         if (figureTypeGroupId == null) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "figureTypeGroupId: 필수 값입니다");
         }
@@ -77,7 +77,7 @@ public class FigureTypeServiceImpl implements FigureTypeService {
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
-        if (figureTypeMapper.countByParent(userId, child.getFigureTypeGroupId()) <= 1) {
+        if (figureTypeMapper.countByParent(userId, child.getGroupId()) <= 1) {
             throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
         }
         Long fallbackId = figureTypeMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
