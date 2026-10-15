@@ -14,7 +14,8 @@ public enum ThumbnailTarget {
     SERIES("series"),
     GENRE_CHARACTER_GROUP("genre-character-group"),
     GENRE_CHARACTER("genre-character"),
-    MAKER("maker");
+    MAKER("maker"),
+    USER("user");
 
     private final String urlValue;
 

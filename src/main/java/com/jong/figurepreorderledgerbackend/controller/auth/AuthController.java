@@ -72,9 +72,9 @@ public class AuthController {
 
     @Operation(
             summary = "내 정보 조회 (예: 로그인한 계정의 닉네임)",
-            description = "응답: userId, loginId, email, name, createdAt, updatedAt")
+            description = "응답: userId, loginId, email, name, thumbnailUrl(프로필 썸네일, 없으면 생략), createdAt, updatedAt")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "userId, loginId, email, name, createdAt, updatedAt"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "userId, loginId, email, name, thumbnailUrl(없으면 생략), createdAt, updatedAt"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "토큰 없음, 만료, 변조, 탈퇴한 계정")
     })
     @GetMapping("/me")

@@ -15,6 +15,7 @@ import com.jong.figurepreorderledgerbackend.mapper.shop.ShopMapper;
 import com.jong.figurepreorderledgerbackend.mapper.thumbnail.ThumbnailImageMapper;
 import com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeGroupMapper;
 import com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeMapper;
+import com.jong.figurepreorderledgerbackend.mapper.user.UserMapper;
 import com.jong.figurepreorderledgerbackend.service.common.ImageFileStore;
 import com.jong.figurepreorderledgerbackend.service.thumbnail.ThumbnailImageService;
 import com.jong.figurepreorderledgerbackend.vo.thumbnail.ThumbnailImageVO;
@@ -47,6 +48,7 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
     private final GenreCharacterGroupMapper genreCharacterGroupMapper;
     private final GenreCharacterMapper genreCharacterMapper;
     private final MakerMapper makerMapper;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -131,6 +133,10 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
                 break;
             case MAKER:
                 exists = makerMapper.selectById(userId, targetId) != null;
+                break;
+            case USER:
+                // 계정의 썸네일은 대상 id가 곧 내 userId다
+                exists = userMapper.selectById(userId) != null && userId.equals(targetId);
                 break;
             default:
                 exists = false;

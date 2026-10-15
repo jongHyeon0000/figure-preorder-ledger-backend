@@ -60,6 +60,10 @@ public class UserVO {
     @Schema(description = "수정일시", example = "2026-10-12T21:30:00")
     private LocalDateTime updatedAt;
 
+    /** [thumbnail_image joined] 프로필 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 생략) */
+    @Schema(description = "프로필 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 생략) (내 정보 조회 응답에서만 나온다)")
+    private String thumbnailUrl;
+
     /** [request] 가입 비밀번호 (평문, 8~20자). 요청에서만 읽고 응답에는 나가지 않는다 */
     @Schema(description = "가입 비밀번호 (평문, 8~20자). 요청에서만 읽고 응답에는 나가지 않는다", example = "password1234", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

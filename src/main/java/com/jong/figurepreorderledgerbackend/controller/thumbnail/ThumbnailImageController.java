@@ -38,7 +38,7 @@ public class ThumbnailImageController {
     })
     @PutMapping(value = "/{targetType}/{targetId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ThumbnailUrlResponse> upload(
-            @Parameter(description = "썸네일을 붙일 대상 종류 (경로): figure, shop-group, shop, figure-type-group, figure-type, series-group, series, genre-character-group, genre-character, maker", example = "figure") @PathVariable String targetType,
+            @Parameter(description = "썸네일을 붙일 대상 종류 (경로): figure, shop-group, shop, figure-type-group, figure-type, series-group, series, genre-character-group, genre-character, maker, user(내 프로필, targetId는 내 계정 id)", example = "figure") @PathVariable String targetType,
             @Parameter(description = "대상 id", example = "1") @PathVariable Long targetId,
             @Parameter(description = "업로드할 이미지 파일 (본문 multipart, 필드명 file, 필수, jpg/jpeg/png/gif/webp, 최대 5MB)") @RequestParam("file") MultipartFile file) {
         ThumbnailTarget target = ThumbnailTarget.fromUrlValue(targetType);

@@ -233,11 +233,11 @@ CREATE TABLE figure_editor_image_map (
   CONSTRAINT fk_figure_editor_image_map_editor_image FOREIGN KEY (user_id, editor_image_id) REFERENCES editor_image (user_id, editor_image_id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='상품-에디터 이미지 연결(N:M)';
 
--- ---------------------------------------------------------------- 썸네일 이미지 (상품, 분류 공통)
+-- ---------------------------------------------------------------- 썸네일 이미지 (상품, 분류, 계정 공통)
 CREATE TABLE thumbnail_image (
   thumbnail_image_id BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
   user_id            BIGINT       NOT NULL COMMENT '소유 계정',
-  target_type        VARCHAR(30)  NOT NULL COMMENT '대상 종류: FIGURE 상품, SHOP_GROUP 판매처 채널, SHOP 판매처 스토어, FIGURE_TYPE_GROUP 형태 상위, FIGURE_TYPE 형태 하위, SERIES_GROUP 시리즈 상위, SERIES 시리즈 하위, GENRE_CHARACTER_GROUP 장르, GENRE_CHARACTER 캐릭터, MAKER 제조사',
+  target_type        VARCHAR(30)  NOT NULL COMMENT '대상 종류: FIGURE 상품, SHOP_GROUP 판매처 채널, SHOP 판매처 스토어, FIGURE_TYPE_GROUP 형태 상위, FIGURE_TYPE 형태 하위, SERIES_GROUP 시리즈 상위, SERIES 시리즈 하위, GENRE_CHARACTER_GROUP 장르, GENRE_CHARACTER 캐릭터, MAKER 제조사, USER 계정(프로필, target_id는 user_id)',
   target_id          BIGINT       NOT NULL COMMENT '대상 행의 id (target_type 테이블의 PK)',
   file_path          VARCHAR(500) NOT NULL COMMENT '서버 저장 경로',
   original_name      VARCHAR(255) NOT NULL COMMENT '원본 파일명',
@@ -246,5 +246,5 @@ CREATE TABLE thumbnail_image (
   PRIMARY KEY (thumbnail_image_id),
   UNIQUE KEY uk_thumbnail_image_target (user_id, target_type, target_id),
   CONSTRAINT fk_thumbnail_image_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
-  CONSTRAINT ck_thumbnail_image_target_type CHECK (target_type IN ('FIGURE','SHOP_GROUP','SHOP','FIGURE_TYPE_GROUP','FIGURE_TYPE','SERIES_GROUP','SERIES','GENRE_CHARACTER_GROUP','GENRE_CHARACTER','MAKER'))
-) ENGINE=InnoDB COMMENT='썸네일 이미지 (상품, 분류 공통)';
+  CONSTRAINT ck_thumbnail_image_target_type CHECK (target_type IN ('FIGURE','SHOP_GROUP','SHOP','FIGURE_TYPE_GROUP','FIGURE_TYPE','SERIES_GROUP','SERIES','GENRE_CHARACTER_GROUP','GENRE_CHARACTER','MAKER','USER'))
+) ENGINE=InnoDB COMMENT='썸네일 이미지 (상품, 분류, 계정 공통)';
