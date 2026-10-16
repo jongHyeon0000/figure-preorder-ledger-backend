@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### 운영 설정 (저장소에서 제외, 로컬에만 둔다) ###
+src/main/resources/application-prod.yaml
