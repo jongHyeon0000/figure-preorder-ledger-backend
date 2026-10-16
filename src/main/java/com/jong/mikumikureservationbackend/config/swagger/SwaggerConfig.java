@@ -16,7 +16,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
-                .info(new Info().title("Figure Preorder Ledger API").version("v1"))
+                .info(new Info().title("Miku Miku Reservation API").version("v1"))
                 .components(new Components().addSecuritySchemes(BEARER_SCHEME,
                         new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
