@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.jong'
 version = '0.0.1-SNAPSHOT'
-description = 'figure-preorder-ledger-backend'
+description = 'miku-miku-reservation-backend'
 
 java {
     toolchain {

@@ -1,0 +1,39 @@
+package com.jong.mikumikureservationbackend.mapper.figure;
+
+import com.jong.mikumikureservationbackend.common.constant.FigureStatus;
+import com.jong.mikumikureservationbackend.vo.figure.FigureResponseVO;
+import com.jong.mikumikureservationbackend.vo.figure.FigureSaveRequestVO;
+import com.jong.mikumikureservationbackend.vo.figure.FigureVO;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+@Mapper
+public interface FigureMapper {
+
+    List<FigureResponseVO> selectList(@Param("userId") Long userId);
+
+    FigureResponseVO selectListById(@Param("userId") Long userId, @Param("figureId") Long figureId);
+
+    FigureResponseVO selectDetailById(@Param("userId") Long userId, @Param("figureId") Long figureId);
+
+    int insert(@Param("userId") Long userId, @Param("status") FigureStatus status,
+               @Param("request") FigureSaveRequestVO request);
+
+    Long selectLastInsertId();
+
+    int update(@Param("userId") Long userId, @Param("figureId") Long figureId, @Param("request") FigureSaveRequestVO request);
+
+    int delete(@Param("userId") Long userId, @Param("figureId") Long figureId);
+
+    int deleteByIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);
+
+    int deleteAllByUser(@Param("userId") Long userId);
+
+    FigureVO selectCurrentStatus(@Param("userId") Long userId, @Param("figureId") Long figureId);
+
+    List<FigureVO> selectCurrentStatusByIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);
+
+    int updateStatus(FigureVO param);
+}

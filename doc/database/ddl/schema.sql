@@ -1,4 +1,4 @@
--- figure_preorder_ledger 스키마 (MariaDB, utf8mb4)
+-- miku_miku_reservation 스키마 (MariaDB, utf8mb4)
 -- 설계 근거: doc/planning-and-db-design.md
 -- Spring 자동 실행 대상이 아니다(classpath 루트가 아니라 db/ 아래). 수동으로 적용한다.
 --

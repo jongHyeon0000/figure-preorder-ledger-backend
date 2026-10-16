@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.type.FigureTypeGroupMapper">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.type.FigureTypeGroupMapper">
 
     <select id="selectAll" resultType="FigureTypeGroupVO">
         SELECT e.figure_type_group_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,

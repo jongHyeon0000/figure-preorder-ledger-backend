@@ -1,0 +1,26 @@
+package com.jong.mikumikureservationbackend.service.figure;
+
+import com.jong.mikumikureservationbackend.vo.figure.FigureResponseVO;
+import com.jong.mikumikureservationbackend.vo.figure.FigureSaveRequestVO;
+
+import java.util.List;
+
+public interface FigureService {
+
+    List<FigureResponseVO> getList(Long userId);
+
+    FigureResponseVO getDetail(Long userId, Long figureId);
+
+    /* 상태 전이 등 다른 서비스가 변경된 상품 한 건을 목록 항목 모양으로 돌려줄 때도 쓴다 */
+    FigureResponseVO getListItem(Long userId, Long figureId);
+
+    FigureResponseVO create(Long userId, FigureSaveRequestVO request);
+
+    /* 상태와 결제 방식은 바꾸지 않는다. 시리즈와 캐릭터 연결은 지우고 다시 넣는다 */
+    FigureResponseVO update(Long userId, Long figureId, FigureSaveRequestVO request);
+
+    void delete(Long userId, Long figureId);
+
+    /* 하나라도 없는 상품이면 전체를 되돌린다 (예외로 트랜잭션 롤백) */
+    void deleteAll(Long userId, List<Long> figureIds);
+}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.figure.FigureMapper">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.figure.FigureMapper">
 
     <!-- thumbnail_url: thumbnail_image.file_path(상대 경로) 앞에 /uploads/ 를 붙인 웹 주소 (썸네일이 없으면 NULL). 분류 매퍼도 같은 방식 -->
     <!-- 목록용: 설명(HTML) 제외. 시리즈와 캐릭터는 서비스가 따로 조회해 채운다 -->

@@ -14,3 +14,7 @@ app:
   jwt:
     # 환경변수 PROD_JWT_SECRET(32자 이상, 예: openssl rand -base64 48)이 없으면 기동에 실패한다
     secret: ${PROD_JWT_SECRET}
+  swagger:
+    # 공개 저장소에 올라가는 값이다(사용자 결정: yaml 하드코딩). 비밀번호를 바꾸려면 이 줄을 고친다
+    username: swagger
+    password: f1d4629b041c2d4918ca5c43

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.shop.ShopGroupMapper">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.shop.ShopGroupMapper">
 
     <select id="selectAll" resultType="ShopGroupVO">
         SELECT e.shop_group_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,

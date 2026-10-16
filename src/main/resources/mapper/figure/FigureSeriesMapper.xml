@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.figure.FigureSeriesMapper">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.figure.FigureSeriesMapper">
 
     <!-- 여러 상품의 시리즈를 한 번에 조회 (figure_id로 상품별로 묶는 것은 서비스) -->
     <select id="selectByFigureIds" resultType="SeriesVO">

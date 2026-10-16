@@ -1,0 +1,18 @@
+package com.jong.mikumikureservationbackend.mapper.figure;
+
+import com.jong.mikumikureservationbackend.vo.series.SeriesVO;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+@Mapper
+public interface FigureSeriesMapper {
+
+    List<SeriesVO> selectByFigureIds(@Param("userId") Long userId, @Param("figureIds") List<Long> figureIds);
+
+    int insertAll(@Param("userId") Long userId, @Param("figureId") Long figureId,
+                  @Param("seriesIds") List<Long> seriesIds);
+
+    int deleteByFigure(@Param("userId") Long userId, @Param("figureId") Long figureId);
+}

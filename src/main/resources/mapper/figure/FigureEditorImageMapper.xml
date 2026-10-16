@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jong.figurepreorderledgerbackend.mapper.figure.FigureEditorImageMapper">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.figure.FigureEditorImageMapper">
 
     <!-- file_path가 정확히 같은 내 이미지를 찾아 이 상품에 연결한다. 목록이 비어 있으면 호출하지 않는다(서비스가 거른다) -->
     <insert id="insertAllByFilePaths">
